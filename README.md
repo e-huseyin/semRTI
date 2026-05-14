@@ -29,6 +29,27 @@ The graph documents **40 RTI acquisition sessions** across **11 rock art figures
 python3 01-pipeline/semRTI.py
 ```
 
+On first launch, the following structure is created automatically:
+
+```
+semRTI/
+├── 01-pipeline/          ← scripts and ontology files (cloned)
+├── 02-datasets/          ← created on first run
+│   └── Site Name/
+│       └── Object-01/
+│           └── RTI-01/
+│               ├── raw/          ← original camera RAW files
+│               ├── jpg/          ← original camera JPEG files
+│               └── jpg-export/   ← RAW to JPEG output
+├── 03-outputs/
+│   └── knowledge-graph/  ← created on first run
+└── 04-logs/
+    ├── knowledge-graph/  ← created on first run
+    └── rdf-plugin/       ← created on first run
+```
+
+Place your RTI dataset folders under `02-datasets/` following the same `Site Name / Object-01 / RTI-01` pattern.
+
 ---
 
 ## Files

@@ -1229,4 +1229,8 @@ if __name__ == '__main__':
               os.path.join(LOGS_DIR, 'rdf-plugin')]:
         os.makedirs(d, exist_ok=True)
 
+    _example = os.path.join(DATASETS_DIR, 'Site Name', 'Object-01', 'RTI-01')
+    for sub in ('raw', 'jpg', 'jpg-export'):
+        os.makedirs(os.path.join(_example, sub), exist_ok=True)
+
     main()
