@@ -11,6 +11,10 @@ The graph documents **40 RTI acquisition sessions** across **11 rock art figures
 
 ---
 
+> **Platform:** Developed and tested on macOS. Linux should work with minor path adjustments. Windows is not yet supported.
+
+---
+
 ## Requirements
 
 | Tool | Version | Install |
