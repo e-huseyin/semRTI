@@ -1,0 +1,574 @@
+[12:10:28] INFO    Log: /Volumes/ehuseyin/01-compute/RTI-FLOW/04-logs/rdf-plugin/2026-05-14_12-10-28_install.log
+[12:10:28] INFO    Plugin files: OK
+[12:10:28] INFO    Relight structure: OK
+[12:10:29] INFO    Copied: rdfexport.h
+[12:10:29] INFO    Copied: rdfexport.cpp
+[12:10:29] INFO    Copied: metadataframe.h
+[12:10:29] INFO    Copied: metadataframe.cpp
+[12:10:29] INFO    Patches: cmake=True mw_h=True mw_cpp=True rti_h=True rti_cpp=True
+[12:10:29] INFO    Build dir: /Users/huseyerd/relight/build
+[12:10:30] DEBUG   -- The CXX compiler identification is AppleClang 17.0.0.17000013
+[12:10:30] DEBUG   -- Detecting CXX compiler ABI info
+[12:10:30] DEBUG   -- Detecting CXX compiler ABI info - done
+[12:10:30] DEBUG   -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[12:10:30] DEBUG   -- Detecting CXX compile features
+[12:10:30] DEBUG   -- Detecting CXX compile features - done
+[12:10:30] DEBUG   -- CMAKE_MODULE_PATH=/Users/huseyerd/relight/cmake
+[12:10:30] DEBUG   -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[12:10:30] DEBUG   -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[12:10:30] DEBUG   -- Found Threads: TRUE
+[12:10:30] DEBUG   -- Performing Test HAVE_STDATOMIC
+[12:10:30] DEBUG   -- Performing Test HAVE_STDATOMIC - Success
+[12:10:30] DEBUG   -- Found WrapAtomic: TRUE
+[12:10:31] DEBUG   -- Found OpenGL: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework
+[12:10:31] DEBUG   -- Found WrapOpenGL: TRUE
+[12:10:31] DEBUG   -- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR)
+[12:10:31] DEBUG   -- Using Qt6
+[12:10:32] DEBUG   -- Using system Eigen3
+[12:10:32] DEBUG   -- Found JPEG: /opt/homebrew/lib/libjpeg.dylib (found version "80")
+[12:10:32] DEBUG   -- Using system JPEG
+[12:10:32] DEBUG   -- Using system TIFF library
+[12:10:32] DEBUG   -- Found ZLIB: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libz.tbd (found version "1.2.12")
+[12:10:32] DEBUG   -- Found PNG: /opt/homebrew/lib/libpng.dylib (found version "1.6.55")
+[12:10:32] DEBUG   -- Using PNG library: /opt/homebrew/lib/libpng.dylib;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libz.tbd
+[12:10:32] DEBUG   -- Found LCMS2: /opt/homebrew/lib/liblcms2.dylib (found version "2180")
+[12:10:32] DEBUG   -- Using LittleCMS2 include dirs: /opt/homebrew/include
+[12:10:32] DEBUG   -- Relight Version: 2026.03
+[12:10:32] DEBUG   -- The C compiler identification is AppleClang 17.0.0.17000013
+[12:10:32] DEBUG   -- Detecting C compiler ABI info
+[12:10:32] DEBUG   -- Detecting C compiler ABI info - done
+[12:10:32] DEBUG   -- Check for working C compiler: /usr/bin/cc - skipped
+[12:10:32] DEBUG   -- Detecting C compile features
+[12:10:32] DEBUG   -- Detecting C compile features - done
+[12:10:33] DEBUG   -- Found OpenMP_C: -Xclang -fopenmp (found version "5.1")
+[12:10:33] DEBUG   -- Found OpenMP_CXX: -Xclang -fopenmp (found version "5.1")
+[12:10:33] DEBUG   -- Found OpenMP: TRUE (found version "5.1")
+[12:10:33] DEBUG   -- Configuring done (3.9s)
+[12:10:34] DEBUG   -- Generating done (0.9s)
+[12:10:34] DEBUG   -- Build files have been written to: /Users/huseyerd/relight/build
+[12:10:34] INFO    cmake: OK
+[12:10:34] DEBUG   [  0%] Built target relight-cli_autogen_timestamp_deps
+[12:10:34] DEBUG   [  0%] Built target relight-deepzoom_autogen_timestamp_deps
+[12:10:34] DEBUG   [  0%] Built target relightlab_autogen_timestamp_deps
+[12:10:34] DEBUG   [  0%] Built target relight-merge_autogen_timestamp_deps
+[12:10:34] DEBUG   [  0%] Built target relight-normals_autogen_timestamp_deps
+[12:10:34] DEBUG   [  1%] Automatic MOC for target relight-deepzoom
+[12:10:34] DEBUG   [  2%] Automatic MOC and UIC for target relightlab
+[12:10:34] DEBUG   [  2%] Automatic MOC for target relight-cli
+[12:10:34] DEBUG   [  2%] Automatic MOC for target relight-normals
+[12:10:34] DEBUG   [  2%] Automatic MOC for target relight-merge
+[12:10:34] DEBUG   [  2%] Built target relight-deepzoom_autogen
+[12:10:34] DEBUG   [  2%] Built target relight-merge_autogen
+[12:10:34] DEBUG   [  2%] Automatic RCC for ../src/icc_profiles.qrc
+[12:10:34] DEBUG   [  3%] Automatic RCC for ../src/icc_profiles.qrc
+[12:10:34] DEBUG   [  3%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/relight-merge_autogen/mocs_compilation.cpp.o
+[12:10:34] DEBUG   [  3%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/main.cpp.o
+[12:10:34] DEBUG   [  4%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/getopt.cpp.o
+[12:10:34] DEBUG   [  4%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/main.cpp.o
+[12:10:34] DEBUG   [  5%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/relight-deepzoom_autogen/mocs_compilation.cpp.o
+[12:10:34] DEBUG   [  5%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/rti.cpp.o
+[12:10:34] DEBUG   [  5%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/__/src/deepzoom.cpp.o
+[12:10:35] DEBUG   [  6%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/__/src/jpeg_decoder.cpp.o
+[12:10:36] DEBUG   [  6%] Built target relight-cli_autogen
+[12:10:36] DEBUG   [  7%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/jpeg_decoder.cpp.o
+[12:10:36] DEBUG   [  7%] Built target relight-normals_autogen
+[12:10:36] DEBUG   [  7%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/image_decoder.cpp.o
+[12:10:36] DEBUG   [  7%] Automatic RCC for ../src/icc_profiles.qrc
+[12:10:37] DEBUG   [  8%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/relight-cli_autogen/mocs_compilation.cpp.o
+[12:10:38] DEBUG   [  9%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/tiff_decoder.cpp.o
+[12:10:38] DEBUG   [ 10%] Automatic RCC for ../src/icc_profiles.qrc
+[12:10:38] DEBUG   [ 10%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/relight-normals_autogen/mocs_compilation.cpp.o
+[12:10:38] DEBUG   [ 10%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/main.cpp.o
+[12:10:39] DEBUG   [ 10%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/__/src/image_decoder.cpp.o
+[12:10:41] DEBUG   [ 10%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/png_decoder.cpp.o
+[12:10:41] DEBUG   [ 11%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/cli/rtibuilder.cpp.o
+[12:10:42] DEBUG   [ 12%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/__/src/tiff_decoder.cpp.o
+[12:10:43] DEBUG   [ 13%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/main.cpp.o
+[12:10:44] DEBUG   [ 14%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/exr_decoder.cpp.o
+[12:10:45] DEBUG   [ 14%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/__/src/png_decoder.cpp.o
+[12:10:45] DEBUG   [ 14%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/getopt.cpp.o
+[12:10:46] DEBUG   [ 14%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/normals/bni_normal_integration.cpp.o
+[12:10:46] DEBUG   [ 15%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/__/src/exr_decoder.cpp.o
+[12:10:47] DEBUG   [ 15%] Building C object relight-merge/CMakeFiles/relight-merge.dir/__/src/miniz.c.o
+[12:10:47] DEBUG   [ 15%] Built target relightlab_autogen
+[12:10:47] DEBUG   [ 16%] Automatic RCC for res.qrc
+[12:10:47] DEBUG   [ 16%] Automatic RCC for ../src/icc_profiles.qrc
+[12:10:48] DEBUG   [ 17%] Building CXX object relightlab/CMakeFiles/relightlab.dir/relightlab_autogen/mocs_compilation.cpp.o
+[12:10:48] DEBUG   [ 18%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/imageset.cpp.o
+[12:10:48] DEBUG   [ 18%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/imageset.cpp.o
+[12:10:48] DEBUG   /Users/huseyerd/relight/src/normals/bni_normal_integration.cpp:180:3: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:10:48] DEBUG     180 |                 file.open(QFile::WriteOnly);
+[12:10:48] DEBUG         |                 ^~~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:10:49] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:430:11: warning: 'compute' is deprecated: Options should be specified using the class template parameter. [-Wdeprecated-declarations]
+[12:10:49] DEBUG     430 |                 mat.svd.compute(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+[12:10:49] DEBUG         |                         ^
+[12:10:49] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/SVD/JacobiSVD.h:625:14: note: 'compute' has been explicitly marked deprecated here
+[12:10:49] DEBUG     625 |   JacobiSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
+[12:10:49] DEBUG         |              ^
+[12:10:49] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:430:11: warning: 'compute<Eigen::Matrix<float, -1, -1>>' is deprecated: Options should be specified using the class template parameter. [-Wdeprecated-declarations]
+[12:10:49] DEBUG     430 |                 mat.svd.compute(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+[12:10:49] DEBUG         |                         ^
+[12:10:49] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/SVD/JacobiSVD.h:624:3: note: 'compute<Eigen::Matrix<float, -1, -1>>' has been explicitly marked deprecated here
+[12:10:49] DEBUG     624 |   EIGEN_DEPRECATED_WITH_REASON("Options should be specified using the class template parameter.")
+[12:10:49] DEBUG         |   ^
+[12:10:49] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+[12:10:49] DEBUG     965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+[12:10:49] DEBUG         |                                                              ^
+[12:10:49] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:803:2: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:10:49] DEBUG     803 |         info.open(QFile::WriteOnly);
+[12:10:49] DEBUG         |         ^~~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:10:49] DEBUG   [ 19%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/normals/fft_normal_integration.cpp.o
+[12:10:51] DEBUG   [ 20%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/exif.cpp.o
+[12:10:51] DEBUG   [ 20%] Building C object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/__/src/miniz.c.o
+[12:10:52] DEBUG   [ 20%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/exif.cpp.o
+[12:10:52] DEBUG   [ 20%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/colorprofile.cpp.o
+[12:10:53] DEBUG   [ 21%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/lp.cpp.o
+[12:10:53] DEBUG   [ 21%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/__/src/jpeg_encoder.cpp.o
+[12:10:53] DEBUG   1 warning generated.
+[12:10:53] DEBUG   [ 21%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/normals/fast_gaussian_blur.cpp.o
+[12:10:53] DEBUG   [ 21%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/jpeg_encoder.cpp.o
+[12:10:54] DEBUG   [ 22%] Building CXX object relight-deepzoom/CMakeFiles/relight-deepzoom.dir/relight-deepzoom_autogen/VNU7RW3YIC/qrc_icc_profiles.cpp.o
+[12:10:54] DEBUG   [ 22%] Building CXX object relightlab/CMakeFiles/relightlab.dir/main.cpp.o
+[12:10:54] DEBUG   [ 22%] Linking CXX executable relight-deepzoom
+[12:10:54] DEBUG   [ 23%] Built target relight-deepzoom
+[12:10:54] DEBUG   [ 23%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/colorprofile.cpp.o
+[12:10:54] DEBUG   [ 24%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/normals/flatnormals.cpp.o
+[12:10:54] DEBUG   [ 24%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/normals/normals_parameters.cpp.o
+[12:10:54] DEBUG   [ 25%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/icc_profiles.cpp.o
+[12:10:54] DEBUG   [ 26%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/jpeg_decoder.cpp.o
+[12:10:56] DEBUG   [ 26%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/image_decoder.cpp.o
+[12:10:56] DEBUG   [ 27%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/tiff_decoder.cpp.o
+[12:10:56] DEBUG   [ 27%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/lens.cpp.o
+[12:10:56] DEBUG   [ 27%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/png_decoder.cpp.o
+[12:10:57] DEBUG   [ 28%] Building CXX object relightlab/CMakeFiles/relightlab.dir/zoom.cpp.o
+[12:10:57] DEBUG   [ 29%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/exr_decoder.cpp.o
+[12:10:58] DEBUG   [ 29%] Building C object relight-cli/CMakeFiles/relight-cli.dir/__/src/miniz.c.o
+[12:10:59] DEBUG   [ 29%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/normals/normalstask.cpp.o
+[12:10:59] DEBUG   [ 29%] Building CXX object relightlab/CMakeFiles/relightlab.dir/processqueue.cpp.o
+[12:11:00] DEBUG   [ 29%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/jpeg_encoder.cpp.o
+[12:11:01] DEBUG   [ 29%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/dome.cpp.o
+[12:11:01] DEBUG   [ 30%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/icc_profiles.cpp.o
+[12:11:02] DEBUG   [ 31%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/align.cpp.o
+[12:11:02] DEBUG   In file included from /Users/huseyerd/relight/src/normals/normalstask.cpp:6:
+[12:11:02] DEBUG   /Users/huseyerd/relight/src/normals/../relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:11:02] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:11:02] DEBUG         |                                    ^
+[12:11:02] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:11:02] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:11:02] DEBUG         |                   ^
+[12:11:02] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:11:02] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:11:02] DEBUG         |                                         ^
+[12:11:02] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:11:02] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:11:02] DEBUG         |                                                 ^
+[12:11:02] DEBUG   In file included from /Users/huseyerd/relight/src/normals/normalstask.cpp:6:
+[12:11:02] DEBUG   /Users/huseyerd/relight/src/normals/../relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:11:02] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:11:02] DEBUG         |                                    ^
+[12:11:02] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:11:02] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:11:02] DEBUG         |                   ^
+[12:11:02] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:11:02] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:11:02] DEBUG         |                                         ^
+[12:11:03] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:11:03] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:11:03] DEBUG         |                                                 ^
+[12:11:03] DEBUG   [ 31%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/rti.cpp.o
+[12:11:03] DEBUG   [ 32%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/normals/normalsworker.cpp.o
+[12:11:04] DEBUG   [ 33%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/legacy_rti.cpp.o
+[12:11:04] DEBUG   [ 33%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/dome.cpp.o
+[12:11:07] DEBUG   [ 33%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/lp.cpp.o
+[12:11:10] DEBUG   [ 34%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/sphere.cpp.o
+[12:11:10] DEBUG   [ 35%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/dome.cpp.o
+[12:11:13] DEBUG   [ 35%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/lens.cpp.o
+[12:11:14] DEBUG   [ 35%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/exif.cpp.o
+[12:11:15] DEBUG   [ 35%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/task.cpp.o
+[12:11:16] DEBUG   [ 36%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/sphere.cpp.o
+[12:11:16] DEBUG   [ 37%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/image.cpp.o
+[12:11:17] DEBUG   [ 37%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/crop.cpp.o
+[12:11:17] DEBUG   [ 37%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/crop.cpp.o
+[12:11:18] DEBUG   [ 37%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/lens.cpp.o
+[12:11:18] DEBUG   3 warnings generated.
+[12:11:18] DEBUG   [ 37%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/cli/convert_rti.cpp.o
+[12:11:19] DEBUG   [ 38%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/lp.cpp.o
+[12:11:19] DEBUG   [ 39%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/__/src/cli/rtibuilder.cpp.o
+[12:11:20] DEBUG   [ 40%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/brdf/brdftask.cpp.o
+[12:11:20] DEBUG   2 warnings generated.
+[12:11:20] DEBUG   [ 41%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/threadpool.cpp.o
+[12:11:21] DEBUG   /Users/huseyerd/relight/src/threadpool.cpp:27:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:11:21] DEBUG      27 |     template<class F, class R=std::result_of_t<F&()>>
+[12:11:21] DEBUG         |                                    ^
+[12:11:21] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:11:21] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:11:21] DEBUG         |                   ^
+[12:11:21] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:11:21] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:11:21] DEBUG         |                                         ^
+[12:11:21] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:11:21] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:11:21] DEBUG         |                                                 ^
+[12:11:21] DEBUG   1 warning generated.
+[12:11:21] DEBUG   [ 41%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/cli/rtibuilder.cpp.o
+[12:11:21] DEBUG   [ 41%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/measure.cpp.o
+[12:11:22] DEBUG   [ 42%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/project.cpp.o
+[12:11:22] DEBUG   [ 42%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/brdf/brdfparameters.cpp.o
+[12:11:22] DEBUG   In file included from /Users/huseyerd/relight/src/brdf/brdftask.cpp:2:
+[12:11:22] DEBUG   /Users/huseyerd/relight/relight-cli/../src/relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:11:22] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:11:22] DEBUG         |                                    ^
+[12:11:22] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:11:22] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:11:22] DEBUG         |                   ^
+[12:11:22] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:11:22] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:11:22] DEBUG         |                                         ^
+[12:11:22] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:11:22] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:11:22] DEBUG         |                                                 ^
+[12:11:22] DEBUG   In file included from /Users/huseyerd/relight/src/brdf/brdftask.cpp:2:
+[12:11:22] DEBUG   /Users/huseyerd/relight/relight-cli/../src/relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:11:22] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:11:22] DEBUG         |                                    ^
+[12:11:22] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:11:22] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:11:22] DEBUG         |                   ^
+[12:11:22] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:11:22] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:11:22] DEBUG         |                                         ^
+[12:11:22] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:11:22] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:11:22] DEBUG         |                                                 ^
+[12:11:23] DEBUG   [ 42%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/sphere.cpp.o
+[12:11:23] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:430:11: warning: 'compute' is deprecated: Options should be specified using the class template parameter. [-Wdeprecated-declarations]
+[12:11:23] DEBUG     430 |                 mat.svd.compute(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+[12:11:23] DEBUG         |                         ^
+[12:11:23] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/SVD/JacobiSVD.h:625:14: note: 'compute' has been explicitly marked deprecated here
+[12:11:23] DEBUG     625 |   JacobiSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
+[12:11:23] DEBUG         |              ^
+[12:11:23] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:430:11: warning: 'compute<Eigen::Matrix<float, -1, -1>>' is deprecated: Options should be specified using the class template parameter. [-Wdeprecated-declarations]
+[12:11:23] DEBUG     430 |                 mat.svd.compute(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+[12:11:23] DEBUG         |                         ^
+[12:11:23] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/SVD/JacobiSVD.h:624:3: note: 'compute<Eigen::Matrix<float, -1, -1>>' has been explicitly marked deprecated here
+[12:11:23] DEBUG     624 |   EIGEN_DEPRECATED_WITH_REASON("Options should be specified using the class template parameter.")
+[12:11:23] DEBUG         |   ^
+[12:11:23] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+[12:11:23] DEBUG     965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+[12:11:23] DEBUG         |                                                              ^
+[12:11:23] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:803:2: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:11:23] DEBUG     803 |         info.open(QFile::WriteOnly);
+[12:11:23] DEBUG         |         ^~~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:11:23] DEBUG   2 warnings generated.
+[12:11:23] DEBUG   [ 43%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/external/assm/SurfaceMesh.cpp.o
+[12:11:24] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:430:11: warning: 'compute' is deprecated: Options should be specified using the class template parameter. [-Wdeprecated-declarations]
+[12:11:24] DEBUG     430 |                 mat.svd.compute(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+[12:11:24] DEBUG         |                         ^
+[12:11:24] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/SVD/JacobiSVD.h:625:14: note: 'compute' has been explicitly marked deprecated here
+[12:11:24] DEBUG     625 |   JacobiSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
+[12:11:24] DEBUG         |              ^
+[12:11:24] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:430:11: warning: 'compute<Eigen::Matrix<float, -1, -1>>' is deprecated: Options should be specified using the class template parameter. [-Wdeprecated-declarations]
+[12:11:24] DEBUG     430 |                 mat.svd.compute(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+[12:11:24] DEBUG         |                         ^
+[12:11:24] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/SVD/JacobiSVD.h:624:3: note: 'compute<Eigen::Matrix<float, -1, -1>>' has been explicitly marked deprecated here
+[12:11:24] DEBUG     624 |   EIGEN_DEPRECATED_WITH_REASON("Options should be specified using the class template parameter.")
+[12:11:24] DEBUG         |   ^
+[12:11:24] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+[12:11:24] DEBUG     965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+[12:11:24] DEBUG         |                                                              ^
+[12:11:24] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:803:2: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:11:24] DEBUG     803 |         info.open(QFile::WriteOnly);
+[12:11:24] DEBUG         |         ^~~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:11:24] DEBUG   [ 43%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/external/assm/algorithms/DifferentialGeometry.cpp.o
+[12:11:24] DEBUG   /Users/huseyerd/relight/src/project.cpp:875:2: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:11:24] DEBUG     875 |         obj.open(QFile::WriteOnly);
+[12:11:24] DEBUG         |         ^~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:11:26] DEBUG   [ 44%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/external/assm/algorithms/Rasterizer.cpp.o
+[12:11:26] DEBUG   [ 44%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/external/assm/algorithms/ScreenRemeshing.cpp.o
+[12:11:26] DEBUG   [ 44%] Building CXX object relight-merge/CMakeFiles/relight-merge.dir/relight-merge_autogen/VNU7RW3YIC/qrc_icc_profiles.cpp.o
+[12:11:26] DEBUG   [ 44%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/external/assm/algorithms/Triangulation.cpp.o
+[12:11:26] DEBUG   [ 45%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/getopt.cpp.o
+[12:11:26] DEBUG   1 warning generated.
+[12:11:27] DEBUG   [ 45%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/white.cpp.o
+[12:11:27] DEBUG   [ 45%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/imageset.cpp.o
+[12:11:29] DEBUG   [ 46%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/normals/flatnormals.cpp.o
+[12:11:29] DEBUG   [ 47%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/normals/bni_normal_integration.cpp.o
+[12:11:32] DEBUG   [ 47%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/normals/bni_normal_integration.cpp.o
+[12:11:32] DEBUG   [ 47%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/normals/fft_normal_integration.cpp.o
+[12:11:33] DEBUG   /Users/huseyerd/relight/src/normals/bni_normal_integration.cpp:180:3: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:11:33] DEBUG     180 |                 file.open(QFile::WriteOnly);
+[12:11:33] DEBUG         |                 ^~~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:11:37] DEBUG   /Users/huseyerd/relight/src/normals/bni_normal_integration.cpp:180:3: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:11:37] DEBUG     180 |                 file.open(QFile::WriteOnly);
+[12:11:37] DEBUG         |                 ^~~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:11:42] DEBUG   [ 47%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/exif.cpp.o
+[12:11:44] DEBUG   1 warning generated.
+[12:11:44] DEBUG   [ 48%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/normals/fast_gaussian_blur.cpp.o
+[12:11:45] DEBUG   [ 49%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/normals/fft_normal_integration.cpp.o
+[12:11:46] DEBUG   [ 49%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/normals/flatnormals.cpp.o
+[12:11:47] DEBUG   1 warning generated.
+[12:11:47] DEBUG   [ 49%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/normals/fast_gaussian_blur.cpp.o
+[12:11:48] DEBUG   [ 50%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/normals/normals_parameters.cpp.o
+[12:11:50] DEBUG   [ 51%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/normals/normals_parameters.cpp.o
+[12:11:50] DEBUG   [ 51%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/normals/normalstask.cpp.o
+[12:11:51] DEBUG   [ 51%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/normals/normalsworker.cpp.o
+[12:11:52] DEBUG   [ 52%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/task.cpp.o
+[12:11:52] DEBUG   [ 52%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/normals/normalstask.cpp.o
+[12:11:53] DEBUG   In file included from /Users/huseyerd/relight/src/normals/normalstask.cpp:6:
+[12:11:53] DEBUG   /Users/huseyerd/relight/src/normals/../relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:11:53] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:11:53] DEBUG         |                                    ^
+[12:11:53] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:11:53] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:11:53] DEBUG         |                   ^
+[12:11:53] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:11:53] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:11:53] DEBUG         |                                         ^
+[12:11:53] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:11:53] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:11:53] DEBUG         |                                                 ^
+[12:11:53] DEBUG   In file included from /Users/huseyerd/relight/src/normals/normalstask.cpp:6:
+[12:11:53] DEBUG   /Users/huseyerd/relight/src/normals/../relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:11:53] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:11:53] DEBUG         |                                    ^
+[12:11:53] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:11:53] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:11:53] DEBUG         |                   ^
+[12:11:53] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:11:53] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:11:53] DEBUG         |                                         ^
+[12:11:54] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:11:54] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:11:54] DEBUG         |                                                 ^
+[12:11:54] DEBUG   [ 52%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/crop.cpp.o
+[12:11:55] DEBUG   In file included from /Users/huseyerd/relight/src/normals/normalstask.cpp:6:
+[12:11:55] DEBUG   /Users/huseyerd/relight/src/normals/../relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:11:55] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:11:55] DEBUG         |                                    ^
+[12:11:55] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:11:55] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:11:55] DEBUG         |                   ^
+[12:11:55] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:11:55] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:11:55] DEBUG         |                                         ^
+[12:11:55] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:11:55] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:11:55] DEBUG         |                                                 ^
+[12:11:55] DEBUG   In file included from /Users/huseyerd/relight/src/normals/normalstask.cpp:6:
+[12:11:55] DEBUG   /Users/huseyerd/relight/src/normals/../relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:11:55] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:11:55] DEBUG         |                                    ^
+[12:11:55] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:11:55] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:11:55] DEBUG         |                   ^
+[12:11:55] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:11:55] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:11:55] DEBUG         |                                         ^
+[12:11:55] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:11:55] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:11:55] DEBUG         |                                                 ^
+[12:11:55] DEBUG   [ 53%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/rti/rtitask.cpp.o
+[12:11:56] DEBUG   [ 53%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/rti/rtiparameters.cpp.o
+[12:11:59] DEBUG   [ 54%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/cli/rtibuilder.cpp.o
+[12:11:59] DEBUG   3 warnings generated.
+[12:11:59] DEBUG   [ 55%] Linking CXX executable relight-merge
+[12:11:59] DEBUG   /Users/huseyerd/relight/src/rti/rtitask.cpp:184:3: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:11:59] DEBUG     184 |                 fp.open(QFile::ReadOnly);
+[12:11:59] DEBUG         |                 ^~~~~~~ ~~~~~~~~~~~~~~~
+[12:11:59] DEBUG   /Users/huseyerd/relight/src/rti/rtitask.cpp:187:3: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:11:59] DEBUG     187 |                 copy.open(QFile::WriteOnly);
+[12:11:59] DEBUG         |                 ^~~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:11:59] DEBUG   [ 55%] Built target relight-merge
+[12:11:59] DEBUG   [ 56%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/image.cpp.o
+[12:12:00] DEBUG   [ 56%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/cli/convert_rti.cpp.o
+[12:12:00] DEBUG   2 warnings generated.
+[12:12:00] DEBUG   [ 57%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/deepzoom.cpp.o
+[12:12:01] DEBUG   3 warnings generated.
+[12:12:01] DEBUG   [ 57%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/jpeg_decoder.cpp.o
+[12:12:01] DEBUG   [ 57%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/rti.cpp.o
+[12:12:02] DEBUG   [ 57%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/normals/normalsworker.cpp.o
+[12:12:02] DEBUG   [ 58%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/image_decoder.cpp.o
+[12:12:02] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:430:11: warning: 'compute' is deprecated: Options should be specified using the class template parameter. [-Wdeprecated-declarations]
+[12:12:02] DEBUG     430 |                 mat.svd.compute(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+[12:12:02] DEBUG         |                         ^
+[12:12:02] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/SVD/JacobiSVD.h:625:14: note: 'compute' has been explicitly marked deprecated here
+[12:12:02] DEBUG     625 |   JacobiSVD& compute(const MatrixBase<Derived>& matrix, unsigned int computationOptions) {
+[12:12:02] DEBUG         |              ^
+[12:12:02] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:430:11: warning: 'compute<Eigen::Matrix<float, -1, -1>>' is deprecated: Options should be specified using the class template parameter. [-Wdeprecated-declarations]
+[12:12:02] DEBUG     430 |                 mat.svd.compute(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+[12:12:03] DEBUG         |                         ^
+[12:12:03] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/SVD/JacobiSVD.h:624:3: note: 'compute<Eigen::Matrix<float, -1, -1>>' has been explicitly marked deprecated here
+[12:12:03] DEBUG     624 |   EIGEN_DEPRECATED_WITH_REASON("Options should be specified using the class template parameter.")
+[12:12:03] DEBUG         |   ^
+[12:12:03] DEBUG   /opt/homebrew/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+[12:12:03] DEBUG     965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+[12:12:03] DEBUG         |                                                              ^
+[12:12:03] DEBUG   /Users/huseyerd/relight/src/cli/rtibuilder.cpp:803:2: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:12:03] DEBUG     803 |         info.open(QFile::WriteOnly);
+[12:12:03] DEBUG         |         ^~~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:12:03] DEBUG   [ 58%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/legacy_rti.cpp.o
+[12:12:03] DEBUG   [ 58%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/tiff_decoder.cpp.o
+[12:12:03] DEBUG   [ 59%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/imageset.cpp.o
+[12:12:03] DEBUG   [ 60%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/png_decoder.cpp.o
+[12:12:04] DEBUG   [ 60%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/exr_decoder.cpp.o
+[12:12:04] DEBUG   [ 60%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/colorprofile.cpp.o
+[12:12:05] DEBUG   2 warnings generated.
+[12:12:05] DEBUG   [ 61%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/jpeg_decoder.cpp.o
+[12:12:05] DEBUG   [ 61%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/image_decoder.cpp.o
+[12:12:06] DEBUG   [ 62%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/tiff_decoder.cpp.o
+[12:12:06] DEBUG   [ 62%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/png_decoder.cpp.o
+[12:12:06] DEBUG   [ 63%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/__/src/task.cpp.o
+[12:12:06] DEBUG   [ 63%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/exr_decoder.cpp.o
+[12:12:06] DEBUG   [ 64%] Building C object relightlab/CMakeFiles/relightlab.dir/__/src/miniz.c.o
+[12:12:06] DEBUG   [ 64%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/jpeg_encoder.cpp.o
+[12:12:06] DEBUG   2 warnings generated.
+[12:12:06] DEBUG   [ 64%] Building CXX object relight-cli/CMakeFiles/relight-cli.dir/relight-cli_autogen/VNU7RW3YIC/qrc_icc_profiles.cpp.o
+[12:12:06] DEBUG   [ 64%] Building C object relight-normals/CMakeFiles/relight-normals.dir/__/src/miniz.c.o
+[12:12:07] DEBUG   [ 65%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/icc_profiles.cpp.o
+[12:12:07] DEBUG   [ 65%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/network/httpserver.cpp.o
+[12:12:08] DEBUG   [ 66%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/jpeg_encoder.cpp.o
+[12:12:08] DEBUG   [ 67%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/brdf/brdftask.cpp.o
+[12:12:08] DEBUG   [ 68%] Linking CXX executable relight-cli
+[12:12:08] DEBUG   [ 68%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/icc_profiles.cpp.o
+[12:12:08] DEBUG   [ 69%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/project.cpp.o
+[12:12:08] DEBUG   [ 69%] Built target relight-cli
+[12:12:08] DEBUG   [ 69%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/src/brdf/brdfparameters.cpp.o
+[12:12:08] DEBUG   [ 69%] Building CXX object relightlab/CMakeFiles/relightlab.dir/alignframe.cpp.o
+[12:12:09] DEBUG   /Users/huseyerd/relight/src/network/httpserver.cpp:31:3: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:12:09] DEBUG      31 |                 file.open(QFile::ReadOnly);
+[12:12:09] DEBUG         |                 ^~~~~~~~~ ~~~~~~~~~~~~~~~
+[12:12:10] DEBUG   [ 69%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/colorprofile.cpp.o
+[12:12:10] DEBUG   In file included from /Users/huseyerd/relight/src/brdf/brdftask.cpp:2:
+[12:12:10] DEBUG   /Users/huseyerd/relight/relightlab/../src/relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:12:10] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:12:10] DEBUG         |                                    ^
+[12:12:10] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:12:10] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:12:10] DEBUG         |                   ^
+[12:12:10] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:12:10] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:12:10] DEBUG         |                                         ^
+[12:12:10] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:12:10] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:12:10] DEBUG         |                                                 ^
+[12:12:10] DEBUG   In file included from /Users/huseyerd/relight/src/brdf/brdftask.cpp:2:
+[12:12:10] DEBUG   /Users/huseyerd/relight/relightlab/../src/relight_threadpool.h:31:36: warning: 'result_of_t' is deprecated [-Wdeprecated-declarations]
+[12:12:10] DEBUG      31 |     template<class F, class R=std::result_of_t<F&()>>
+[12:12:10] DEBUG         |                                    ^
+[12:12:10] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:32:19: note: 'result_of_t' has been explicitly marked deprecated here
+[12:12:10] DEBUG      32 | using result_of_t _LIBCPP_DEPRECATED_IN_CXX17 = typename result_of<_Tp>::type;
+[12:12:10] DEBUG         |                   ^
+[12:12:10] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:731:41: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+[12:12:10] DEBUG     731 | #    define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+[12:12:10] DEBUG         |                                         ^
+[12:12:10] DEBUG   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:696:49: note: expanded from macro '_LIBCPP_DEPRECATED'
+[12:12:10] DEBUG     696 | #      define _LIBCPP_DEPRECATED __attribute__((__deprecated__))
+[12:12:10] DEBUG         |                                                 ^
+[12:12:11] DEBUG   [ 70%] Building CXX object relightlab/CMakeFiles/relightlab.dir/alignpicking.cpp.o
+[12:12:11] DEBUG   [ 70%] Building CXX object relightlab/CMakeFiles/relightlab.dir/alignrow.cpp.o
+[12:12:11] DEBUG   [ 71%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/dome.cpp.o
+[12:12:11] DEBUG   /Users/huseyerd/relight/src/project.cpp:875:2: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:12:11] DEBUG     875 |         obj.open(QFile::WriteOnly);
+[12:12:11] DEBUG         |         ^~~~~~~~ ~~~~~~~~~~~~~~~~
+[12:12:11] DEBUG   [ 72%] Building CXX object relightlab/CMakeFiles/relightlab.dir/canvas.cpp.o
+[12:12:11] DEBUG   2 warnings generated.
+[12:12:11] DEBUG   [ 72%] Building CXX object relightlab/CMakeFiles/relightlab.dir/domepanel.cpp.o
+[12:12:13] DEBUG   [ 73%] Building CXX object relightlab/CMakeFiles/relightlab.dir/lightgeometry.cpp.o
+[12:12:13] DEBUG   1 warning generated.
+[12:12:13] DEBUG   [ 73%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/sphere.cpp.o
+[12:12:13] DEBUG   [ 74%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/lens.cpp.o
+[12:12:13] DEBUG   [ 74%] Building CXX object relightlab/CMakeFiles/relightlab.dir/mainwindow.cpp.o
+[12:12:14] DEBUG   [ 75%] Building CXX object relightlab/CMakeFiles/relightlab.dir/preferences.cpp.o
+[12:12:14] DEBUG   1 warning generated.
+[12:12:14] DEBUG   [ 75%] Building CXX object relightlab/CMakeFiles/relightlab.dir/recentprojects.cpp.o
+[12:12:15] DEBUG   [ 75%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/crop.cpp.o
+[12:12:16] DEBUG   [ 75%] Building CXX object relightlab/CMakeFiles/relightlab.dir/reflectionview.cpp.o
+[12:12:16] DEBUG   [ 75%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/lp.cpp.o
+[12:12:16] DEBUG   [ 76%] Building CXX object relightlab/CMakeFiles/relightlab.dir/relightapp.cpp.o
+[12:12:17] DEBUG   [ 76%] Building CXX object relightlab/CMakeFiles/relightlab.dir/sphererow.cpp.o
+[12:12:17] DEBUG   [ 78%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/measure.cpp.o
+[12:12:17] DEBUG   [ 78%] Building CXX object relightlab/CMakeFiles/relightlab.dir/tabwidget.cpp.o
+[12:12:18] DEBUG   [ 78%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/align.cpp.o
+[12:12:18] DEBUG   /Users/huseyerd/relight/relightlab/relightapp.cpp:51:2: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:12:18] DEBUG      51 |         style.open(QFile::ReadOnly);
+[12:12:18] DEBUG         |         ^~~~~~~~~~ ~~~~~~~~~~~~~~~
+[12:12:18] DEBUG   [ 78%] Building CXX object relightlab/CMakeFiles/relightlab.dir/imageframe.cpp.o
+[12:12:18] DEBUG   [ 79%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/white.cpp.o
+[12:12:19] DEBUG   [ 80%] Building CXX object relightlab/CMakeFiles/relightlab.dir/imageview.cpp.o
+[12:12:19] DEBUG   1 warning generated.
+[12:12:19] DEBUG   [ 80%] Building CXX object relightlab/CMakeFiles/relightlab.dir/homeframe.cpp.o
+[12:12:19] DEBUG   3 warnings generated.
+[12:12:19] DEBUG   [ 80%] Building CXX object relightlab/CMakeFiles/relightlab.dir/imagelist.cpp.o
+[12:12:19] DEBUG   [ 81%] Building CXX object relightlab/CMakeFiles/relightlab.dir/flowlayout.cpp.o
+[12:12:20] DEBUG   [ 81%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/rti.cpp.o
+[12:12:20] DEBUG   [ 82%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/src/legacy_rti.cpp.o
+[12:12:21] DEBUG   [ 82%] Building CXX object relightlab/CMakeFiles/relightlab.dir/imagegrid.cpp.o
+[12:12:21] DEBUG   [ 83%] Building CXX object relightlab/CMakeFiles/relightlab.dir/lightsframe.cpp.o
+[12:12:22] DEBUG   /Users/huseyerd/relight/relightlab/homeframe.cpp:145:2: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:12:22] DEBUG     145 |         html_file.open(QFile::ReadOnly);
+[12:12:22] DEBUG         |         ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~
+[12:12:22] DEBUG   /Users/huseyerd/relight/relightlab/homeframe.cpp:149:2: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+[12:12:22] DEBUG     149 |         css_file.open(QFile::ReadOnly);
+[12:12:22] DEBUG         |         ^~~~~~~~~~~~~ ~~~~~~~~~~~~~~~
+[12:12:22] DEBUG   [ 83%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/external/assm/SurfaceMesh.cpp.o
+[12:12:22] DEBUG   [ 83%] Building CXX object relightlab/CMakeFiles/relightlab.dir/markerdialog.cpp.o
+[12:12:22] DEBUG   2 warnings generated.
+[12:12:22] DEBUG   [ 84%] Building CXX object relightlab/CMakeFiles/relightlab.dir/directionsview.cpp.o
+[12:12:23] DEBUG   [ 84%] Building CXX object relightlab/CMakeFiles/relightlab.dir/sphereframe.cpp.o
+[12:12:23] DEBUG   [ 84%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/external/assm/algorithms/DifferentialGeometry.cpp.o
+[12:12:24] DEBUG   [ 84%] Building CXX object relightlab/CMakeFiles/relightlab.dir/spherepicking.cpp.o
+[12:12:24] DEBUG   [ 85%] Building CXX object relightlab/CMakeFiles/relightlab.dir/verifyview.cpp.o
+[12:12:24] DEBUG   [ 85%] Building CXX object relightlab/CMakeFiles/relightlab.dir/verifydialog.cpp.o
+[12:12:24] DEBUG   [ 86%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/external/assm/algorithms/Rasterizer.cpp.o
+[12:12:24] DEBUG   [ 86%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/external/assm/algorithms/Triangulation.cpp.o
+[12:12:25] DEBUG   [ 87%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/__/external/assm/algorithms/ScreenRemeshing.cpp.o
+[12:12:25] DEBUG   [ 87%] Building CXX object relight-normals/CMakeFiles/relight-normals.dir/relight-normals_autogen/VNU7RW3YIC/qrc_icc_profiles.cpp.o
+[12:12:25] DEBUG   [ 88%] Building CXX object relightlab/CMakeFiles/relightlab.dir/helpbutton.cpp.o
+[12:12:25] DEBUG   [ 88%] Building CXX object relightlab/CMakeFiles/relightlab.dir/cropframe.cpp.o
+[12:12:26] DEBUG   [ 89%] Building CXX object relightlab/CMakeFiles/relightlab.dir/rtiframe.cpp.o
+[12:12:26] DEBUG   [ 89%] Building CXX object relightlab/CMakeFiles/relightlab.dir/rtirecents.cpp.o
+[12:12:26] DEBUG   [ 90%] Building CXX object relightlab/CMakeFiles/relightlab.dir/rtiplan.cpp.o
+[12:12:26] DEBUG   [ 90%] Building CXX object relightlab/CMakeFiles/relightlab.dir/queueframe.cpp.o
+[12:12:26] DEBUG   [ 90%] Building CXX object relightlab/CMakeFiles/relightlab.dir/queueitem.cpp.o
+[12:12:27] DEBUG   [ 91%] Building CXX object relightlab/CMakeFiles/relightlab.dir/historytask.cpp.o
+[12:12:28] DEBUG   [ 91%] Building CXX object relightlab/CMakeFiles/relightlab.dir/normalsframe.cpp.o
+[12:12:28] DEBUG   [ 92%] Building CXX object relightlab/CMakeFiles/relightlab.dir/normalsplan.cpp.o
+[12:12:29] DEBUG   [ 92%] Building CXX object relightlab/CMakeFiles/relightlab.dir/planrow.cpp.o
+[12:12:29] DEBUG   /Users/huseyerd/relight/relightlab/rtiplan.cpp:357:32: warning: 'stateChanged' is deprecated: Use checkStateChanged() instead [-Wdeprecated-declarations]
+[12:12:29] DEBUG     357 |         connect(openlime, &QCheckBox::stateChanged, [this](int state) { this->parameters.openlime = state > 0; });
+[12:12:29] DEBUG         |                                       ^
+[12:12:29] DEBUG   /opt/homebrew/opt/qt/lib/QtWidgets.framework/Headers/qcheckbox.h:41:19: note: 'stateChanged' has been explicitly marked deprecated here
+[12:12:29] DEBUG      41 |     QT_MOC_COMPAT QT_DEPRECATED_VERSION_X_6_9("Use checkStateChanged() instead")
+[12:12:29] DEBUG         |                   ^
+[12:12:29] DEBUG   /opt/homebrew/opt/qt/lib/QtCore.framework/Headers/qtdeprecationmarkers.h:214:44: note: expanded from macro 'QT_DEPRECATED_VERSION_X_6_9'
+[12:12:29] DEBUG     214 | # define QT_DEPRECATED_VERSION_X_6_9(text) QT_DEPRECATED_X(text)
+[12:12:29] DEBUG         |                                            ^
+[12:12:29] DEBUG   /opt/homebrew/opt/qt/lib/QtCore.framework/Headers/qtdeprecationmarkers.h:30:33: note: expanded from macro 'QT_DEPRECATED_X'
+[12:12:29] DEBUG      30 | #  define QT_DEPRECATED_X(text) Q_DECL_DEPRECATED_X(text)
+[12:12:29] DEBUG         |                                 ^
+[12:12:29] DEBUG   /opt/homebrew/opt/qt/lib/QtCore.framework/Headers/qcompilerdetection.h:1013:36: note: expanded from macro 'Q_DECL_DEPRECATED_X'
+[12:12:29] DEBUG    1013 | #  define Q_DECL_DEPRECATED_X(x) [[deprecated(x)]]
+[12:12:29] DEBUG         |                                    ^
+[12:12:29] DEBUG   [ 93%] Building CXX object relightlab/CMakeFiles/relightlab.dir/planepicking.cpp.o
+[12:12:29] DEBUG   [ 93%] Building CXX object relightlab/CMakeFiles/relightlab.dir/scaleframe.cpp.o
+[12:12:29] DEBUG   1 warning generated.
+[12:12:29] DEBUG   [ 93%] Building CXX object relightlab/CMakeFiles/relightlab.dir/imagecropper.cpp.o
+[12:12:30] DEBUG   [ 94%] Building CXX object relightlab/CMakeFiles/relightlab.dir/brdfframe.cpp.o
+[12:12:31] DEBUG   [ 94%] Building CXX object relightlab/CMakeFiles/relightlab.dir/brdfplan.cpp.o
+[12:12:31] DEBUG   [ 95%] Building CXX object relightlab/CMakeFiles/relightlab.dir/convertdialog.cpp.o
+[12:12:31] DEBUG   [ 95%] Building CXX object relightlab/CMakeFiles/relightlab.dir/metadataframe.cpp.o
+[12:12:32] DEBUG   [ 96%] Building CXX object relightlab/CMakeFiles/relightlab.dir/rdfexport.cpp.o
+[12:12:32] DEBUG   [ 96%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/external/assm/SurfaceMesh.cpp.o
+[12:12:32] DEBUG   [ 96%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/external/assm/algorithms/DifferentialGeometry.cpp.o
+[12:12:32] DEBUG   [ 97%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/external/assm/algorithms/Rasterizer.cpp.o
+[12:12:33] DEBUG   [ 97%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/external/assm/algorithms/ScreenRemeshing.cpp.o
+[12:12:33] DEBUG   [ 98%] Building CXX object relightlab/CMakeFiles/relightlab.dir/__/external/assm/algorithms/Triangulation.cpp.o
+[12:12:34] DEBUG   [ 98%] Building CXX object relightlab/CMakeFiles/relightlab.dir/relightlab_autogen/EWIEGA46WW/qrc_res.cpp.o
+[12:12:34] DEBUG   [ 99%] Building CXX object relightlab/CMakeFiles/relightlab.dir/relightlab_autogen/VNU7RW3YIC/qrc_icc_profiles.cpp.o
+[12:12:34] DEBUG   [100%] Linking CXX executable relight-normals
+[12:12:34] DEBUG   [100%] Built target relight-normals
+[12:12:38] DEBUG   [100%] Linking CXX executable relightlab.app/Contents/MacOS/relightlab
+[12:12:39] DEBUG   [100%] Built target relightlab
+[12:12:39] INFO    make: OK
+[12:12:39] INFO    RelightLab: /Users/huseyerd/relight/build/relightlab/relightlab.app
+[12:12:39] INFO    relight-cli: /Users/huseyerd/relight/build/relight-cli/relight-cli
