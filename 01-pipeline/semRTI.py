@@ -36,10 +36,9 @@ KG_GPS_ALT  = "679.9"
 
 # ── end of USER CONFIGURATION ──────────────────────────────────────────────────
 
-# semRTI/ klasörü 01-pipeline/ içinde; proje kökü iki üst seviyede
-DATASETS_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '..', '02-datasets'))
-OUTPUTS_DIR  = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '..', '03-outputs'))
-LOGS_DIR     = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '..', '04-logs'))
+DATASETS_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '02-datasets'))
+OUTPUTS_DIR  = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '03-outputs'))
+LOGS_DIR     = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '04-logs'))
 
 KG_CONFIG_FILE      = os.path.join(SCRIPT_DIR, 'kg-config.json')
 SPARQL_ANYTHING_JAR = os.path.join(SCRIPT_DIR, 'sparql-anything.jar')

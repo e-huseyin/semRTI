@@ -1,7 +1,7 @@
 
 # semRTI — Semantic RTI Knowledge Graph
 
-![semRTI terminal interface](01-pipeline/semRTI/semRTI-interface.png)
+![semRTI terminal interface](01-pipeline/semRTI-interface.png)
 
 ## Overview
 
@@ -26,7 +26,7 @@ The graph documents **40 RTI acquisition sessions** across **11 rock art figures
 ## Quick Start
 
 ```bash
-python3 01-pipeline/semRTI/semRTI.py
+python3 01-pipeline/semRTI.py
 ```
 
 ---
