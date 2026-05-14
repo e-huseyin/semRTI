@@ -10,7 +10,7 @@
 
 ---
 
-![semRTI terminal interface](semRTI-interface.png)
+![semRTI terminal interface](01-pipeline/semRTI/semRTI-interface.png)
 
 ## Overview
 
