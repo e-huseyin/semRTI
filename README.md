@@ -1,15 +1,6 @@
 
 # semRTI — Semantic RTI Knowledge Graph
 
-**Rupe Magna Rock Art Site, Grosio, Italy**
-
-**Author:** Hüseyin Erdoğan · [ORCID 0000-0002-2965-0918](https://orcid.org/0000-0002-2965-0918)  
-**Affiliation:** Alma Mater Studiorum – Università di Bologna  
-**License:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)  
-**Version:** 1.0 · 2026-05-14
-
----
-
 ![semRTI terminal interface](01-pipeline/semRTI/semRTI-interface.png)
 
 ## Overview
@@ -372,3 +363,11 @@ Sessions support two capture modes:
 | `rm-mtype:` | `https://w3id.org/rupemagna/resource/measurement-type/` |
 | `rm-unit:` | `https://w3id.org/rupemagna/resource/unit/` |
 | `prov:` | `http://www.w3.org/ns/prov#` |
+
+---
+
+
+**Author:** Hüseyin Erdoğan · [ORCID 0000-0002-2965-0918](https://orcid.org/0000-0002-2965-0918)  
+**Affiliation:** Alma Mater Studiorum – Università di Bologna  
+**License:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)  
+**Version:** 1.0 · 2026-05-14
