@@ -541,7 +541,8 @@ bool RdfExport::write(const Project       &project,
        << "@prefix rm-mtype: <" << base << "measurement-type/> .\n"
        << "@prefix rm-unit:  <" << base << "measurement-unit/> .\n"
        << "@prefix rm-equip: <" << base << "equipment/> .\n"
-       << "@prefix rm-agent: <" << base << "agent/> .\n\n";
+       << "@prefix rm-agent:  <" << base << "agent/> .\n"
+       << "@prefix rm-survey: <" << base << "survey/> .\n\n";
 
     // ════════════════════════════════════════════════════════════════════════
     //  SECTION E.1 — Link existing dataset to new RTI distribution
