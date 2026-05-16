@@ -63,6 +63,7 @@ PREFIX rm-equip:   <https://w3id.org/rupemagna/resource/equipment/>
 PREFIX rm-site:    <https://w3id.org/rupemagna/resource/site/>
 PREFIX rm-mtype:   <https://w3id.org/rupemagna/resource/measurement-type/>
 PREFIX rm-unit:    <https://w3id.org/rupemagna/resource/unit/>
+PREFIX prov:       <http://www.w3.org/ns/prov#>
 
 CONSTRUCT {
 
@@ -143,7 +144,8 @@ CONSTRUCT {
     dct:identifier ?sessionID ;
     dct:issued ?startDate ;
     dct:description ?dataDesc ;
-    dct:title ?labelData .
+    dct:title ?labelData ;
+    prov:wasGeneratedBy ?surveyURI .
 
   ### Distribution JPG ###
   ?distJpgURI
@@ -151,6 +153,9 @@ CONSTRUCT {
     dcat:mediaType <https://www.iana.org/assignments/media-types/image/jpeg> ;
     dct:format "image/jpeg" ;
     schema:numberOfItems 48 ;
+    dct:creator rm-agent:huseyin-erdogan ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    prov:wasGeneratedBy ?surveyURI ;
     dct:title ?labelDistJpg .
 
   ### Distribution RAW ###
@@ -158,6 +163,9 @@ CONSTRUCT {
     a owl:NamedIndividual, dcat:Distribution ;
     dct:format "image/x-fujifilm-raf" ;
     schema:numberOfItems 48 ;
+    dct:creator rm-agent:huseyin-erdogan ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    prov:wasGeneratedBy ?surveyURI ;
     dct:title ?labelDistRaw .
 }
 WHERE {

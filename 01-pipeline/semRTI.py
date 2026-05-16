@@ -500,7 +500,30 @@ def _kg_step6_section_e(dataset_dir, output_final, output_final_e, logger):
     with open(output_final_e, 'a', encoding='utf-8') as f_out:
         for ttl_path in sorted(ttl_files):
             with open(ttl_path, encoding='utf-8') as f_in:
-                f_out.write(f_in.read())
+                content = f_in.read()
+            f_out.write(content)
+
+            # Inject schema:width/height from info.json if missing from sidecar
+            if 'schema:width' not in content:
+                info_path = os.path.join(os.path.dirname(ttl_path), 'info.json')
+                if os.path.exists(info_path):
+                    try:
+                        with open(info_path, encoding='utf-8') as jf:
+                            info = json.load(jf)
+                        w, h = info.get('width', 0), info.get('height', 0)
+                        if w > 0 and h > 0:
+                            m = re.search(r'rm-dist:(\S+)\s*\n\s*a owl:NamedIndividual', content)
+                            if m:
+                                dist_uri = f'https://w3id.org/rupemagna/resource/distribution/{m.group(1)}'
+                                f_out.write(
+                                    f'\n<{dist_uri}>\n'
+                                    f'    <https://schema.org/width> {w} ;\n'
+                                    f'    <https://schema.org/height> {h} .\n'
+                                )
+                                logger.info(f"Section E: injected width={w} height={h} → {m.group(1)}")
+                    except Exception as e:
+                        logger.warning(f"Section E: info.json read failed for {ttl_path}: {e}")
+
             disp = f"{os.path.basename(os.path.dirname(ttl_path))}/{os.path.basename(ttl_path)}"
             print(f"           {disp}")
             logger.info(f"Section E: {disp}")
