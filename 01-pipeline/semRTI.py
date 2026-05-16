@@ -770,25 +770,41 @@ def _patch_mainwindow_cpp(cpp_path):
         else:
             print("      [!] mainwindow.cpp: queueframe.h include not found — include skipped")
 
-    if 'new MetadataFrame' not in content:
-        if 'queue_frame = new QueueFrame' in content:
-            content = content.replace(
-                'queue_frame = new QueueFrame',
-                'metadata_frame = new MetadataFrame(this);\n\tqueue_frame = new QueueFrame'
-            )
-            modified = True
-        else:
-            print("      [!] mainwindow.cpp: QueueFrame constructor not found — MetadataFrame init skipped")
-
-    if 'Metadata' not in content or 'addTab' not in content or 'metadata_frame' not in content:
-        if 'queue_frame, tr("Queue")' in content:
-            content = content.replace(
-                'queue_frame, tr("Queue")',
-                'queue_frame, tr("Queue")\n\ttab->addTab(metadata_frame, tr("Metadata"))'
-            )
-            modified = True
-        elif 'metadata_frame' in content and 'addTab(metadata_frame' not in content:
-            print("      [!] mainwindow.cpp: 'Queue' tab anchor not found — Metadata tab skipped")
+    if 'addTab(metadata_frame' not in content:
+        patched = False
+        for q, m in [('"Queue"', '"Metadata"'), ('tr("Queue")', 'tr("Metadata")')]:
+            inline = f'tabs->addTab(queue_frame = new QueueFrame, {q})'
+            if inline in content:
+                content = content.replace(
+                    inline,
+                    f'queue_frame = new QueueFrame;\n\tmetadata_frame = new MetadataFrame(this);\n\ttabs->addTab(queue_frame, {q});\n\ttabs->addTab(metadata_frame, {m})'
+                )
+                modified = True
+                patched = True
+                break
+        if not patched:
+            if 'new MetadataFrame' not in content:
+                if 'queue_frame = new QueueFrame' in content:
+                    content = content.replace(
+                        'queue_frame = new QueueFrame',
+                        'metadata_frame = new MetadataFrame(this);\n\tqueue_frame = new QueueFrame'
+                    )
+                    modified = True
+                else:
+                    print("      [!] mainwindow.cpp: QueueFrame constructor not found — MetadataFrame init skipped")
+            tab_added = False
+            for q, m in [('"Queue"', '"Metadata"'), ('tr("Queue")', 'tr("Metadata")')]:
+                anchor = f'queue_frame, {q})'
+                if anchor in content:
+                    content = content.replace(
+                        anchor,
+                        f'queue_frame, {q});\n\ttabs->addTab(metadata_frame, {m})'
+                    )
+                    modified = True
+                    tab_added = True
+                    break
+            if not tab_added:
+                print("      [!] mainwindow.cpp: 'Queue' tab anchor not found — Metadata tab skipped")
 
     if modified:
         with open(cpp_path, 'w', encoding='utf-8') as f:
