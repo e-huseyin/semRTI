@@ -1,0 +1,13 @@
+[16:29:18] INFO    Log: /Users/huseyerd/-project/semontol/semRTI/04-logs/knowledge-graph/2026-06-25_16-29-18_Rupe_Magna.log
+[16:29:18] INFO    Dataset: /Users/huseyerd/-project/semontol/semRTI/02-datasets/Rupe Magna
+[16:29:18] INFO    Site:    Rupe Magna
+[16:29:18] INFO    === EXIF export ===
+[16:29:26] INFO    EXIF export: 5372 records → /Users/huseyerd/-project/semontol/semRTI/03-outputs/knowledge-graph/rupe-magna-exif.json
+[16:29:26] INFO    === Section C/D ===
+[16:29:27] INFO    Section C → /Users/huseyerd/-project/semontol/semRTI/01-pipeline/_tmp-section-c.ttl
+[16:29:28] INFO    Section D → /Users/huseyerd/-project/semontol/semRTI/01-pipeline/_tmp-section-d.ttl
+[16:29:28] INFO    === Section E ===
+[16:29:29] INFO    Section E: F03/RTI-17/ptm (F03RTI17-ptm.json)
+[16:29:29] INFO    Section E: F01/RTI-08/ptm (F01RTI08-ptm.json)
+[16:29:29] INFO    === Merge ===
+[16:29:29] INFO    === Build complete: 7447 triples → /Users/huseyerd/-project/semontol/semRTI/03-outputs/knowledge-graph/rupe-magna-knowledge-graph.ttl ===

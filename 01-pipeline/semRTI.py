@@ -12,38 +12,21 @@ from rich import box
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 console = Console()
 
-# ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║                          USER CONFIGURATION                                ║
-# ╠══════════════════════════════════════════════════════════════════════════════╣
-# ║  Edit the values in this section before first use.                         ║
-# ╚══════════════════════════════════════════════════════════════════════════════╝
-
-KG_AUTHOR      = "Hüseyin Erdoğan"
-KG_ROLE        = "Post-Lauream Research Fellow"
-KG_EMAIL       = "huseyin.erdogan@unibo.it"
-KG_ORCID       = "https://orcid.org/0000-0002-2965-0918"
-KG_AFFILIATION = "Alma Mater Studiorum – Università di Bologna"
-KG_LICENSE     = "Licensed under CC BY 4.0"
-KG_LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
-
-KG_SITE     = "Rupe Magna"
-KG_CITY     = "Grosio"
-KG_PROVINCE = "Lombardy"
-KG_COUNTRY  = "Italy"
-KG_GPS_LAT  = "46.292692"
-KG_GPS_LON  = "10.264064"
-KG_GPS_ALT  = "679.9"
-
-# ── end of USER CONFIGURATION ──────────────────────────────────────────────────
+# Project/site metadata (creator, licence, coordinates) is the single source of
+# truth in enrich-metadata.json — edit that file, not this script.
 
 DATASETS_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '02-datasets'))
 OUTPUTS_DIR  = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '03-outputs'))
 LOGS_DIR     = os.path.normpath(os.path.join(SCRIPT_DIR, '..', '04-logs'))
 
-KG_CONFIG_FILE      = os.path.join(SCRIPT_DIR, 'kg-config.json')
+METADATA_FILE       = os.path.join(SCRIPT_DIR, 'enrich-metadata.json')
+METADATA_KEYS = ['author', 'role', 'email', 'orcid', 'affiliation',
+                 'license', 'license_url', 'site',
+                 'city', 'province', 'country', 'gps_lat', 'gps_lon', 'gps_alt']
 SPARQL_ANYTHING_JAR = os.path.join(SCRIPT_DIR, 'sparql-anything.jar')
 TEMPLATE_DATASET    = os.path.join(SCRIPT_DIR, 'construct-dataset.sparql')
 TEMPLATE_PHOTOS     = os.path.join(SCRIPT_DIR, 'construct-photos.sparql')
+TEMPLATE_RTI        = os.path.join(SCRIPT_DIR, 'construct-rti.sparql')
 KG_DATASET_CSV      = os.path.join(SCRIPT_DIR, 'dataset-config.csv')
 KG_SHARED_TTL       = os.path.join(SCRIPT_DIR, 'shared.ttl')
 KG_OUTPUTS_DIR      = os.path.join(OUTPUTS_DIR, 'knowledge-graph')
@@ -61,12 +44,13 @@ LOGO = [
 ]
 
 TAGLINE = "Semantic RTI Knowledge Graph"
-VERSION = "v1.0.0"
+VERSION = "v1.0.1"
 
 MENU = [
-    ("Knowledge Graph",    "EXIF → RDF / Turtle"),
-    ("RDF Plugin Install", "Patch & build RelightLab"),
-    ("Logs",               "Browse pipeline logs"),
+    ("Your metadata → JPG",      "Stamp JPGs from enrich-metadata.json"),
+    ("RDF Plugin Install",       "Patch & build RelightLab"),
+    ("Generate KG",              "Build final knowledge graph (.ttl)"),
+    ("Logs",                     "Browse pipeline logs"),
 ]
 
 _TREE_EXCLUDE = {'raw', 'jpg', 'jpg-export', '.ds_store'}
@@ -121,6 +105,12 @@ def _wait_enter(msg="  Press Enter to continue (Q to go back)"):
         input(msg)
     except (KeyboardInterrupt, EOFError):
         pass
+
+
+def _confirm(prompt):
+    """Yes/no prompt; True only on an explicit y / yes."""
+    val = _ask(prompt)
+    return val is not None and val.strip().lower() in ('y', 'yes')
 
 
 # ── Dataset tree browser ───────────────────────────────────────────────────────
@@ -183,148 +173,102 @@ def _dataset_picker(title, subtitle=''):
     return val.replace('\\ ', ' ').strip().strip("'\"")
 
 
-# ── Dataset helpers ────────────────────────────────────────────────────────────
-
-def _find_jpg_export_dir(base):
-    base = os.path.abspath(base)
-    candidates = []
-    for search_root in [base] + [os.path.join(base, c)
-                                  for c in sorted(os.listdir(base))
-                                  if os.path.isdir(os.path.join(base, c))]:
-        try:
-            for entry in sorted(os.listdir(search_root)):
-                if entry == 'jpg-export' or entry.startswith('jpg-export-'):
-                    full = os.path.join(search_root, entry)
-                    if os.path.isdir(full):
-                        candidates.append(full)
-        except (PermissionError, NotADirectoryError):
-            pass
-        if candidates:
-            break
-    if not candidates:
-        return None
-    exact = [c for c in candidates if os.path.basename(c) == 'jpg-export']
-    return exact[0] if exact else candidates[0]
-
-
 # ── Knowledge Graph pipeline ───────────────────────────────────────────────────
 
-def _kg_load_config():
-    default = {
-        "author":      KG_AUTHOR,
-        "role":        KG_ROLE,
-        "email":       KG_EMAIL,
-        "orcid":       KG_ORCID,
-        "affiliation": KG_AFFILIATION,
-        "license":     KG_LICENSE,
-        "license_url": KG_LICENSE_URL,
-        "site":        KG_SITE,
-        "city":        KG_CITY,
-        "province":    KG_PROVINCE,
-        "country":     KG_COUNTRY,
-        "gps_lat":     KG_GPS_LAT,
-        "gps_lon":     KG_GPS_LON,
-        "gps_alt":     KG_GPS_ALT,
-    }
-    if not os.path.exists(KG_CONFIG_FILE):
-        with open(KG_CONFIG_FILE, 'w', encoding='utf-8') as f:
-            json.dump(default, f, indent=2, ensure_ascii=False)
-        return default
+def _load_metadata():
+    """Load project/site metadata from enrich-metadata.json — the single source
+    of truth. Returns the config dict, or None if the file is missing/invalid."""
+    if not os.path.exists(METADATA_FILE):
+        return None
     try:
-        with open(KG_CONFIG_FILE, encoding='utf-8') as f:
-            cfg = json.load(f)
-        for k, v in default.items():
-            cfg.setdefault(k, v)
-        return cfg
+        with open(METADATA_FILE, encoding='utf-8') as f:
+            return json.load(f)
     except Exception:
-        return default
+        return None
 
 
 def _to_file_uri(path):
     return 'file://' + urllib.parse.quote(os.path.abspath(path), safe='/:')
 
 
-def _kg_step1_metadata(dataset_dir, site_name, cfg, logger):
-    author      = cfg.get('author', '')
-    role        = cfg.get('role', '')
-    email       = cfg.get('email', '')
-    orcid       = cfg.get('orcid', '')
-    affiliation = cfg.get('affiliation', '')
-    license_str = cfg.get('license', 'Licensed under CC BY 4.0')
-    license_url = cfg.get('license_url', 'https://creativecommons.org/licenses/by/4.0/')
-    city        = cfg.get('city', '')
-    province    = cfg.get('province', '')
-    country     = cfg.get('country', '')
-    gps_lat     = cfg.get('gps_lat', '')
-    gps_lon     = cfg.get('gps_lon', '')
-    gps_alt     = cfg.get('gps_alt', '')
+def _ttl_literal(s):
+    """Escape a value for use inside a Turtle quoted literal."""
+    return str(s).replace('\\', '\\\\').replace('"', '\\"')
 
-    total    = 0
-    jpg_dirs = []
 
-    for f_dir in sorted(glob.glob(os.path.join(dataset_dir, 'F*/'))):
-        if not os.path.isdir(f_dir):
+def _metadata_ttl(meta):
+    """Turtle for the project agent and site whose VALUES come from
+    enrich-metadata.json. Only non-blank fields are emitted, so a missing value
+    simply produces no triple (no broken literal). The structure (which property,
+    which subject) lives here; the values come from the single source. Must be
+    parsed together with shared.ttl so the prefixes resolve."""
+    agent = []
+    if meta.get('author'):      agent.append(f'    foaf:name "{_ttl_literal(meta["author"])}"')
+    if meta.get('email'):       agent.append(f'    foaf:mbox <mailto:{meta["email"]}>')
+    if meta.get('orcid'):       agent.append(f'    schema:identifier <{meta["orcid"]}>')
+    if meta.get('affiliation'): agent.append(f'    schema:affiliation "{_ttl_literal(meta["affiliation"])}"')
+    if meta.get('role'):        agent.append(f'    schema:jobTitle "{_ttl_literal(meta["role"])}"')
+
+    site = []
+    if meta.get('gps_lat'):  site.append(f'    geo:lat   {meta["gps_lat"]}')
+    if meta.get('gps_lon'):  site.append(f'    geo:long  {meta["gps_lon"]}')
+    if meta.get('gps_alt'):  site.append(f'    geo:alt   {meta["gps_alt"]}')
+    if meta.get('city'):     site.append(f'    schema:addressLocality "{_ttl_literal(meta["city"])}"')
+    if meta.get('province'): site.append(f'    schema:addressRegion   "{_ttl_literal(meta["province"])}"')
+    if meta.get('country'):  site.append(f'    schema:addressCountry  "{_ttl_literal(meta["country"])}"')
+
+    blocks = []
+    if agent:
+        blocks.append("rm-agent:huseyin-erdogan\n" + " ;\n".join(agent) + " .")
+    if site:
+        blocks.append("rm-site:rupe-magna\n" + " ;\n".join(site) + " .")
+    return "\n\n".join(blocks) + ("\n" if blocks else "")
+
+
+def _kg_step1_metadata(dataset_dir, site_name, meta, logger):
+    author      = meta.get('author', '')
+    role        = meta.get('role', '')
+    email       = meta.get('email', '')
+    orcid       = meta.get('orcid', '')
+    affiliation = meta.get('affiliation', '')
+    license_str = meta.get('license', 'Licensed under CC BY 4.0')
+    license_url = meta.get('license_url', 'https://creativecommons.org/licenses/by/4.0/')
+    city        = meta.get('city', '')
+    province    = meta.get('province', '')
+    country     = meta.get('country', '')
+    gps_lat     = meta.get('gps_lat', '')
+    gps_lon     = meta.get('gps_lon', '')
+    gps_alt     = meta.get('gps_alt', '')
+
+    total = 0
+
+    # Stamp only the photographer's input images: any folder whose name starts
+    # with "jpg" or "jpeg" (jpg-export, jpeg-exports, "jpg raw", …), at any depth.
+    # RelightLab output folders (ptm, hsh, rbf, …) never match by name, and their
+    # deepzoom tile pyramids (*_files) are pruned, so their images are untouched.
+    for cur, dirs, files in os.walk(dataset_dir):
+        dirs[:] = sorted(d for d in dirs
+                         if not d.startswith('.') and not d.endswith('_files'))
+
+        if not os.path.basename(cur).lower().startswith(('jpg', 'jpeg')):
             continue
-        f_name = os.path.basename(f_dir.rstrip('/'))
-        for rti_dir in sorted(glob.glob(os.path.join(f_dir, 'RTI-*/'))):
-            rti_name = os.path.basename(rti_dir.rstrip('/'))
-            try:
-                for entry in sorted(os.listdir(rti_dir)):
-                    if entry == 'jpg-export' or entry.startswith('jpg-export-'):
-                        full = os.path.join(rti_dir, entry)
-                        if os.path.isdir(full):
-                            jpg_dirs.append((f_name, rti_name, full))
-            except (PermissionError, NotADirectoryError):
-                pass
-            jpg_only = os.path.join(rti_dir, 'jpg')
-            if os.path.isdir(jpg_only):
-                jpg_dirs.append((f_name, rti_name, jpg_only))
+        imgs = [f for f in files if f.lower().endswith(('.jpg', '.jpeg'))]
+        if not imgs:
+            continue
 
-    if not jpg_dirs:
-        for rti_dir in sorted(glob.glob(os.path.join(dataset_dir, 'RTI-*/'))):
-            rti_name = os.path.basename(rti_dir.rstrip('/'))
-            try:
-                for entry in sorted(os.listdir(rti_dir)):
-                    if entry == 'jpg-export' or entry.startswith('jpg-export-'):
-                        full = os.path.join(rti_dir, entry)
-                        if os.path.isdir(full):
-                            jpg_dirs.append(('', rti_name, full))
-            except (PermissionError, NotADirectoryError):
-                pass
-            jpg_only = os.path.join(rti_dir, 'jpg')
-            if os.path.isdir(jpg_only):
-                jpg_dirs.append(('', rti_name, jpg_only))
-
-    if not jpg_dirs:
-        dirs_to_write = []
-        try:
-            for entry in sorted(os.listdir(dataset_dir)):
-                if entry == 'jpg-export' or entry.startswith('jpg-export-'):
-                    full = os.path.join(dataset_dir, entry)
-                    if os.path.isdir(full):
-                        dirs_to_write.append(full)
-        except (PermissionError, NotADirectoryError):
-            pass
-        jpg_only = os.path.join(dataset_dir, 'jpg')
-        if os.path.isdir(jpg_only):
-            dirs_to_write.append(jpg_only)
-        if not dirs_to_write:
-            dirs_to_write.append(dataset_dir)
-        for d in dirs_to_write:
-            jpg_dirs.append(('', os.path.basename(dataset_dir), d))
-
-    for f_name, rti_name, jpg_dir in jpg_dirs:
-        label = (f"{site_name} - [{f_name}] - [{rti_name}]"
-                 if f_name else f"{site_name} - [{rti_name}]")
+        # Human label = path from the datasets root, so it starts with the top
+        # folder the researcher chose (e.g. "Settore B / F03 / RTI-02 / jpeg").
+        rel   = os.path.relpath(cur, DATASETS_DIR)
+        label = rel.replace(os.sep, ' / ')
 
         cmd = ['exiftool', '-overwrite_original', '-P', '-m', '-q',
-               '-i', '.*', '-ext', 'jpg',
+               '-i', '.*', '-ext', 'jpg', '-ext', 'jpeg',
                f'-Title={label}',
                f'-XMP-dc:title={label}',
                f'-Description={label}',
                f'-XMP-dc:description={label}',
                f'-Caption-Abstract={label}',
-               f'-Keywords=RTI, {site_name}, FAIR data, ArCo, {f_name}/{rti_name}',
+               f'-Keywords=RTI, {site_name}, FAIR data, ArCo, {label}',
                f'-XMP-dc:subject=RTI, {site_name}, FAIR data, ArCo',
                f'-Artist={author}',
                f'-By-line={author}',
@@ -350,7 +294,7 @@ def _kg_step1_metadata(dataset_dir, site_name, cfg, logger):
                f'-XMP-photoshop:Country={country}',
                f'-Sub-location={site_name}',
                '-IPTCDigest=',
-               jpg_dir]
+               cur]
 
         if gps_lat:
             cmd += [f'-GPSLatitude={gps_lat}', '-GPSLatitudeRef=N']
@@ -361,13 +305,12 @@ def _kg_step1_metadata(dataset_dir, site_name, cfg, logger):
 
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
-            logger.warning(f"exiftool warning for {jpg_dir}: {result.stderr.strip()}")
+            logger.warning(f"exiftool warning for {cur}: {result.stderr.strip()}")
 
-        n = len(glob.glob(os.path.join(jpg_dir, '*.[Jj][Pp][Gg]')))
+        n = len(imgs)
         total += n
-        disp = f"{f_name}/{rti_name}" if f_name else rti_name
-        print(f"           {disp} — {n} files")
-        logger.info(f"Metadata written: {disp}  ({n} files)")
+        print(f"           {label} — {n} files")
+        logger.info(f"Metadata written: {label}  ({n} files)")
 
     return total
 
@@ -396,214 +339,202 @@ def _kg_step2_exif_export(dataset_dir, exif_json, logger):
     return count
 
 
-def _kg_step3_section_c(exif_json, output_c, logger):
-    if not os.path.exists(TEMPLATE_DATASET):
-        logger.error(f"Template not found: {TEMPLATE_DATASET}"); return False
+def _run_construct(template_path, replacements, out_path, logger):
+    """Render a SPARQL Anything CONSTRUCT template (substituting the given
+    token→value pairs), run it, and write Turtle to out_path. Returns True on
+    success. The temporary query file is always cleaned up.
+
+    This is the single SPARQL driver shared by Sections C, D and E."""
+    if not os.path.exists(template_path):
+        logger.error(f"Template not found: {template_path}")
+        return False
+
+    with open(template_path, encoding='utf-8') as f:
+        query = f.read()
+    for token, value in replacements.items():
+        query = query.replace(token, value)
+
+    tmp = os.path.join(SCRIPT_DIR, '_tmp-' + os.path.basename(template_path))
+    with open(tmp, 'w', encoding='utf-8') as f:
+        f.write(query)
+
+    result = subprocess.run(
+        ['java', '-jar', SPARQL_ANYTHING_JAR, '-q', tmp, '-o', out_path],
+        capture_output=True, text=True
+    )
+    try:
+        os.remove(tmp)
+    except Exception:
+        pass
+
+    if result.returncode != 0:
+        logger.error(f"SPARQL Anything failed "
+                     f"({os.path.basename(template_path)}):\n{result.stderr.strip()}")
+        return False
+    return True
+
+
+def _kg_step3_section_c(exif_json, output_c, extra, logger):
     if not os.path.exists(KG_DATASET_CSV):
         logger.error(f"dataset-config.csv not found: {KG_DATASET_CSV}"); return False
 
-    with open(TEMPLATE_DATASET, encoding='utf-8') as f:
-        query = f.read()
-    query = query.replace('EXIF_LOCATION_PLACEHOLDER', _to_file_uri(exif_json))
-    query = query.replace('CSV_LOCATION_PLACEHOLDER',  _to_file_uri(KG_DATASET_CSV))
-
-    tmp = os.path.join(SCRIPT_DIR, '_tmp-construct-dataset.sparql')
-    with open(tmp, 'w', encoding='utf-8') as f:
-        f.write(query)
-
-    result = subprocess.run(
-        ['java', '-jar', SPARQL_ANYTHING_JAR, '-q', tmp, '-o', output_c],
-        capture_output=True, text=True
-    )
-    try:
-        os.remove(tmp)
-    except Exception:
-        pass
-
-    if result.returncode != 0:
-        logger.error(f"SPARQL Anything (C) failed:\n{result.stderr.strip()}")
-        return False
-    logger.info(f"Section C → {output_c}")
-    return True
+    ok = _run_construct(TEMPLATE_DATASET, {
+        'EXIF_LOCATION_PLACEHOLDER': _to_file_uri(exif_json),
+        'CSV_LOCATION_PLACEHOLDER':  _to_file_uri(KG_DATASET_CSV),
+        **extra,
+    }, output_c, logger)
+    if ok:
+        logger.info(f"Section C → {output_c}")
+    return ok
 
 
-def _kg_step4_section_d(exif_json, output_d, logger):
-    if not os.path.exists(TEMPLATE_PHOTOS):
-        logger.error(f"Template not found: {TEMPLATE_PHOTOS}"); return False
-
-    with open(TEMPLATE_PHOTOS, encoding='utf-8') as f:
-        query = f.read()
-    query = query.replace('EXIF_LOCATION_PLACEHOLDER', _to_file_uri(exif_json))
-
-    tmp = os.path.join(SCRIPT_DIR, '_tmp-construct-photos.sparql')
-    with open(tmp, 'w', encoding='utf-8') as f:
-        f.write(query)
-
-    result = subprocess.run(
-        ['java', '-jar', SPARQL_ANYTHING_JAR, '-q', tmp, '-o', output_d],
-        capture_output=True, text=True
-    )
-    try:
-        os.remove(tmp)
-    except Exception:
-        pass
-
-    if result.returncode != 0:
-        logger.error(f"SPARQL Anything (D) failed:\n{result.stderr.strip()}")
-        return False
-    logger.info(f"Section D → {output_d}")
-    return True
+def _kg_step4_section_d(exif_json, output_d, extra, logger):
+    ok = _run_construct(TEMPLATE_PHOTOS, {
+        'EXIF_LOCATION_PLACEHOLDER': _to_file_uri(exif_json),
+        **extra,
+    }, output_d, logger)
+    if ok:
+        logger.info(f"Section D → {output_d}")
+    return ok
 
 
-def _kg_step5_merge(output_c, output_d, output_final, logger):
-    if not os.path.exists(KG_SHARED_TTL):
-        logger.error(f"shared.ttl not found: {KG_SHARED_TTL}"); return -1
+def _kg_section_e(datasets_dir, extra, logger):
+    """Build all Section E triples from the per-dataset provenance JSONs via
+    construct-rti.sparql (SPARQL Anything). Returns (rdflib.Graph, dataset_count).
+    A provenance JSON is any *.json sitting next to an info.json (not info.json
+    itself) — i.e. RelightLab's F01RTI08-ptm.json sidecar."""
+    import rdflib
+    g = rdflib.Graph()
+    if not os.path.exists(TEMPLATE_RTI):
+        logger.error(f"Template not found: {TEMPLATE_RTI}")
+        return g, 0
 
-    with open(output_final, 'w', encoding='utf-8') as f_out:
-        for src in [KG_SHARED_TTL, output_c, output_d]:
-            if os.path.exists(src):
-                with open(src, encoding='utf-8') as f_in:
-                    f_out.write(f_in.read())
-            else:
-                logger.warning(f"Source missing, skipping: {src}")
+    count = 0
+    tmp_o = os.path.join(SCRIPT_DIR, '_tmp-rti-out.ttl')
+    for root, dirs, files in os.walk(datasets_dir):
+        if 'info.json' not in files:
+            continue
+        prov = next((fn for fn in sorted(files)
+                     if fn.lower().endswith('.json') and fn != 'info.json'), None)
+        if not prov:
+            continue
+        prov_path = os.path.join(root, prov)
+        info_path = os.path.join(root, 'info.json')
 
-    try:
-        import rdflib
-        g = rdflib.Graph()
-        g.parse(output_final, format='turtle')
-        count = len(g)
-        logger.info(f"Merge: {count} triples → {output_final}")
-        return count
-    except ImportError:
-        logger.warning("rdflib not installed — pip3 install rdflib")
-        return -1
-    except Exception as e:
-        logger.warning(f"Triple count error: {e}")
-        return -1
-
-
-def _kg_step6_section_e(dataset_dir, output_final, output_final_e, logger):
-    shutil.copy(output_final, output_final_e)
-    ttl_files = []
-    for root, dirs, files in os.walk(dataset_dir):
-        for fname in sorted(files):
-            if re.match(r'(?i)^(ptm|hsh|rbf|bln)[^/]*\.ttl$', fname) or \
-               re.match(r'RTI-.*-(PTM|HSH)\.ttl$', fname) or \
-               re.match(r'^[A-Z]+\d+RTI\d+(PTM|HSH|RBF|BLN)\.ttl$', fname) or \
-               re.match(r'^[A-Z]+\d+RTI\d+-(ptm|hsh|rbf|bln)[a-zA-Z0-9\-]*\.ttl$', fname, re.IGNORECASE):
-                ttl_files.append(os.path.join(root, fname))
-
-    if not ttl_files:
-        logger.info("Section E: no RTI sidecar TTLs found — skipping")
-        return 0
-
-    with open(output_final_e, 'a', encoding='utf-8') as f_out:
-        for ttl_path in sorted(ttl_files):
-            with open(ttl_path, encoding='utf-8') as f_in:
-                content = f_in.read()
-            f_out.write(content)
-
-            # Inject schema:width/height from info.json if missing from sidecar
-            if 'schema:width' not in content:
-                info_path = os.path.join(os.path.dirname(ttl_path), 'info.json')
-                if os.path.exists(info_path):
-                    try:
-                        with open(info_path, encoding='utf-8') as jf:
-                            info = json.load(jf)
-                        w, h = info.get('width', 0), info.get('height', 0)
-                        if w > 0 and h > 0:
-                            m = re.search(r'rm-dist:(\S+)\s*\n\s*a owl:NamedIndividual', content)
-                            if m:
-                                dist_uri = f'https://w3id.org/rupemagna/resource/distribution/{m.group(1)}'
-                                f_out.write(
-                                    f'\n<{dist_uri}>\n'
-                                    f'    <https://schema.org/width> {w} ;\n'
-                                    f'    <https://schema.org/height> {h} .\n'
-                                )
-                                logger.info(f"Section E: injected width={w} height={h} → {m.group(1)}")
-                    except Exception as e:
-                        logger.warning(f"Section E: info.json read failed for {ttl_path}: {e}")
-
-            disp = f"{os.path.basename(os.path.dirname(ttl_path))}/{os.path.basename(ttl_path)}"
-            print(f"           {disp}")
-            logger.info(f"Section E: {disp}")
-
-    try:
-        import rdflib
-        g = rdflib.Graph()
-        g.parse(output_final_e, format='turtle')
-        count = len(g)
-        logger.info(f"Section E: {len(ttl_files)} file(s), {count} triples → {output_final_e}")
-        return count
-    except ImportError:
-        return -1
-    except Exception as e:
-        logger.warning(f"Triple count error: {e}")
-        return -1
+        ok = _run_construct(TEMPLATE_RTI, {
+            'PROV_LOCATION_PLACEHOLDER': _to_file_uri(prov_path),
+            'INFO_LOCATION_PLACEHOLDER': _to_file_uri(info_path),
+            **extra,
+        }, tmp_o, logger)
+        if ok:
+            try:
+                g.parse(tmp_o, format='turtle')
+                count += 1
+                disp = os.path.relpath(root, datasets_dir)
+                print(f"           {disp}")
+                logger.info(f"Section E: {disp} ({prov})")
+            except Exception as e:
+                logger.warning(f"Section E parse failed for {prov_path}: {e}")
+        try:
+            os.remove(tmp_o)
+        except Exception:
+            pass
+    return g, count
 
 
-def _kg_pipeline(dataset_dir, site_name, cfg, logger):
+def _kg_build_final(dataset_dir, site_name, meta, logger):
+    """Build a single final Knowledge Graph TTL: EXIF → Section C/D (SPARQL
+    Anything) + Section E (provenance JSON) + shared.ttl, merged in memory with
+    rdflib and written once. No intermediate section files; no JPG stamping
+    (that is a separate menu item)."""
+    import rdflib
     safe_site = re.sub(r'[^\w\-]', '-', site_name).lower().strip('-')
     os.makedirs(KG_OUTPUTS_DIR, exist_ok=True)
 
-    exif_json      = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-exif.json')
-    output_c       = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-section-c.ttl')
-    output_d       = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-section-d.ttl')
-    output_final   = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-complete.ttl')
-    output_final_e = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-final.ttl')
+    exif_json = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-exif.json')
+    final_ttl = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-knowledge-graph.ttl')
+    tmp_c     = os.path.join(SCRIPT_DIR, '_tmp-section-c.ttl')
+    tmp_d     = os.path.join(SCRIPT_DIR, '_tmp-section-d.ttl')
 
     sep = "=" * 55
     print(f"\n{sep}")
-    print(f"  RTI Knowledge Graph Pipeline — {site_name}")
+    print(f"  RTI Knowledge Graph — {site_name}")
     print(f"  Dataset : {dataset_dir}")
     print(sep)
 
-    print("\n[1/6] Writing EXIF/XMP/IPTC metadata into JPEGs...")
-    logger.info("=== Step 1 — Writing metadata ===")
-    total = _kg_step1_metadata(dataset_dir, site_name, cfg, logger)
-    print(f"      → {total} JPEG files updated")
+    print("\n[1/4] Exporting EXIF to JSON...")
+    logger.info("=== EXIF export ===")
+    n = _kg_step2_exif_export(dataset_dir, exif_json, logger)
+    print(f"      → {n} records")
 
-    print("\n[2/6] Exporting EXIF to JSON...")
-    logger.info("=== Step 2 — Exporting EXIF ===")
-    count = _kg_step2_exif_export(dataset_dir, exif_json, logger)
-    print(f"      → {count} records")
+    print("\n[2/4] Generating dataset + photo triples (SPARQL Anything)...")
+    logger.info("=== Section C/D ===")
+    # Personal-metadata injection: the licence IRI is the only value carried by
+    # the SPARQL templates; everything else (agent/site values) is added to the
+    # static graph below. Sourced from enrich-metadata.json.
+    extra = {'LICENSE_URL_PLACEHOLDER': meta.get('license_url', '')}
+    ok_c = _kg_step3_section_c(exif_json, tmp_c, extra, logger)
+    ok_d = _kg_step4_section_d(exif_json, tmp_d, extra, logger)
+    print(f"      → C: {'OK' if ok_c else 'FAILED'}   D: {'OK' if ok_d else 'FAILED'}")
 
-    print("\n[3/6] Generating Section C (per-session triples)...")
-    logger.info("=== Step 3 — Section C ===")
-    ok_c = _kg_step3_section_c(exif_json, output_c, logger)
-    print(f"      → {'OK' if ok_c else 'FAILED'}")
+    print("\n[3/4] Mapping RTI provenance (Section E)...")
+    logger.info("=== Section E ===")
+    g_e, e_count = _kg_section_e(dataset_dir, extra, logger)
+    print(f"      → {e_count} RTI dataset(s)")
 
-    print("\n[4/6] Generating Section D (per-photo triples)...")
-    logger.info("=== Step 4 — Section D ===")
-    ok_d = _kg_step4_section_d(exif_json, output_d, logger)
-    print(f"      → {'OK' if ok_d else 'FAILED'}")
+    print("\n[4/4] Merging into single final graph...")
+    logger.info("=== Merge ===")
+    g = rdflib.Graph()
+    if os.path.exists(KG_SHARED_TTL):
+        with open(KG_SHARED_TTL, encoding='utf-8') as f:
+            shared_text = f.read()
+        shared_text = shared_text.replace('LICENSE_URL_PLACEHOLDER',
+                                          meta.get('license_url', ''))
+        shared_text += "\n" + _metadata_ttl(meta)
+        g.parse(data=shared_text, format='turtle')
+    for part in (tmp_c, tmp_d):
+        if os.path.exists(part):
+            try:
+                g.parse(part, format='turtle')
+            except Exception as ex:
+                logger.warning(f"merge parse failed for {part}: {ex}")
+    g += g_e
+    g.serialize(destination=final_ttl, format='turtle')
+    for t in (tmp_c, tmp_d):
+        try:
+            os.remove(t)
+        except Exception:
+            pass
 
-    print("\n[5/6] Merging into final Knowledge Graph...")
-    logger.info("=== Step 5 — Merge ===")
-    triples = _kg_step5_merge(output_c, output_d, output_final, logger)
-    t_str = f"{triples} triples" if triples >= 0 else "done"
-    print(f"      → {t_str}")
-
-    print("\n[6/6] Collecting Section E (RTI sidecar TTLs)...")
-    logger.info("=== Step 6 — Section E ===")
-    triples_e = _kg_step6_section_e(dataset_dir, output_final, output_final_e, logger)
-    te_str = f"{triples_e} triples" if triples_e >= 0 else "done"
-    print(f"      → {te_str}")
-
+    print(f"      → {len(g)} triples")
     print(f"\n{sep}")
-    print(f"  Done → {output_final_e}")
+    print(f"  Done → {final_ttl}")
     print(f"{sep}\n")
-    logger.info("=== Pipeline complete ===")
+    logger.info(f"=== Build complete: {len(g)} triples → {final_ttl} ===")
+    return len(g)
 
 
-def run_knowledge_graph():
+def _choose_dataset(title, subtitle):
+    """Shared front-end for the dataset operations: clear the screen, load the
+    project metadata, let the user pick a dataset folder, and resolve its path.
+    Returns (meta, dataset_dir, site_name), or None if the user cancels or
+    enrich-metadata.json is missing/invalid."""
     console.clear()
-    cfg = _kg_load_config()
+    meta = _load_metadata()
+    if meta is None:
+        console.print(f"\n  [red][!] {os.path.basename(METADATA_FILE)} not found or invalid — "
+                      f"create it first.[/red]")
+        _wait_enter()
+        return None
 
-    dataset_raw = _dataset_picker("KNOWLEDGE GRAPH",
-                                  "·  EXIF → RDF/Turtle  ·  6-step semantic pipeline")
+    missing = [k for k in METADATA_KEYS if k not in meta]
+    if missing:
+        console.print(f"  [yellow][!] enrich-metadata.json missing field(s): "
+                      f"{', '.join(missing)} — they will be left blank.[/yellow]")
+
+    dataset_raw = _dataset_picker(title, subtitle)
     if not dataset_raw:
-        return
+        return None
 
     dataset_raw = dataset_raw.replace('\\ ', ' ')
     if os.path.isabs(dataset_raw):
@@ -611,7 +542,15 @@ def run_knowledge_graph():
     else:
         dataset_dir = os.path.join(DATASETS_DIR, dataset_raw)
 
-    site_name = cfg.get('site', 'dataset')
+    return meta, dataset_dir, meta.get('site', 'dataset')
+
+
+def run_knowledge_graph():
+    chosen = _choose_dataset("GENERATE KNOWLEDGE GRAPH",
+                             "·  EXIF → RDF/Turtle  ·  Sections C / D / E")
+    if not chosen:
+        return
+    meta, dataset_dir, site_name = chosen
 
     missing = []
     for dep in ['exiftool', 'java']:
@@ -624,112 +563,87 @@ def run_knowledge_graph():
 
     if missing:
         console.print()
-        console.rule("[bold red]KNOWLEDGE GRAPH  ·  Prerequisites missing[/bold red]")
+        console.rule("[bold red]GENERATE KNOWLEDGE GRAPH  ·  Prerequisites missing[/bold red]")
         for m in missing:
             console.print(f"  [red][!][/red]  {m}")
         _wait_enter()
         return
 
-    safe_site        = re.sub(r'[^\w\-]', '-', site_name).lower().strip('-')
-    complete_ttl     = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-complete.ttl')
-    exif_json_path   = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-exif.json')
-    step6_available  = os.path.exists(complete_ttl)
-    exif_available   = os.path.exists(exif_json_path) and os.path.getsize(exif_json_path) > 10
+    # Scan for RTI datasets: folders with info.json + a provenance JSON sidecar
+    prov_count = 0
+    for root, dirs, files in os.walk(dataset_dir):
+        if 'info.json' in files and any(
+                fn.lower().endswith('.json') and fn != 'info.json' for fn in files):
+            prov_count += 1
 
     console.clear()
     console.print()
-    console.rule(f"[bold cyan]KNOWLEDGE GRAPH[/bold cyan]  [dim]·  {site_name}[/dim]")
+    console.rule(f"[bold cyan]GENERATE KNOWLEDGE GRAPH[/bold cyan]  [dim]·  {site_name}[/dim]")
     console.print(f"  [dim]Dataset : {dataset_dir}[/dim]")
-    console.print(f"  [dim]Site    : {site_name}[/dim]")
     console.print()
-    console.print("  [bold cyan]1.[/bold cyan]  Full pipeline  [dim](steps 1–6, rewrites EXIF + rebuilds KG)[/dim]")
-    if step6_available:
-        console.print("  [bold cyan]2.[/bold cyan]  Collect RTI sidecars only  [dim](step 6, appends new TTL sidecars)[/dim]")
-    else:
-        console.print(f"  [dim]2.  (not available — {os.path.basename(complete_ttl)} not found)[/dim]")
-    if exif_available:
-        console.print("  [bold cyan]3.[/bold cyan]  Rebuild KG from existing EXIF  [dim](steps 3–6, skips EXIF export)[/dim]")
-    else:
-        console.print(f"  [dim]3.  (not available — {os.path.basename(exif_json_path)} not found)[/dim]")
+    console.print(f"  Found [bold]{prov_count}[/bold] RTI dataset(s) with a provenance JSON.")
     console.print()
-
-    val = _ask("  Select (1/2/3, Q to cancel): ")
-    if val is None:
+    if prov_count == 0:
+        console.print("  [yellow]No provenance JSON found — process the RTIs in RelightLab first.[/yellow]")
+        _wait_enter()
         return
-    if val == '1':
-        mode = 'full'
-    elif val == '2' and step6_available:
-        mode = 'step6'
-    elif val == '3' and exif_available:
-        mode = 'steps3_6'
-    else:
+
+    if not _confirm("  Build the final knowledge graph from these? (y/N): "):
         return
 
     logger, log_path = _make_logger('knowledge-graph', site_name)
     logger.info(f"Dataset: {dataset_dir}")
     logger.info(f"Site:    {site_name}")
-    logger.info(f"Mode:    {mode}")
 
     console.clear()
     console.print()
-    console.rule(f"[bold cyan]KNOWLEDGE GRAPH[/bold cyan]  [dim]·  {site_name}[/dim]")
+    console.rule(f"[bold cyan]GENERATE KNOWLEDGE GRAPH[/bold cyan]  [dim]·  {site_name}[/dim]")
     console.print(f"  [dim]Dataset : {dataset_dir}[/dim]")
-    console.print(f"  [dim]Site    : {site_name}[/dim]")
     console.print(f"  [dim]Log     : {os.path.basename(log_path)}[/dim]")
     console.rule(style="dim")
 
     try:
-        if mode == 'step6':
-            output_final_e = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-final.ttl')
-            sep = "=" * 55
-            print(f"\n{sep}")
-            print(f"  RTI Knowledge Graph — Collect sidecars — {site_name}")
-            print(f"  Base : {complete_ttl}")
-            print(sep)
-            print("\n[6/6] Collecting Section E (RTI sidecar TTLs)...")
-            logger.info("=== Step 6 only — Section E ===")
-            triples_e = _kg_step6_section_e(dataset_dir, complete_ttl, output_final_e, logger)
-            te_str = f"{triples_e} triples" if triples_e >= 0 else "done"
-            print(f"      → {te_str}")
-            print(f"\n{sep}")
-            print(f"  Done → {output_final_e}")
-            print(f"{sep}\n")
-            logger.info("=== Step 6 complete ===")
-        elif mode == 'steps3_6':
-            exif_json      = exif_json_path
-            output_c       = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-section-c.ttl')
-            output_d       = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-section-d.ttl')
-            output_final   = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-complete.ttl')
-            output_final_e = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-final.ttl')
-            sep = "=" * 55
-            print(f"\n{sep}")
-            print(f"  RTI Knowledge Graph — Rebuild from existing EXIF — {site_name}")
-            print(f"  EXIF : {exif_json}")
-            print(sep)
-            print("\n[3/6] Generating Section C (per-session triples)...")
-            logger.info("=== Step 3 — Section C ===")
-            ok_c = _kg_step3_section_c(exif_json, output_c, logger)
-            print(f"      → {'OK' if ok_c else 'FAILED'}")
-            print("\n[4/6] Generating Section D (per-photo triples)...")
-            logger.info("=== Step 4 — Section D ===")
-            ok_d = _kg_step4_section_d(exif_json, output_d, logger)
-            print(f"      → {'OK' if ok_d else 'FAILED'}")
-            print("\n[5/6] Merging into final Knowledge Graph...")
-            logger.info("=== Step 5 — Merge ===")
-            triples = _kg_step5_merge(output_c, output_d, output_final, logger)
-            t_str = f"{triples} triples" if triples >= 0 else "done"
-            print(f"      → {t_str}")
-            print("\n[6/6] Collecting Section E (RTI sidecar TTLs)...")
-            logger.info("=== Step 6 — Section E ===")
-            triples_e = _kg_step6_section_e(dataset_dir, output_final, output_final_e, logger)
-            te_str = f"{triples_e} triples" if triples_e >= 0 else "done"
-            print(f"      → {te_str}")
-            print(f"\n{sep}")
-            print(f"  Done → {output_final_e}")
-            print(f"{sep}\n")
-            logger.info("=== Pipeline complete ===")
-        else:
-            _kg_pipeline(dataset_dir, site_name, cfg, logger)
+        _kg_build_final(dataset_dir, site_name, meta, logger)
+    except Exception as e:
+        console.print(f"\n  [red][!] Error: {e}[/red]")
+        logger.error(str(e), exc_info=True)
+
+    _wait_enter()
+
+
+def run_jpg_metadata():
+    """Standalone: stamp creator & licence (from enrich-metadata.json) into the
+    JPGs via exiftool. Separate from graph building — for archiving / sharing."""
+    chosen = _choose_dataset("YOUR METADATA → JPG",
+                             "·  Stamp JPGs from enrich-metadata.json")
+    if not chosen:
+        return
+    meta, dataset_dir, site_name = chosen
+
+    if subprocess.run(['which', 'exiftool'], capture_output=True).returncode != 0:
+        console.print("\n  [red][!] exiftool not found[/red]")
+        _wait_enter()
+        return
+    if not os.path.isdir(dataset_dir):
+        console.print(f"\n  [red][!] dataset not found: {dataset_dir}[/red]")
+        _wait_enter()
+        return
+
+    console.clear()
+    console.print()
+    console.rule(f"[bold cyan]YOUR METADATA → JPG[/bold cyan]  [dim]·  {site_name}[/dim]")
+    console.print(f"  [dim]Dataset : {dataset_dir}[/dim]")
+    console.print()
+    console.print("  This writes the enrich-metadata.json fields into the JPG files themselves.")
+    console.print()
+    if not _confirm("  Stamp metadata into JPGs? (y/N): "):
+        return
+
+    logger, _ = _make_logger('jpg-metadata', site_name)
+    logger.info(f"JPG metadata stamping — {dataset_dir}")
+    try:
+        total = _kg_step1_metadata(dataset_dir, site_name, meta, logger)
+        console.print(f"\n  [green]✓ {total} JPG file(s) updated[/green]")
     except Exception as e:
         console.print(f"\n  [red][!] Error: {e}[/red]")
         logger.error(str(e), exc_info=True)
@@ -886,7 +800,7 @@ def _patch_rtiframe_h(h_path):
         if 'class ZoomOverview;' in content:
             content = content.replace(
                 'class ZoomOverview;',
-                'class ZoomOverview;\nclass QCheckBox;'
+                'class ZoomOverview;\nclass QCheckBox;\nclass QJsonObject;'
             )
             modified = True
         else:
@@ -908,7 +822,7 @@ def _patch_rtiframe_h(h_path):
         if 'void updateNPlanes();' in content:
             content = content.replace(
                 'void updateNPlanes();',
-                'void updateNPlanes();\n\tvoid exportRdfSidecar();'
+                'void updateNPlanes();\n\tvoid exportRdfSidecar(const QJsonObject &task);'
             )
             modified = True
         else:
@@ -940,9 +854,9 @@ def _patch_rtiframe_cpp(cpp_path):
         anchor = 'buttons_layout->addWidget(save);'
         if anchor in content:
             replacement = (
-                'rdf_check = new QCheckBox("Export RDF/TTL", this);\n'
+                'rdf_check = new QCheckBox("Export provenance JSON", this);\n'
                 '\t\t\t\trdf_check->setChecked(true);\n'
-                '\t\t\t\trdf_check->setToolTip("Automatically write a Turtle (.ttl) sidecar alongside the RTI output.");\n'
+                '\t\t\t\trdf_check->setToolTip("Automatically write an ontology-neutral provenance JSON sidecar alongside the RTI output.");\n'
                 '\t\t\t\tbuttons_layout->addWidget(rdf_check);\n'
                 '\t\t\t\t' + anchor
             )
@@ -964,7 +878,7 @@ def _patch_rtiframe_cpp(cpp_path):
                 '\t\t\tQObject::disconnect(*conn);\n'
                 '\t\t\tdelete conn;\n'
                 '\t\t\tif (task.value("status").toInt() != ProcessQueue::STOPPED)\n'
-                '\t\t\t\texportRdfSidecar();\n'
+                '\t\t\t\texportRdfSidecar(task);\n'
                 '\t\t});\n'
                 '\t}\n}',
                 1
@@ -973,33 +887,13 @@ def _patch_rtiframe_cpp(cpp_path):
         else:
             print("      [!] rtiframe.cpp: emit processStarted() anchor not found — auto-export call skipped")
 
-    if 'void RtiFrame::exportRdfSidecar()' not in content:
+    if 'void RtiFrame::exportRdfSidecar(' not in content:
         sidecar_impl = (
-            '\n\nvoid RtiFrame::exportRdfSidecar() {\n'
-            '\tProject &project = qRelightApp->project();\n'
-            '\tRdfMetadata meta = RdfExport::readFromProject(project);\n'
-            '\n'
-            '\tmeta.hasRtiOutput = true;\n'
-            '\tmeta.rtiNPlanes   = parameters.nplanes;\n'
-            '\tmeta.rtiQuality   = parameters.quality;\n'
-            '\tswitch (parameters.basis) {\n'
-            '\t\tcase Rti::PTM:      meta.rtiType = "ptm"; break;\n'
-            '\t\tcase Rti::HSH:      meta.rtiType = "hsh"; break;\n'
-            '\t\tcase Rti::RBF:      meta.rtiType = "rbf"; break;\n'
-            '\t\tcase Rti::BILINEAR: meta.rtiType = "bln"; break;\n'
-            '\t\tdefault:            meta.rtiType = "rti"; break;\n'
-            '\t}\n'
-            '\n'
-            '\tif (parameters.format == RtiParameters::WEB) {\n'
-            '\t\tswitch (parameters.web_layout) {\n'
-            '\t\t\tcase RtiParameters::DEEPZOOM: meta.rtiWebLayout = "deepzoom"; break;\n'
-            '\t\t\tcase RtiParameters::TARZOOM:  meta.rtiWebLayout = "tarzoom";  break;\n'
-            '\t\t\tcase RtiParameters::ITARZOOM: meta.rtiWebLayout = "itarzoom"; break;\n'
-            '\t\t\tdefault:                      meta.rtiWebLayout = "plain";    break;\n'
-            '\t\t}\n'
-            '\t}\n'
-            '\n'
-            '\tQString p = parameters.path;\n'
+            '\n\nvoid RtiFrame::exportRdfSidecar(const QJsonObject &task) {\n'
+            '\t// Automatic, ontology-neutral provenance sidecar.\n'
+            '\t// Naming mirrors the manual TTL: e.g. F01RTI08-ptm.json\n'
+            '\tQString p = task.value("parameters").toObject().value("path").toString();\n'
+            '\tif (p.isEmpty()) return;\n'
             '\tif (p.endsWith(\'/\') || p.endsWith(\'\\\\\')) p.chop(1);\n'
             '\tQFileInfo fi(p);\n'
             '\tQDir    sessionDir = fi.dir();\n'
@@ -1009,12 +903,12 @@ def _patch_rtiframe_cpp(cpp_path):
             '\tQString figure     = figureDir.dirName();\n'
             '\tsession.remove(\'-\');\n'
             '\tQString folderName = fi.fileName();\n'
-            '\tQString ttl_name = figure + session + "-" + folderName + ".ttl";\n'
-            '\tQString ttl_path = p + "/" + ttl_name;\n'
+            '\tQString json_name = figure + session + "-" + folderName + ".json";\n'
+            '\tQString json_path = p + "/" + json_name;\n'
             '\n'
             '\tQString error;\n'
-            '\tif (!RdfExport::write(project, &parameters, meta, ttl_path, error))\n'
-            '\t\tQMessageBox::warning(this, "RDF Export", "Could not write TTL:\\n" + error);\n'
+            '\tif (!RdfExport::writeProvenanceJson(task, json_path, error))\n'
+            '\t\tQMessageBox::warning(this, "Provenance Export", "Could not write provenance JSON:\\n" + error);\n'
             '}\n'
         )
         content += sidecar_impl
@@ -1024,6 +918,34 @@ def _patch_rtiframe_cpp(cpp_path):
         with open(cpp_path, 'w', encoding='utf-8') as f:
             f.write(content)
     return modified
+
+
+def _git_reset_patched(relight_src, files, logger):
+    """Restore previously patched relight files to their pristine state so a fresh
+    patch can be applied cleanly. Without this, re-installing an updated plugin onto
+    an already-patched source is skipped (the guards see the old patch and bail),
+    leaving the OLD behaviour in place. Only acts when relight_src is a git work tree;
+    the files we patch are upstream relight files we never hand-edit, so resetting them
+    is safe. Copied plugin files (rdfexport/metadataframe) are untracked and untouched."""
+    is_git = subprocess.run(
+        ['git', '-C', relight_src, 'rev-parse', '--is-inside-work-tree'],
+        capture_output=True, text=True
+    ).returncode == 0
+    if not is_git:
+        print("      [!] Not a git repo — cannot auto-reset old patch; existing wiring kept.")
+        logger.info("git reset skipped: not a git repo")
+        return False
+    res = subprocess.run(
+        ['git', '-C', relight_src, 'checkout', '--'] + files,
+        capture_output=True, text=True
+    )
+    if res.returncode != 0:
+        print(f"      [!] git checkout failed: {res.stderr.strip()}")
+        logger.info(f"git reset failed: {res.stderr.strip()}")
+        return False
+    print("      OK — previous patch reset (clean source)")
+    logger.info("git reset patched files: OK")
+    return True
 
 
 def _rdf_plugin_install(relight_src, logger):
@@ -1057,6 +979,11 @@ def _rdf_plugin_install(relight_src, logger):
             raise RuntimeError(f"Not found: {label} in {relight_src}")
     print(f"      OK — relightlab/ structure verified")
     logger.info("Relight structure: OK")
+
+    print("\n[2b] Resetting any previous plugin patch...")
+    _git_reset_patched(relight_src,
+                       [cmake_path, mw_h_path, mw_cpp_path, rti_h_path, rti_cpp_path],
+                       logger)
 
     print("\n[3/5] Copying plugin files → relightlab/...")
     for fname in RDF_PLUGIN_FILES:
@@ -1191,7 +1118,7 @@ def run_rdf_plugin_install():
 
 # ── Logs ───────────────────────────────────────────────────────────────────────
 
-_LOG_MODULES = ['knowledge-graph', 'rdf-plugin']
+_LOG_MODULES = ['jpg-metadata', 'knowledge-graph', 'rdf-plugin']
 
 
 def _collect_logs():
@@ -1296,10 +1223,12 @@ def main():
         if val is None or val.upper() == 'Q':
             break
         if val == '1':
-            run_knowledge_graph()
+            run_jpg_metadata()
         elif val == '2':
             run_rdf_plugin_install()
         elif val == '3':
+            run_knowledge_graph()
+        elif val == '4':
             run_log_viewer()
 
 

@@ -76,7 +76,7 @@ CONSTRUCT {
     a owl:NamedIndividual, chs:Result, a-cd:PhotographicDocumentation ;
     dct:creator rm-agent:huseyin-erdogan ;
     dct:isPartOf ?distJpgURI ;
-    dct:rights <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:rights <LICENSE_URL_PLACEHOLDER> ;
     a-dd:hasMeasurementCollection ?mcollJpgURI ;
     dct:created ?createDateTime ;
     dct:format "image/jpeg" ;
@@ -89,7 +89,7 @@ CONSTRUCT {
     a owl:NamedIndividual, chs:Result, a-cd:PhotographicDocumentation ;
     dct:creator rm-agent:huseyin-erdogan ;
     dct:isPartOf ?distRawURI ;
-    dct:rights <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:rights <LICENSE_URL_PLACEHOLDER> ;
     a-dd:hasMeasurementCollection ?mcollRawURI ;
     dct:created ?createDateTime ;
     dct:format "image/x-fujifilm-raf" ;
@@ -156,8 +156,8 @@ WHERE {
       xyz:FileName    ?fileName ;
       xyz:CreateDate  ?createDateRaw ;
       xyz:FileSize    ?fileSizeRaw ;
-      xyz:ImageWidth  ?imageWidth ;
-      xyz:ImageHeight ?imageHeight .
+      xyz:ImageWidth  ?imageWidthRaw ;
+      xyz:ImageHeight ?imageHeightRaw .
   }
 
   # Accept processed JPEG exports (all jpg-export* variants) AND camera JPEGs
@@ -204,6 +204,14 @@ WHERE {
   # Transform FileSize: "23 MB" → xsd:integer 23
   ##########################################################################
   BIND(xsd:integer(STRBEFORE(?fileSizeRaw, " MB")) AS ?fileSize)
+
+  ##########################################################################
+  # Cast ImageWidth / ImageHeight to xsd:integer.
+  # SPARQL Anything emits these as xsd:int, but a-dd:MeasurementShape requires
+  # xsd:integer and sh:datatype is not subtype-aware (xsd:int != xsd:integer).
+  ##########################################################################
+  BIND(xsd:integer(?imageWidthRaw)  AS ?imageWidth)
+  BIND(xsd:integer(?imageHeightRaw) AS ?imageHeight)
 
   ##########################################################################
   # Construct URIs

@@ -862,3 +862,51 @@ bool RdfExport::write(const Project       &project,
     file.close();
     return true;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  §8  Provenance JSON writer  (public, automatic mode)
+//
+//  Writes an ontology-NEUTRAL provenance JSON sidecar next to info.json,
+//  capturing the full RelightLab job record that only RelightLab knows at
+//  export time. All ontology mapping is deferred to the external KG Builder,
+//  so this output never changes when the ontology evolves.
+//
+//  taskInfo is the JSON RelightLab already emits via Task::info() on
+//  ProcessQueue::finished — for an RtiTask: uuid, label, status, mime,
+//  startedAt, output + parameters{ path, quality, crop, basis, colorSpace,
+//  planeCount, format, webLayout, lossless, iiifManifest, openlime,
+//  colorProfileMode }. Any new RTI parameter added upstream appears here
+//  automatically. We add only what that record lacks: software name+version
+//  and an export timestamp.
+//
+//  The plugin depends ONLY on this JSON, not on any RelightLab class, so it
+//  installs unchanged across RelightLab versions. Does NOT duplicate the heavy
+//  info.json payload (lights, materials) and does NOT read EXIF/XMP — the KG
+//  Builder reads those from info.json and the source JPEGs directly.
+// ═══════════════════════════════════════════════════════════════════════════
+
+bool RdfExport::writeProvenanceJson(const QJsonObject &taskInfo,
+                                    const QString     &outputPath,
+                                    QString           &error)
+{
+    QJsonObject root = taskInfo;
+
+    // exportTimestamp = when this sidecar was written (job start is startedAt).
+    root["exportTimestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+
+    // Processing software — only RelightLab knows its own version.
+    QJsonObject software;
+    software["name"]    = QStringLiteral("RelightLab");
+    software["version"] = QCoreApplication::applicationVersion();
+    software["page"]    = QStringLiteral("https://vcg.isti.cnr.it/relight/");
+    root["software"]    = software;
+
+    QFile file(outputPath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        error = "Cannot write to: " + outputPath;
+        return false;
+    }
+    file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+    file.close();
+    return true;
+}
