@@ -1,0 +1,333 @@
+##############################################################################
+# construct-dataset.sparql  (semRTI-ODP)
+# SPARQL Anything — Section C: per-session resources
+#
+# ODP alignment (CulturalHeritageSurvey.ttl):
+#
+#   chs:CulturalHeritageProject
+#     └─ chs:hasSurvey ──► chs:CulturalHeritageSurvey        [NEW]
+#           ├─ chs:isSurveyOf ──► arco:ArchaeologicalProperty
+#           ├─ chs:usesEquipmentConfiguration ──► chs:EquipmentConfiguration
+#           │     └─ chs:usesEquipment ──► chs:Hardware
+#           └─ chs:hasObservationCollection ──► chs:ObservationCollection
+#
+# Generates for every session in the VALUES table:
+#   rm-project:rupe-magna-rti  chs:hasSurvey  rm-survey:{sessionID}
+#   rm-role:{sessionID}-photographer   core:AgentRole
+#   rm-mcoll:{sessionID}               a-dd:MeasurementCollection
+#   rm-meas:{sessionID}-iso/aperture/shutter-speed/focal-length
+#   rm-econf:{sessionID}               chs:EquipmentConfiguration
+#   rm-survey:{sessionID}              chs:CulturalHeritageSurvey
+#   rm-ocoll:{sessionID}               chs:ObservationCollection
+#   rm-data:{sessionID}                dcat:Dataset
+#   rm-dist:{sessionID}-jpg/raw        dcat:Distribution
+#
+# FILTER covers all jpg-export* variants (jpg-export/, jpg-export-linear/,
+# jpg-export-linear-LC/, etc.) so production datasets are handled correctly.
+#
+# INPUT
+#   EXIF_LOCATION_PLACEHOLDER — replaced by semRTI.py with file:// URI
+#   CSV_LOCATION_PLACEHOLDER  — passed by semRTI.py (placeholder only)
+##############################################################################
+
+PREFIX fx:     <http://sparql.xyz/facade-x/ns/>
+PREFIX xyz:    <http://sparql.xyz/facade-x/data/>
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX dct:    <http://purl.org/dc/terms/>
+PREFIX dcat:   <http://www.w3.org/ns/dcat#>
+PREFIX a-cd:   <https://w3id.org/arco/ontology/context-description/>
+PREFIX a-dd:   <https://w3id.org/arco/ontology/denotative-description/>
+PREFIX chs:    <http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#>
+PREFIX core:   <https://w3id.org/arco/ontology/core/>
+PREFIX muapit: <http://www.ontologydesignpatterns.org/ont/dul/muapit.owl#>
+PREFIX roapit: <http://www.ontologydesignpatterns.org/ont/ro/roapit.owl#>
+PREFIX tiapit: <http://www.ontologydesignpatterns.org/ont/ti/tiapit.owl#>
+PREFIX schema: <https://schema.org/>
+
+PREFIX rm-project: <https://w3id.org/rupemagna/resource/project/>
+PREFIX rm-role:    <https://w3id.org/rupemagna/resource/role/>
+PREFIX rm-mcoll:   <https://w3id.org/rupemagna/resource/measurement-collection/>
+PREFIX rm-meas:    <https://w3id.org/rupemagna/resource/measurement/>
+PREFIX rm-econf:   <https://w3id.org/rupemagna/resource/equipment-config/>
+PREFIX rm-survey:  <https://w3id.org/rupemagna/resource/survey/>
+PREFIX rm-ocoll:   <https://w3id.org/rupemagna/resource/observation-collection/>
+PREFIX rm-data:    <https://w3id.org/rupemagna/resource/dataset/>
+PREFIX rm-dist:    <https://w3id.org/rupemagna/resource/distribution/>
+PREFIX rm-series:  <https://w3id.org/rupemagna/resource/dataset-series/>
+PREFIX rm-fig:     <https://w3id.org/rupemagna/resource/figure/>
+PREFIX rm-agent:   <https://w3id.org/rupemagna/resource/agent/>
+PREFIX rm-equip:   <https://w3id.org/rupemagna/resource/equipment/>
+PREFIX rm-site:    <https://w3id.org/rupemagna/resource/site/>
+PREFIX rm-mtype:   <https://w3id.org/rupemagna/resource/measurement-type/>
+PREFIX rm-unit:    <https://w3id.org/rupemagna/resource/unit/>
+PREFIX prov:       <http://www.w3.org/ns/prov#>
+PREFIX rm-method:  <https://w3id.org/rupemagna/resource/method/>
+
+CONSTRUCT {
+
+  ### ODP top: Project → Survey  [chs:hasSurvey] ###
+  rm-project:rupe-magna-rti chs:hasSurvey ?surveyURI .
+
+  ### AgentRole ###
+  ?roleURI
+    a owl:NamedIndividual, core:AgentRole ;
+    roapit:isRoleOf rm-agent:huseyin-erdogan ;
+    roapit:withRole "Photographer" .
+
+  ### Camera MeasurementCollection ###
+  ?mcollSessionURI
+    a owl:NamedIndividual, a-dd:MeasurementCollection ;
+    a-dd:hasMeasurement
+      ?measIsoURI, ?measApertureURI, ?measShutterURI, ?measFocalURI .
+
+  ?measIsoURI
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:iso ;
+    muapit:hasMeasurementUnit rm-unit:iso-sensitivity ;
+    muapit:value ?isoVal ;
+    rdfs:label ?labelIso .
+
+  ?measApertureURI
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:f-number ;
+    muapit:hasMeasurementUnit rm-unit:f-stop ;
+    muapit:value ?fNumberVal ;
+    rdfs:label ?labelAperture .
+
+  ?measShutterURI
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:exposure-time ;
+    muapit:hasMeasurementUnit rm-unit:second ;
+    muapit:value ?exposureTimeDec ;
+    rdfs:label ?labelShutter .
+
+  ?measFocalURI
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:focal-length ;
+    muapit:hasMeasurementUnit rm-unit:millimetre ;
+    muapit:value ?focalLengthDec ;
+    rdfs:label ?labelFocal .
+
+  ### EquipmentConfiguration ###
+  ?econfURI
+    a owl:NamedIndividual, chs:EquipmentConfiguration ;
+    chs:usesEquipment rm-equip:rti-dome, rm-equip:fujifilm-xs20 ;
+    chs:isEquipmentConfigurationOf ?surveyURI ;
+    a-dd:hasMeasurementCollection ?mcollSessionURI ;
+    rdfs:label ?labelEconf .
+
+  ### Survey  [chs:isSurveyOf — ODP native property, Survey → CulturalProperty] ###
+  ?surveyURI
+    a owl:NamedIndividual, chs:CulturalHeritageSurvey ;
+    chs:usesEquipmentConfiguration ?econfURI ;
+    chs:hasObservationCollection ?ocollURI ;
+    chs:isSurveyOf ?figURI, rm-site:rupe-magna ;
+    core:hasAgentRole ?roleURI ;
+    tiapit:startTime ?startDate ;
+    tiapit:endTime   ?endDate ;
+    chs:usesMethod rm-method:rti ;
+    rdfs:label ?labelSurvey .
+
+  ### ObservationCollection ###
+  ?ocollURI
+    a owl:NamedIndividual, chs:ObservationCollection ;
+    rdfs:label ?labelOcoll .
+
+  ### Dataset ###
+  ?dataURI
+    a owl:NamedIndividual, dcat:Dataset ;
+    dct:creator rm-agent:huseyin-erdogan ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:spatial rm-site:rupe-magna ;
+    dcat:distribution ?distJpgURI, ?distRawURI ;
+    dcat:inSeries ?seriesURI ;
+    dct:identifier ?sessionID ;
+    dct:issued ?startDate ;
+    dct:description ?dataDesc ;
+    dct:title ?labelData ;
+    prov:wasGeneratedBy ?surveyURI .
+
+  ### Distribution JPG ###
+  ?distJpgURI
+    a owl:NamedIndividual, dcat:Distribution ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/image/jpeg> ;
+    dct:format "image/jpeg" ;
+    schema:numberOfItems 48 ;
+    dct:creator rm-agent:huseyin-erdogan ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    prov:wasGeneratedBy ?surveyURI ;
+    dct:title ?labelDistJpg .
+
+  ### Distribution RAW ###
+  ?distRawURI
+    a owl:NamedIndividual, dcat:Distribution ;
+    dct:format "image/x-fujifilm-raf" ;
+    schema:numberOfItems 48 ;
+    dct:creator rm-agent:huseyin-erdogan ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    prov:wasGeneratedBy ?surveyURI ;
+    dct:title ?labelDistRaw .
+}
+WHERE {
+
+  ##########################################################################
+  # Session metadata — embedded VALUES table
+  # Columns: sessionID, figureID, sector, figureName, startDate, endDate
+  ##########################################################################
+  VALUES (?sessionID ?figureID ?sector ?figureName ?startDateStr ?endDateStr) {
+    ("RTI-01" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-02" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-03" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-04" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-05" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-06" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-07" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-08" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-09" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-10" "F01" "AA" "The Praying Figure with Spiral"    "2025-09-05" "2025-09-09")
+    ("RTI-11" "F02" "B"  "The Praying Woman Figure"          "2025-09-05" "2025-09-09")
+    ("RTI-12" "F02" "B"  "The Praying Woman Figure"          "2025-09-05" "2025-09-09")
+    ("RTI-13" "F03" "F"  "The Spiral Figure"                 "2025-09-05" "2025-09-09")
+    ("RTI-14" "F03" "F"  "The Spiral Figure"                 "2025-09-05" "2025-09-09")
+    ("RTI-15" "F03" "F"  "The Spiral Figure"                 "2025-09-05" "2025-09-09")
+    ("RTI-16" "F03" "F"  "The Spiral Figure"                 "2025-09-05" "2025-09-09")
+    ("RTI-17" "F03" "F"  "The Spiral Figure"                 "2025-09-05" "2025-09-09")
+    ("RTI-18" "F03" "F"  "The Spiral Figure"                 "2025-09-05" "2025-09-09")
+    ("RTI-19" "F04" "L"  "The Warrior Figure with Shield"    "2025-09-05" "2025-09-09")
+    ("RTI-20" "F04" "L"  "The Warrior Figure with Shield"    "2025-09-05" "2025-09-09")
+    ("RTI-21" "F04" "L"  "The Warrior Figure with Shield"    "2025-09-05" "2025-09-09")
+    ("RTI-22" "F04" "L"  "The Warrior Figure with Shield"    "2025-09-05" "2025-09-09")
+    ("RTI-23" "F04" "L"  "The Warrior Figure with Shield"    "2025-09-05" "2025-09-09")
+    ("RTI-24" "F05" "L"  "The Second Warrior Figure"         "2025-09-05" "2025-09-09")
+    ("RTI-25" "F06" "L"  "The Wild Boar Figure"              "2025-09-05" "2025-09-09")
+    ("RTI-26" "F06" "L"  "The Wild Boar Figure"              "2025-09-05" "2025-09-09")
+    ("RTI-27" "F07" "Q"  "The Goat Figure with a Beard"      "2025-09-05" "2025-09-09")
+    ("RTI-28" "F07" "Q"  "The Goat Figure with a Beard"      "2025-09-05" "2025-09-09")
+    ("RTI-29" "F08" "Q"  "The Second Goat Figure"            "2025-09-05" "2025-09-09")
+    ("RTI-30" "F08" "Q"  "The Second Goat Figure"            "2025-09-05" "2025-09-09")
+    ("RTI-31" "F08" "Q"  "The Second Goat Figure"            "2025-09-05" "2025-09-09")
+    ("RTI-32" "F08" "Q"  "The Second Goat Figure"            "2025-09-05" "2025-09-09")
+    ("RTI-33" "F08" "Q"  "The Second Goat Figure"            "2025-09-05" "2025-09-09")
+    ("RTI-34" "F09" "Q"  "The Map-like Figure"               "2025-09-05" "2025-09-09")
+    ("RTI-35" "F09" "Q"  "The Map-like Figure"               "2025-09-05" "2025-09-09")
+    ("RTI-36" "F10" "S"  "The Knight Figure"                 "2025-09-05" "2025-09-09")
+    ("RTI-37" "F10" "S"  "The Knight Figure"                 "2025-09-05" "2025-09-09")
+    ("RTI-38" "F10" "S"  "The Knight Figure"                 "2025-09-05" "2025-09-09")
+    ("RTI-39" "F11" "S"  "The Figure with a Square"          "2025-09-05" "2025-09-09")
+    ("RTI-40" "F11" "S"  "The Figure with a Square"          "2025-09-05" "2025-09-09")
+  }
+
+  BIND(xsd:date(?startDateStr) AS ?startDate)
+  BIND(xsd:date(?endDateStr)   AS ?endDate)
+
+  ##########################################################################
+  # Camera settings — one representative EXIF record per session.
+  # FILTER matches any jpg-export* variant (jpg-export/, jpg-export-linear/,
+  # jpg-export-linear-LC/, etc.) so all production dataset layouts work.
+  ##########################################################################
+  SERVICE <x-sparql-anything:EXIF_LOCATION_PLACEHOLDER> {
+    ?root a fx:root ;
+          ?idx ?exifItem .
+    ?exifItem
+      xyz:SourceFile   ?sp ;
+      xyz:ISO          ?isoRaw ;
+      xyz:FNumber      ?fnRaw ;
+      xyz:ExposureTime ?expRaw ;
+      xyz:FocalLength  ?focalRaw .
+    # Match all jpg-export* variants AND jpg/ for datasets without Fast Forge output
+    FILTER(REGEX(?sp, "/(jpg-export[^/]*|jpg)/"))
+  }
+
+  # Extract sessionID from path (works for both jpg-export* and jpg/ layouts)
+  BIND(REPLACE(?sp, ".*/([^/]+)/([^/]+)/(jpg-export[^/]*|jpg)/.*", "$2") AS ?sessFromPath)
+  FILTER(?sessFromPath = ?sessionID)
+
+  # Priority: skip jpg/ entries for sessions that also have a jpg-export* directory.
+  # This prevents duplicate triples when both directories exist in the same session.
+  BIND(REGEX(?sp, "/jpg-export[^/]*/") AS ?isExport)
+  FILTER(
+    ?isExport
+    || NOT EXISTS {
+      SERVICE <x-sparql-anything:EXIF_LOCATION_PLACEHOLDER> {
+        ?root2 a fx:root ; ?idx2 ?checkItem .
+        ?checkItem xyz:SourceFile ?checkPath .
+      }
+      FILTER(REGEX(?checkPath, "/jpg-export[^/]*/"))
+      FILTER(CONTAINS(?checkPath, CONCAT("/", ?sessFromPath, "/")))
+    }
+  )
+
+  ##########################################################################
+  # Camera value transforms
+  ##########################################################################
+  BIND(xsd:integer(?isoRaw) AS ?isoVal)
+  BIND(xsd:decimal(?fnRaw)  AS ?fNumberVal)
+  BIND(
+    xsd:decimal(STRBEFORE(STR(?expRaw), "/")) /
+    xsd:decimal(STRAFTER(STR(?expRaw), "/"))
+    AS ?exposureTimeDec)
+  BIND(xsd:decimal(STRBEFORE(STR(?focalRaw), " mm")) AS ?focalLengthDec)
+
+  ##########################################################################
+  # URI construction
+  ##########################################################################
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/role/",
+       ?sessionID, "-photographer")) AS ?roleURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement-collection/",
+       ?sessionID)) AS ?mcollSessionURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+       ?sessionID, "-iso")) AS ?measIsoURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+       ?sessionID, "-aperture")) AS ?measApertureURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+       ?sessionID, "-shutter-speed")) AS ?measShutterURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+       ?sessionID, "-focal-length")) AS ?measFocalURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/equipment-config/",
+       ?sessionID)) AS ?econfURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/survey/",
+       ?sessionID)) AS ?surveyURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/observation-collection/",
+       ?sessionID)) AS ?ocollURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/dataset/",
+       ?sessionID)) AS ?dataURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/distribution/",
+       ?sessionID, "-jpg")) AS ?distJpgURI)
+  BIND(IF(?isExport,
+       IRI(CONCAT("https://w3id.org/rupemagna/resource/distribution/",
+       ?sessionID, "-raw")), ?_undef) AS ?distRawURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/figure/",
+       ?figureID)) AS ?figURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/dataset-series/",
+       ?figureID)) AS ?seriesURI)
+
+  ##########################################################################
+  # Labels
+  ##########################################################################
+  BIND(STRLANG(CONCAT("ISO sensitivity — ", ?sessionID), "en") AS ?labelIso)
+  BIND(STRLANG(CONCAT("Aperture — ", ?sessionID), "en") AS ?labelAperture)
+  BIND(STRLANG(CONCAT("Shutter speed — ", ?sessionID), "en") AS ?labelShutter)
+  BIND(STRLANG(CONCAT("Focal length — ", ?sessionID), "en") AS ?labelFocal)
+  BIND(STRLANG(CONCAT("Equipment Configuration — ", ?figureID, ", ",
+       ?sessionID, ", Rupe Magna"), "en") AS ?labelEconf)
+  BIND(STRLANG(CONCAT("RTI Survey — ", ?figureName, " (", ?figureID,
+       "), Sector ", ?sector, ", ", ?sessionID, ", Rupe Magna"),
+       "en") AS ?labelSurvey)
+  BIND(STRLANG(CONCAT("Observation Collection — ", ?figureID, ", ",
+       ?sessionID, ", Rupe Magna"), "en") AS ?labelOcoll)
+  BIND(STRLANG(CONCAT("RTI Dataset — ", ?figureID, ", ",
+       ?sessionID, ", Rupe Magna"), "en") AS ?labelData)
+  BIND(STRLANG(CONCAT(?sessionID, " JPEG Export — 48 images"),
+       "en") AS ?labelDistJpg)
+  BIND(STRLANG(CONCAT(?sessionID, " RAW Files — 48 images"),
+       "en") AS ?labelDistRaw)
+  BIND(STRLANG(CONCAT(
+       "Photographic RTI dataset of ", ?figureName, " (", ?figureID,
+       "), acquisition session ", ?sessionID,
+       ". Comprises 48 JPG and 48 RAF images captured with a custom-built ",
+       "portable RTI dome at Rupe Magna Rock Engraving Park, Grosio, Italy."),
+       "en") AS ?dataDesc)
+}
