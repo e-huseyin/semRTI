@@ -1,0 +1,198 @@
+# construct-rti.sparql — RTI provenance (RTI processing output)
+#
+# Builds the RTI distribution triples for ONE dataset from the ontology-neutral
+# files RelightLab produces, replacing the old approach of concatenating the
+# plugin's hand-written TTL. Run once per dataset by semRTI.py.
+#
+# Placeholders (substituted by semRTI.py with file:// URIs):
+#   PROV_LOCATION_PLACEHOLDER — the provenance JSON (e.g. F01RTI08-ptm.json)
+#   INFO_LOCATION_PLACEHOLDER — the sibling info.json
+#
+# Session / figure / type are derived from the provenance "output" path
+#   .../<figure>/<session>/<type>   e.g. .../F01/RTI-08/ptm
+#
+# Technical scalars (nplanes, quality, basis type, colourspace) come from
+# info.json (authoritative); the processing delta (crop, colour-profile mode,
+# format, web layout, openlime, software version) comes from the provenance JSON.
+
+PREFIX fx:     <http://sparql.xyz/facade-x/ns/>
+PREFIX xyz:    <http://sparql.xyz/facade-x/data/>
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX dct:    <http://purl.org/dc/terms/>
+PREFIX dcat:   <http://www.w3.org/ns/dcat#>
+PREFIX a-dd:   <https://w3id.org/arco/ontology/denotative-description/>
+PREFIX chs:    <http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#>
+PREFIX muapit: <http://www.ontologydesignpatterns.org/ont/dul/muapit.owl#>
+PREFIX schema: <https://schema.org/>
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+PREFIX prov:   <http://www.w3.org/ns/prov#>
+PREFIX geo:    <http://www.opengis.net/ont/geosparql#>
+PREFIX rm-data:   <https://w3id.org/rupemagna/resource/dataset/>
+PREFIX rm-dist:   <https://w3id.org/rupemagna/resource/distribution/>
+PREFIX rm-mcoll:  <https://w3id.org/rupemagna/resource/measurement-collection/>
+PREFIX rm-meas:   <https://w3id.org/rupemagna/resource/measurement/>
+PREFIX rm-mtype:  <https://w3id.org/rupemagna/resource/measurement-type/>
+PREFIX rm-equip:  <https://w3id.org/rupemagna/resource/equipment/>
+PREFIX rm-agent:  <https://w3id.org/rupemagna/resource/agent/>
+PREFIX rm-survey: <https://w3id.org/rupemagna/resource/survey/>
+PREFIX rm-site:   <https://w3id.org/rupemagna/resource/site/>
+
+CONSTRUCT {
+
+  ### RTI.1  Dataset → RTI distribution ###
+  ?dataURI dcat:distribution ?distURI .
+
+  ### RTI.2  RTI distribution ###
+  ?distURI
+    a owl:NamedIndividual, dcat:Distribution, chs:Result ;
+    dct:title ?distTitle ;
+    dct:format ?formatLabel ;
+    schema:width ?width ;
+    schema:height ?height ;
+    dct:creator rm-agent:huseyin-erdogan ;
+    dct:license <LICENSE_URL_PLACEHOLDER> ;
+    dct:created ?started ;
+    dct:identifier ?uuid ;
+    prov:wasGeneratedBy ?surveyURI ;
+    dct:spatial rm-site:rupe-magna ;
+    a-dd:hasMeasurementCollection ?mcollURI ;
+    rdfs:label ?distLabel .
+
+  ### RTI.3  Measurement collection + measurements ###
+  ?mcollURI
+    a owl:NamedIndividual, a-dd:MeasurementCollection ;
+    rdfs:label ?mcollLabel ;
+    a-dd:hasMeasurement
+      ?measNplanes, ?measQuality, ?measType,
+      ?measWeblayout, ?measCpm, ?measOpenlime, ?measCrop .
+
+  ?measNplanes
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:rti-nplanes ;
+    muapit:value ?nplanes ;
+    rdfs:label ?labelNplanes .
+
+  ?measQuality
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:jpeg-quality ;
+    muapit:value ?quality ;
+    rdfs:label ?labelQuality .
+
+  ?measType
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:rti-basis-type ;
+    muapit:value ?basisUpper ;
+    rdfs:label ?labelType .
+
+  ?measWeblayout
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:rti-web-layout ;
+    muapit:value ?webLayoutLc ;
+    rdfs:label ?labelWeblayout .
+
+  ?measCpm
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:rti-color-profile-mode ;
+    muapit:value ?cpm ;
+    rdfs:label ?labelCpm .
+
+  ?measOpenlime
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:rti-openlime ;
+    muapit:value ?openlime ;
+    rdfs:label ?labelOpenlime .
+
+  ?measCrop
+    a owl:NamedIndividual, a-dd:Measurement ;
+    a-dd:measurementType rm-mtype:rti-crop-origin ;
+    muapit:value ?cropStr ;
+    rdfs:label ?labelCrop .
+
+  ### RTI.4  Processing software ###
+  rm-equip:relightlab
+    a owl:NamedIndividual, chs:Hardware ;
+    dct:title "RelightLab" ;
+    schema:version ?swVersion ;
+    foaf:page <https://vcg.isti.cnr.it/relight/> ;
+    rdfs:label ?swLabel .
+}
+WHERE {
+
+  ###################################################################
+  # Provenance JSON — identity + processing delta
+  ###################################################################
+  SERVICE <x-sparql-anything:PROV_LOCATION_PLACEHOLDER> {
+    ?root xyz:uuid       ?uuidRaw ;
+          xyz:startedAt  ?startedRaw ;
+          xyz:output     ?outPath ;
+          xyz:software   ?sw ;
+          xyz:parameters ?params .
+    ?sw     xyz:version  ?swVersion .
+    ?params xyz:openlime ?openlimeRaw ;
+            xyz:format   ?formatRaw ;
+            xyz:webLayout ?webLayoutRaw ;
+            xyz:colorProfileMode ?cpmRaw ;
+            xyz:crop     ?crop .
+    ?crop xyz:left ?cropX ; xyz:top ?cropY ; xyz:angle ?cropAngle .
+  }
+
+  ###################################################################
+  # info.json — authoritative technical scalars
+  ###################################################################
+  SERVICE <x-sparql-anything:INFO_LOCATION_PLACEHOLDER> {
+    ?iroot xyz:nplanes ?nplanesRaw ;
+           xyz:quality ?qualityRaw ;
+           xyz:type    ?basisLc ;
+           xyz:width   ?widthRaw ;
+           xyz:height  ?heightRaw .
+  }
+
+  # ---- identity derived from the output path  .../<figure>/<session>/<type>
+  BIND(REPLACE(?outPath, ".*/([^/]+)$", "$1")                 AS ?type)
+  BIND(REPLACE(?outPath, ".*/([^/]+)/([^/]+)$", "$1")         AS ?session)
+  BIND(REPLACE(?session, "-", "")                             AS ?sessionFlat)
+  BIND(STR(?uuidRaw)                                          AS ?uuid)
+  BIND(xsd:dateTime(?startedRaw)                              AS ?started)
+  BIND(UCASE(?basisLc)                                        AS ?basisUpper)
+  BIND(xsd:integer(?nplanesRaw)                               AS ?nplanes)
+  BIND(xsd:integer(?qualityRaw)                               AS ?quality)
+  BIND(xsd:integer(?widthRaw)                                 AS ?width)
+  BIND(xsd:integer(?heightRaw)                                AS ?height)
+  # colour-profile mode: map RelightLab enum names to readable labels
+  BIND(IF(?cpmRaw = "COLOR_PROFILE_LINEAR_RGB", "Linear RGB",
+       IF(?cpmRaw = "COLOR_PROFILE_SRGB",       "sRGB",
+       IF(?cpmRaw = "COLOR_PROFILE_DISPLAY_P3", "Display P3", ?cpmRaw))) AS ?cpm)
+  BIND(LCASE(?webLayoutRaw)                                   AS ?webLayoutLc)
+  BIND(xsd:boolean(?openlimeRaw)                              AS ?openlime)
+  BIND(CONCAT("x=", STR(?cropX), " y=", STR(?cropY), " angle=", STR(?cropAngle)) AS ?cropStr)
+  BIND(CONCAT("RTI (", STR(?formatRaw), ")")                 AS ?formatLabel)
+
+  # ---- IRIs
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/dataset/", ?session))                       AS ?dataURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/survey/", ?session))                        AS ?surveyURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/distribution/", ?session, "-", ?type))      AS ?distURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement-collection/", ?session, "-", ?type)) AS ?mcollURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/", ?session, "-", ?type, "-nplanes"))  AS ?measNplanes)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/", ?session, "-", ?type, "-quality"))  AS ?measQuality)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/", ?session, "-", ?type, "-type"))     AS ?measType)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/", ?session, "-", ?type, "-weblayout")) AS ?measWeblayout)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/", ?session, "-", ?type, "-cpm"))      AS ?measCpm)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/", ?session, "-", ?type, "-openlime")) AS ?measOpenlime)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/", ?session, "-", ?type, "-croporigin")) AS ?measCrop)
+
+  # ---- labels
+  BIND(CONCAT(?basisUpper, " distribution — ", ?session)               AS ?distLabel)
+  BIND(CONCAT(?basisUpper, " output — ", ?session)                     AS ?distTitle)
+  BIND(CONCAT("RTI processing parameters — ", ?session)                AS ?mcollLabel)
+  BIND(CONCAT(?basisUpper, " planes: ", STR(?nplanes), " — ", ?session) AS ?labelNplanes)
+  BIND(CONCAT("JPEG quality: ", STR(?quality), " — ", ?session)        AS ?labelQuality)
+  BIND(CONCAT("RTI basis type: ", ?basisUpper, " — ", ?session)        AS ?labelType)
+  BIND(CONCAT("Web layout: ", ?webLayoutLc, " — ", ?session)           AS ?labelWeblayout)
+  BIND(CONCAT("Colour profile mode: ", STR(?cpm), " — ", ?session)     AS ?labelCpm)
+  BIND(CONCAT("OpenLime viewer: ", STR(?openlime), " — ", ?session)    AS ?labelOpenlime)
+  BIND(CONCAT("Crop origin — ", ?session)                              AS ?labelCrop)
+  BIND(CONCAT("RelightLab ", STR(?swVersion))                          AS ?swLabel)
+}

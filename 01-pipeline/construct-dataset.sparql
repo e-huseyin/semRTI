@@ -1,6 +1,6 @@
 ##############################################################################
 # construct-dataset.sparql  (semRTI-ODP)
-# SPARQL Anything — Section C: per-session resources
+# SPARQL Anything — dataset triples: per-session resources
 #
 # ODP alignment (CulturalHeritageSurvey.ttl):
 #
@@ -140,7 +140,7 @@ CONSTRUCT {
   ?dataURI
     a owl:NamedIndividual, dcat:Dataset ;
     dct:creator rm-agent:huseyin-erdogan ;
-    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:spatial rm-site:rupe-magna ;
     dcat:distribution ?distJpgURI, ?distRawURI ;
     dcat:inSeries ?seriesURI ;
@@ -150,14 +150,19 @@ CONSTRUCT {
     dct:title ?labelData ;
     prov:wasGeneratedBy ?surveyURI .
 
+  ### DatasetSeries → Dataset: data-driven seriesMember (T6).
+  ### Replaces the static list in shared.ttl — only existing datasets become
+  ### members, so dangling seriesMember is structurally impossible. ###
+  ?seriesURI dcat:seriesMember ?dataURI .
+
   ### Distribution JPG ###
   ?distJpgURI
     a owl:NamedIndividual, dcat:Distribution ;
     dcat:mediaType <https://www.iana.org/assignments/media-types/image/jpeg> ;
     dct:format "image/jpeg" ;
-    schema:numberOfItems 48 ;
+    schema:numberOfItems ?itemCount ;
     dct:creator rm-agent:huseyin-erdogan ;
-    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:license <LICENSE_URL_PLACEHOLDER> ;
     prov:wasGeneratedBy ?surveyURI ;
     dct:title ?labelDistJpg .
 
@@ -165,9 +170,9 @@ CONSTRUCT {
   ?distRawURI
     a owl:NamedIndividual, dcat:Distribution ;
     dct:format "image/x-fujifilm-raf" ;
-    schema:numberOfItems 48 ;
+    schema:numberOfItems ?itemCount ;
     dct:creator rm-agent:huseyin-erdogan ;
-    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:license <LICENSE_URL_PLACEHOLDER> ;
     prov:wasGeneratedBy ?surveyURI ;
     dct:title ?labelDistRaw .
 }
@@ -272,6 +277,38 @@ WHERE {
   BIND(xsd:decimal(STRBEFORE(STR(?focalRaw), " mm")) AS ?focalLengthDec)
 
   ##########################################################################
+  # Real item count per session (data-driven, replaces hard-coded 48).
+  # Counts the distinct captures the same way the main body selects them
+  # (jpg-export* preferred, else jpg/). Each capture = 1 JPEG + 1 RAF, so both
+  # distributions use this count. The text labels reuse ?itemCountStr.
+  ##########################################################################
+  {
+    SELECT ?cntSession (COUNT(DISTINCT ?cntPath) AS ?itemCount) WHERE {
+      SERVICE <x-sparql-anything:EXIF_LOCATION_PLACEHOLDER> {
+        ?cntRoot a fx:root ; ?cntIdx ?cntItem .
+        ?cntItem xyz:SourceFile ?cntPath .
+      }
+      FILTER(REGEX(?cntPath, "/(jpg-export[^/]*|jpg)/"))
+      BIND(REPLACE(?cntPath, ".*/([^/]+)/([^/]+)/(jpg-export[^/]*|jpg)/.*", "$2") AS ?cntSession)
+      BIND(REGEX(?cntPath, "/jpg-export[^/]*/") AS ?cntIsExport)
+      FILTER(
+        ?cntIsExport
+        || NOT EXISTS {
+          SERVICE <x-sparql-anything:EXIF_LOCATION_PLACEHOLDER> {
+            ?cntRoot2 a fx:root ; ?cntIdx2 ?cntChk .
+            ?cntChk xyz:SourceFile ?cntChkPath .
+          }
+          FILTER(REGEX(?cntChkPath, "/jpg-export[^/]*/"))
+          FILTER(CONTAINS(?cntChkPath, CONCAT("/", ?cntSession, "/")))
+        }
+      )
+    }
+    GROUP BY ?cntSession
+  }
+  FILTER(?cntSession = ?sessionID)
+  BIND(STR(?itemCount) AS ?itemCountStr)
+
+  ##########################################################################
   # URI construction
   ##########################################################################
   BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/role/",
@@ -320,14 +357,14 @@ WHERE {
        ?sessionID, ", Rupe Magna"), "en") AS ?labelOcoll)
   BIND(STRLANG(CONCAT("RTI Dataset — ", ?figureID, ", ",
        ?sessionID, ", Rupe Magna"), "en") AS ?labelData)
-  BIND(STRLANG(CONCAT(?sessionID, " JPEG Export — 48 images"),
+  BIND(STRLANG(CONCAT(?sessionID, " JPEG Export — ", ?itemCountStr, " images"),
        "en") AS ?labelDistJpg)
-  BIND(STRLANG(CONCAT(?sessionID, " RAW Files — 48 images"),
+  BIND(STRLANG(CONCAT(?sessionID, " RAW Files — ", ?itemCountStr, " images"),
        "en") AS ?labelDistRaw)
   BIND(STRLANG(CONCAT(
        "Photographic RTI dataset of ", ?figureName, " (", ?figureID,
        "), acquisition session ", ?sessionID,
-       ". Comprises 48 JPG and 48 RAF images captured with a custom-built ",
+       ". Comprises ", ?itemCountStr, " JPG and ", ?itemCountStr, " RAF images captured with a custom-built ",
        "portable RTI dome at Rupe Magna Rock Engraving Park, Grosio, Italy."),
        "en") AS ?dataDesc)
 }

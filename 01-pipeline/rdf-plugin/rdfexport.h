@@ -28,6 +28,7 @@
 
 #include <QString>
 #include <QDateTime>
+#include <QJsonObject>
 
 class Project;
 class RtiParameters;
@@ -122,6 +123,17 @@ public:
                       const RdfMetadata   &meta,
                       const QString       &outputPath,
                       QString             &error);
+
+    // Automatic mode: ontology-NEUTRAL provenance JSON sidecar.
+    // Takes the RelightLab job record as a QJsonObject (the value RelightLab
+    // already emits via Task::info() on ProcessQueue::finished) and writes it
+    // to outputPath, adding only software name+version and an export timestamp.
+    // Depends only on that JSON — NOT on any RelightLab class — so the plugin
+    // stays portable across RelightLab versions. All ontology mapping is
+    // deferred to the external KG Builder.
+    static bool writeProvenanceJson(const QJsonObject &taskInfo,
+                                    const QString     &outputPath,
+                                    QString           &error);
 
 private:
     static QString slugify(const QString &s);

@@ -1,0 +1,37 @@
+{
+    "error": "",
+    "exportTimestamp": "2026-07-01T00:37:37Z",
+    "label": "PTM18 (RGB) web: deepzoom",
+    "log": "",
+    "mime": "RELIGHT",
+    "output": "/Volumes/ehuseyin/3DARCHEO/02-datasets/Rupe Magna/F08/RTI-33/ptm",
+    "parameters": {
+        "basis": "PTM",
+        "colorProfileMode": "COLOR_PROFILE_LINEAR_RGB",
+        "colorSpace": "RGB",
+        "crop": {
+            "angle": 0,
+            "height": 3733,
+            "left": 320,
+            "top": 213,
+            "width": 5600
+        },
+        "format": "WEB",
+        "iiifManifest": false,
+        "lossless": false,
+        "openlime": true,
+        "path": "/Volumes/ehuseyin/3DARCHEO/02-datasets/Rupe Magna/F08/RTI-33/ptm",
+        "planeCount": 18,
+        "quality": 95,
+        "taskType": "RTI",
+        "webLayout": "DEEPZOOM"
+    },
+    "software": {
+        "name": "RelightLab",
+        "page": "https://vcg.isti.cnr.it/relight/",
+        "version": "2026.03"
+    },
+    "startedAt": "2026-07-01T00:26:57.976Z",
+    "status": 4,
+    "uuid": "{f35412b0-b68f-4ea3-8acb-23319c67f5bb}"
+}
