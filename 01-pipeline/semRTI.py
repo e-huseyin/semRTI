@@ -254,6 +254,22 @@ def _ttl_number(value):
     return str(value).strip()
 
 
+_ORCID_RE = re.compile(r'^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$')
+
+
+def _orcid_iri(value):
+    """Return a valid absolute ORCID IRI, or None if value is not a usable ORCID.
+    Accepts a full http(s) URL or a bare 16-digit ORCID (normalised to the URL form)."""
+    if not value:
+        return None
+    v = str(value).strip()
+    if v.startswith(('http://', 'https://')) and ' ' not in v:
+        return v
+    if _ORCID_RE.match(v):
+        return 'https://orcid.org/' + v
+    return None
+
+
 def _metadata_ttl(meta):
     """Turtle for the project agent and site whose VALUES come from
     enrich-metadata.json. Only non-blank fields are emitted, so a missing value
@@ -263,7 +279,8 @@ def _metadata_ttl(meta):
     agent = []
     if meta.get('author'):      agent.append(f'    foaf:name "{_ttl_literal(meta["author"])}"')
     if meta.get('email'):       agent.append(f'    foaf:mbox <mailto:{meta["email"]}>')
-    if meta.get('orcid'):       agent.append(f'    schema:identifier <{meta["orcid"]}>')
+    orcid_iri = _orcid_iri(meta.get('orcid'))
+    if orcid_iri:               agent.append(f'    schema:identifier <{orcid_iri}>')
     if meta.get('affiliation'): agent.append(f'    schema:affiliation "{_ttl_literal(meta["affiliation"])}"')
     if meta.get('role'):        agent.append(f'    schema:jobTitle "{_ttl_literal(meta["role"])}"')
 
