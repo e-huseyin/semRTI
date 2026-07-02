@@ -1028,7 +1028,9 @@ def _patch_rtiframe_cpp(cpp_path):
         else:
             print("      [!] rtiframe.cpp: emit processStarted() anchor not found — auto-export call skipped")
 
-    if 'void RtiFrame::exportRdfSidecar(' not in content:
+    if 'void RtiFrame::exportRdfSidecar(' not in content and '#include "rdfexport.h"' in content:
+        # Only append the implementation to a genuine, wired rtiframe.cpp (rdfexport.h present);
+        # never inject the method into an unrelated file that lacks the required include.
         sidecar_impl = (
             '\n\nvoid RtiFrame::exportRdfSidecar(const QJsonObject &task) {\n'
             '\t// Automatic, ontology-neutral provenance sidecar.\n'
