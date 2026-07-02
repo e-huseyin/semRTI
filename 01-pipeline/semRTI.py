@@ -484,14 +484,18 @@ def _run_construct(template_path, replacements, out_path, logger):
     with open(tmp, 'w', encoding='utf-8') as f:
         f.write(query)
 
-    result = subprocess.run(
-        ['java', '-jar', SPARQL_ANYTHING_JAR, '-q', tmp, '-o', out_path],
-        capture_output=True, text=True
-    )
     try:
-        os.remove(tmp)
-    except Exception:
-        pass
+        result = subprocess.run(
+            ['java', '-jar', SPARQL_ANYTHING_JAR, '-q', tmp, '-o', out_path],
+            capture_output=True, text=True
+        )
+    finally:
+        # Remove the temp query even if the run is interrupted, so no stray
+        # _tmp-*.sparql is left in the watched SCRIPT_DIR.
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
 
     if result.returncode != 0:
         logger.error(f"SPARQL Anything failed "
