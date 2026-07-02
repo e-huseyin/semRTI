@@ -239,8 +239,9 @@ def _to_file_uri(path):
 
 
 def _ttl_literal(s):
-    """Escape a value for use inside a Turtle quoted literal."""
-    return str(s).replace('\\', '\\\\').replace('"', '\\"')
+    """Escape a value for use inside a Turtle quoted literal (incl. control chars)."""
+    return (str(s).replace('\\', '\\\\').replace('"', '\\"')
+            .replace('\n', '\\n').replace('\r', '\\r').replace('\t', '\\t'))
 
 
 def _ttl_number(value):
@@ -604,6 +605,15 @@ def _kg_build_final(dataset_dir, site_name, meta, logger):
     ok_c = _kg_step3_section_c(exif_json, tmp_c, extra, logger)
     ok_d = _kg_step4_section_d(exif_json, tmp_d, extra, logger)
     print(f"      → C: {'OK' if ok_c else 'FAILED'}   D: {'OK' if ok_d else 'FAILED'}")
+    if not (ok_c and ok_d):
+        # A partial graph (missing dataset/photo triples) must not be reported as success.
+        failed = [n for n, ok in (('dataset (C)', ok_c), ('photo (D)', ok_d)) if not ok]
+        for t in (tmp_c, tmp_d):
+            try:
+                os.remove(t)
+            except OSError:
+                pass
+        raise RuntimeError(f"knowledge-graph build failed: {', '.join(failed)} produced no triples")
 
     print("\n[3/4] Mapping RTI provenance...")
     logger.info("=== RTI provenance ===")
