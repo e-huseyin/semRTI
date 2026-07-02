@@ -410,13 +410,19 @@ def _kg_step2_exif_export(dataset_dir, exif_json, logger):
         logger.error(f"exiftool export failed: {result.stderr.strip()}")
         return 0
 
+    # Validate BEFORE writing: a truncated/garbled exiftool output must never reach
+    # disk, otherwise the next SPARQL step would silently consume corrupt EXIF.
+    try:
+        records = json.loads(result.stdout)
+    except Exception as e:
+        logger.error(f"exiftool returned invalid JSON — writing empty set instead: {e}")
+        with open(exif_json, 'w', encoding='utf-8') as f:
+            f.write('[]')
+        return 0
+
     with open(exif_json, 'w', encoding='utf-8') as f:
         f.write(result.stdout)
-
-    try:
-        count = len(json.loads(result.stdout))
-    except Exception:
-        count = 0
+    count = len(records)
     n_folders = len({os.path.dirname(s) for s in sources})
     logger.info(f"EXIF export: {count} records from {n_folders} source "
                 f"folder(s) → {exif_json}")
