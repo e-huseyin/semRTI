@@ -243,6 +243,17 @@ def _ttl_literal(s):
     return str(s).replace('\\', '\\\\').replace('"', '\\"')
 
 
+def _ttl_number(value):
+    """Return value unchanged if it is a real number, else None.
+    Keeps a malformed geo coordinate from breaking the whole graph (validated,
+    original formatting preserved)."""
+    try:
+        float(value)
+    except (TypeError, ValueError):
+        return None
+    return str(value).strip()
+
+
 def _metadata_ttl(meta):
     """Turtle for the project agent and site whose VALUES come from
     enrich-metadata.json. Only non-blank fields are emitted, so a missing value
@@ -257,9 +268,12 @@ def _metadata_ttl(meta):
     if meta.get('role'):        agent.append(f'    schema:jobTitle "{_ttl_literal(meta["role"])}"')
 
     site = []
-    if meta.get('gps_lat'):  site.append(f'    geo:lat   {meta["gps_lat"]}')
-    if meta.get('gps_lon'):  site.append(f'    geo:long  {meta["gps_lon"]}')
-    if meta.get('gps_alt'):  site.append(f'    geo:alt   {meta["gps_alt"]}')
+    lat = _ttl_number(meta.get('gps_lat'))
+    lon = _ttl_number(meta.get('gps_lon'))
+    alt = _ttl_number(meta.get('gps_alt'))
+    if lat is not None:  site.append(f'    geo:lat   {lat}')
+    if lon is not None:  site.append(f'    geo:long  {lon}')
+    if alt is not None:  site.append(f'    geo:alt   {alt}')
     if meta.get('city'):     site.append(f'    schema:addressLocality "{_ttl_literal(meta["city"])}"')
     if meta.get('province'): site.append(f'    schema:addressRegion   "{_ttl_literal(meta["province"])}"')
     if meta.get('country'):  site.append(f'    schema:addressCountry  "{_ttl_literal(meta["country"])}"')
