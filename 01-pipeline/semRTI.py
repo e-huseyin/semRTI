@@ -364,10 +364,14 @@ def _kg_step1_metadata(dataset_dir, site_name, meta, logger):
             cmd += [f'-GPSAltitude={gps_alt}', '-GPSAltitudeRef=0']
 
         result = subprocess.run(cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            logger.warning(f"exiftool warning for {cur}: {result.stderr.strip()}")
-
         n = len(imgs)
+        if result.returncode != 0:
+            # exiftool failed here — do not report unstamped files as done.
+            logger.error(f"exiftool failed for {cur} (rc={result.returncode}): "
+                         f"{result.stderr.strip()}")
+            print(f"           {label} — FAILED ({n} files skipped)")
+            continue
+
         total += n
         print(f"           {label} — {n} files")
         logger.info(f"Metadata written: {label}  ({n} files)")
@@ -735,7 +739,11 @@ def run_jpg_metadata():
     logger.info(f"JPG metadata stamping — {dataset_dir}")
     try:
         total = _kg_step1_metadata(dataset_dir, site_name, meta, logger)
-        console.print(f"\n  [green]✓ {total} JPG file(s) updated[/green]")
+        if total > 0:
+            console.print(f"\n  [green]✓ {total} JPG file(s) updated[/green]")
+        else:
+            console.print("\n  [yellow][!] No JPGs updated — no images found in "
+                          "jpg*/jpeg* folders, or exiftool failed (see log).[/yellow]")
     except Exception as e:
         console.print(f"\n  [red][!] Error: {e}[/red]")
         logger.error(str(e), exc_info=True)
