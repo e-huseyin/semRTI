@@ -7,6 +7,7 @@
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix geo1: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
 @prefix muapit: <http://www.ontologydesignpatterns.org/ont/dul/muapit.owl#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
@@ -17,6 +18,7 @@
 @prefix rm-econf: <https://w3id.org/rupemagna/resource/equipment-config/> .
 @prefix rm-equip: <https://w3id.org/rupemagna/resource/equipment/> .
 @prefix rm-fig: <https://w3id.org/rupemagna/resource/figure/> .
+@prefix rm-geom: <https://w3id.org/rupemagna/resource/geometry/> .
 @prefix rm-mcoll: <https://w3id.org/rupemagna/resource/measurement-collection/> .
 @prefix rm-meas: <https://w3id.org/rupemagna/resource/measurement/> .
 @prefix rm-method: <https://w3id.org/rupemagna/resource/method/> .
@@ -1051,6 +1053,10 @@ rm-econf:RTI-40 a chs:EquipmentConfiguration,
     chs:usesEquipment rm-equip:fujifilm-xs20,
         rm-equip:rti-dome ;
     a-dd:hasMeasurementCollection rm-mcoll:RTI-40 .
+
+rm-geom:rupe-magna a geosparql:Geometry,
+        owl:NamedIndividual ;
+    geosparql:asWKT "POINT(10.264064 46.292692)"^^geosparql:wktLiteral .
 
 rm-mcoll:DSCF4264-jpg a owl:NamedIndividual,
         a-dd:MeasurementCollection ;
@@ -87565,7 +87571,7 @@ rm-survey:RTI-03 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Praying Figure with Spiral (F01), Sector AA, RTI-03, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-03 ;
-    chs:isSurveyOf rm-fig:F01,
+    chs:isSurveyOn rm-fig:F01,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-03 ;
     chs:usesMethod rm-method:rti ;
@@ -87577,7 +87583,7 @@ rm-survey:RTI-12 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Praying Woman Figure (F02), Sector B, RTI-12, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-12 ;
-    chs:isSurveyOf rm-fig:F02,
+    chs:isSurveyOn rm-fig:F02,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-12 ;
     chs:usesMethod rm-method:rti ;
@@ -87589,7 +87595,7 @@ rm-survey:RTI-15 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Spiral Figure (F03), Sector F, RTI-15, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-15 ;
-    chs:isSurveyOf rm-fig:F03,
+    chs:isSurveyOn rm-fig:F03,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-15 ;
     chs:usesMethod rm-method:rti ;
@@ -87601,7 +87607,7 @@ rm-survey:RTI-16 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Spiral Figure (F03), Sector F, RTI-16, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-16 ;
-    chs:isSurveyOf rm-fig:F03,
+    chs:isSurveyOn rm-fig:F03,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-16 ;
     chs:usesMethod rm-method:rti ;
@@ -87613,7 +87619,7 @@ rm-survey:RTI-24 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Second Warrior Figure (F05), Sector L, RTI-24, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-24 ;
-    chs:isSurveyOf rm-fig:F05,
+    chs:isSurveyOn rm-fig:F05,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-24 ;
     chs:usesMethod rm-method:rti ;
@@ -87638,7 +87644,7 @@ rm-survey:RTI-05 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Praying Figure with Spiral (F01), Sector AA, RTI-05, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-05 ;
-    chs:isSurveyOf rm-fig:F01,
+    chs:isSurveyOn rm-fig:F01,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-05 ;
     chs:usesMethod rm-method:rti ;
@@ -87650,7 +87656,7 @@ rm-survey:RTI-07 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Praying Figure with Spiral (F01), Sector AA, RTI-07, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-07 ;
-    chs:isSurveyOf rm-fig:F01,
+    chs:isSurveyOn rm-fig:F01,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-07 ;
     chs:usesMethod rm-method:rti ;
@@ -87662,7 +87668,7 @@ rm-survey:RTI-08 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Praying Figure with Spiral (F01), Sector AA, RTI-08, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-08 ;
-    chs:isSurveyOf rm-fig:F01,
+    chs:isSurveyOn rm-fig:F01,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-08 ;
     chs:usesMethod rm-method:rti ;
@@ -87674,7 +87680,7 @@ rm-survey:RTI-09 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Praying Figure with Spiral (F01), Sector AA, RTI-09, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-09 ;
-    chs:isSurveyOf rm-fig:F01,
+    chs:isSurveyOn rm-fig:F01,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-09 ;
     chs:usesMethod rm-method:rti ;
@@ -87686,7 +87692,7 @@ rm-survey:RTI-10 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Praying Figure with Spiral (F01), Sector AA, RTI-10, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-10 ;
-    chs:isSurveyOf rm-fig:F01,
+    chs:isSurveyOn rm-fig:F01,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-10 ;
     chs:usesMethod rm-method:rti ;
@@ -87698,7 +87704,7 @@ rm-survey:RTI-17 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Spiral Figure (F03), Sector F, RTI-17, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-17 ;
-    chs:isSurveyOf rm-fig:F03,
+    chs:isSurveyOn rm-fig:F03,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-17 ;
     chs:usesMethod rm-method:rti ;
@@ -87710,7 +87716,7 @@ rm-survey:RTI-18 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Spiral Figure (F03), Sector F, RTI-18, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-18 ;
-    chs:isSurveyOf rm-fig:F03,
+    chs:isSurveyOn rm-fig:F03,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-18 ;
     chs:usesMethod rm-method:rti ;
@@ -87722,7 +87728,7 @@ rm-survey:RTI-20 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Warrior Figure with Shield (F04), Sector L, RTI-20, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-20 ;
-    chs:isSurveyOf rm-fig:F04,
+    chs:isSurveyOn rm-fig:F04,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-20 ;
     chs:usesMethod rm-method:rti ;
@@ -87734,7 +87740,7 @@ rm-survey:RTI-21 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Warrior Figure with Shield (F04), Sector L, RTI-21, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-21 ;
-    chs:isSurveyOf rm-fig:F04,
+    chs:isSurveyOn rm-fig:F04,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-21 ;
     chs:usesMethod rm-method:rti ;
@@ -87746,7 +87752,7 @@ rm-survey:RTI-22 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Warrior Figure with Shield (F04), Sector L, RTI-22, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-22 ;
-    chs:isSurveyOf rm-fig:F04,
+    chs:isSurveyOn rm-fig:F04,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-22 ;
     chs:usesMethod rm-method:rti ;
@@ -87758,7 +87764,7 @@ rm-survey:RTI-23 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Warrior Figure with Shield (F04), Sector L, RTI-23, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-23 ;
-    chs:isSurveyOf rm-fig:F04,
+    chs:isSurveyOn rm-fig:F04,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-23 ;
     chs:usesMethod rm-method:rti ;
@@ -87770,7 +87776,7 @@ rm-survey:RTI-26 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Wild Boar Figure (F06), Sector L, RTI-26, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-26 ;
-    chs:isSurveyOf rm-fig:F06,
+    chs:isSurveyOn rm-fig:F06,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-26 ;
     chs:usesMethod rm-method:rti ;
@@ -87782,7 +87788,7 @@ rm-survey:RTI-28 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Goat Figure with a Beard (F07), Sector Q, RTI-28, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-28 ;
-    chs:isSurveyOf rm-fig:F07,
+    chs:isSurveyOn rm-fig:F07,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-28 ;
     chs:usesMethod rm-method:rti ;
@@ -87794,7 +87800,7 @@ rm-survey:RTI-33 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Second Goat Figure (F08), Sector Q, RTI-33, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-33 ;
-    chs:isSurveyOf rm-fig:F08,
+    chs:isSurveyOn rm-fig:F08,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-33 ;
     chs:usesMethod rm-method:rti ;
@@ -87806,7 +87812,7 @@ rm-survey:RTI-34 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Map-like Figure (F09), Sector Q, RTI-34, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-34 ;
-    chs:isSurveyOf rm-fig:F09,
+    chs:isSurveyOn rm-fig:F09,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-34 ;
     chs:usesMethod rm-method:rti ;
@@ -87818,7 +87824,7 @@ rm-survey:RTI-35 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Map-like Figure (F09), Sector Q, RTI-35, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-35 ;
-    chs:isSurveyOf rm-fig:F09,
+    chs:isSurveyOn rm-fig:F09,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-35 ;
     chs:usesMethod rm-method:rti ;
@@ -87830,7 +87836,7 @@ rm-survey:RTI-37 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Knight Figure (F10), Sector S, RTI-37, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-37 ;
-    chs:isSurveyOf rm-fig:F10,
+    chs:isSurveyOn rm-fig:F10,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-37 ;
     chs:usesMethod rm-method:rti ;
@@ -87842,7 +87848,7 @@ rm-survey:RTI-38 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Knight Figure (F10), Sector S, RTI-38, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-38 ;
-    chs:isSurveyOf rm-fig:F10,
+    chs:isSurveyOn rm-fig:F10,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-38 ;
     chs:usesMethod rm-method:rti ;
@@ -87854,7 +87860,7 @@ rm-survey:RTI-40 a chs:CulturalHeritageSurvey,
         owl:NamedIndividual ;
     rdfs:label "RTI Survey — The Figure with a Square (F11), Sector S, RTI-40, Rupe Magna"@en ;
     chs:hasObservationCollection rm-ocoll:RTI-40 ;
-    chs:isSurveyOf rm-fig:F11,
+    chs:isSurveyOn rm-fig:F11,
         rm-site:rupe-magna ;
     chs:usesEquipmentConfiguration rm-econf:RTI-40 ;
     chs:usesMethod rm-method:rti ;
@@ -89638,6 +89644,7 @@ rm-site:rupe-magna a owl:NamedIndividual,
         arco:ArchaeologicalProperty ;
     rdfs:label "Rupe Magna Rock Art Site"@en ;
     dct:description "Parco delle Incisioni Rupestri di Grosio — approximately 84 × 35 metres of alpine rock art surface in Upper Valtellina, Northern Italy, featuring over 5,454 petroglyphs spanning the Bronze and Iron Ages."@en ;
+    geosparql:hasGeometry rm-geom:rupe-magna ;
     geo1:alt 679.9 ;
     geo1:lat 46.292692 ;
     geo1:long 10.264064 ;

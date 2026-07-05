@@ -119,12 +119,15 @@ CONSTRUCT {
     a-dd:hasMeasurementCollection ?mcollSessionURI ;
     rdfs:label ?labelEconf .
 
-  ### Survey  [chs:isSurveyOf — ODP native property, Survey → CulturalProperty] ###
+  ### Survey  [chs:isSurveyOn — ODP native: Survey → CulturalProperty (figure + site).
+  ###          NB. isSurveyOf's ODP range is CulturalHeritageProject, not the surveyed
+  ###          property; isSurveyOn is the correct term and matches the ontology's
+  ###          isSurveyOn >=2 restriction on ArchaeologicalProperty.] ###
   ?surveyURI
     a owl:NamedIndividual, chs:CulturalHeritageSurvey ;
     chs:usesEquipmentConfiguration ?econfURI ;
     chs:hasObservationCollection ?ocollURI ;
-    chs:isSurveyOf ?figURI, rm-site:rupe-magna ;
+    chs:isSurveyOn ?figURI, rm-site:rupe-magna ;
     core:hasAgentRole ?roleURI ;
     tiapit:startTime ?startDate ;
     tiapit:endTime   ?endDate ;

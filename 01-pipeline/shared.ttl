@@ -34,6 +34,7 @@
 @prefix roapit:  <http://www.ontologydesignpatterns.org/ont/ro/roapit.owl#> .
 @prefix schema:  <https://schema.org/> .
 @prefix tiapit:  <http://www.ontologydesignpatterns.org/ont/ti/tiapit.owl#> .
+@prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
 
 @prefix rm-fig:     <https://w3id.org/rupemagna/resource/figure/> .
 @prefix rm-data:    <https://w3id.org/rupemagna/resource/dataset/> .
@@ -54,6 +55,7 @@
 @prefix rm-survey:  <https://w3id.org/rupemagna/resource/survey/> .
 @prefix rm-project: <https://w3id.org/rupemagna/resource/project/> .
 @prefix rm-method:  <https://w3id.org/rupemagna/resource/method/> .
+@prefix rm-geom:    <https://w3id.org/rupemagna/resource/geometry/> .
 
 @base <https://w3id.org/rupemagna/ontology/shared#> .
 

@@ -183,9 +183,9 @@ Once the redesigned pipeline was in place (Sections 1–4), the second change wa
 
 | Group | Tasks | Result |
 |---|---|---|
-| Active root-fixes (pipeline source) | T1, T2 (`shared.ttl` TBox / `isSurveyOn`), T6 (data-driven `seriesMember`), T11 (data-driven `numberOfItems`), T12a (measurement datatype) | applied in the new output + verified |
+| Active root-fixes (pipeline source) | T1, T2 (data emits ODP-native `chs:isSurveyOn` → figure + site), T6 (data-driven `seriesMember`), T10 (GeoSPARQL site geometry from the single-source GPS), T11 (data-driven `numberOfItems`), T12a (measurement datatype) | applied in the new output + verified |
 | Verification (no code change) | T3, T4, T5 (pipeline already single-document), T9 (inverse properties), V1–V6 (6/6 PASS) | confirmed clean |
-| Deferred / skipped by decision | T8 (interpretation → deferred), T10 (geometry → deferred), T12b (don't touch SHACL → skip) | documented |
+| Deferred / skipped by decision | T8 (interpretation → deferred), T12b (don't touch SHACL → skip) | documented |
 
 **SHACL net result:** baseline `4 CONFORM / 4 VIOLATE` → corrected 2-session output **`7 CONFORM / 1 VIOLATE`** (the single remaining violation = T12b, deliberately out of scope).
 
@@ -209,6 +209,6 @@ For the details → [[RupeMagnaOnto-Plan2-Report]].
 | Plugin dropping the JSON **automatically** when an RTI finishes (auto-wire) | ✅ | the `*-ptm.json` files are produced (it works); the full auto-wiring was verified |
 
 
-**Remaining on the data-correction (B) side:** T8 (interpretation) and T10 (geometry) → **deferred** by your decision; T12b (shape coverage of the RTI measurements) → **skipped** under the "don't touch SHACL" decision (documented). Detail: [[RupeMagnaOnto-Plan2-Report]].
+**Remaining on the data-correction (B) side:** T8 (interpretation) → **deferred** by your decision; T12b (shape coverage of the RTI measurements) → **skipped** under the "don't touch SHACL" decision (documented). Detail: [[RupeMagnaOnto-Plan2-Report]].
 
 **Data constraint (shared by both changes):** this copy holds only 2 sessions of source data (RTI-08, RTI-17). The architecture and the fixes were proven on these; the **full 24-session deliverable can only be regenerated once the source data is available.**

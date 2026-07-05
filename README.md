@@ -294,6 +294,7 @@ All project resources live under `https://w3id.org/rupemagna/resource/{type}/`
 | `dct:` | Dublin Core Terms | creator, license, format, created, spatial |
 | `foaf:` | FOAF | `Person`, name, mbox |
 | `geo:` | WGS84 Geo | lat, long, alt |
+| `geosparql:` | OGC GeoSPARQL | site `Geometry` + `asWKT` (WKT point, from the same GPS) |
 | `muapit:` · `roapit:` · `tiapit:` | MU · RO · TI profiles | units & values · agent roles · start/end time |
 | `schema:` | Schema.org | equipment attributes, item count, version |
 | `prov:` | PROV-O | `wasGeneratedBy` (output → survey) |

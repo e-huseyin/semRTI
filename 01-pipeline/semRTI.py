@@ -292,6 +292,10 @@ def _metadata_ttl(meta):
     if lat is not None:  site.append(f'    geo:lat   {lat}')
     if lon is not None:  site.append(f'    geo:long  {lon}')
     if alt is not None:  site.append(f'    geo:alt   {alt}')
+    # GeoSPARQL geometry link — emitted only when both coordinates are present, so the
+    # WKT below is derived from the same lat/long and therefore agrees with the WGS84 point.
+    if lat is not None and lon is not None:
+        site.append('    geosparql:hasGeometry rm-geom:rupe-magna')
     if meta.get('city'):     site.append(f'    schema:addressLocality "{_ttl_literal(meta["city"])}"')
     if meta.get('province'): site.append(f'    schema:addressRegion   "{_ttl_literal(meta["province"])}"')
     if meta.get('country'):  site.append(f'    schema:addressCountry  "{_ttl_literal(meta["country"])}"')
@@ -301,6 +305,16 @@ def _metadata_ttl(meta):
         blocks.append("rm-agent:huseyin-erdogan\n" + " ;\n".join(agent) + " .")
     if site:
         blocks.append("rm-site:rupe-magna\n" + " ;\n".join(site) + " .")
+    # GeoSPARQL geometry individual for the site (WKT order is POINT(long lat)). Named node
+    # (rm-geom:) rather than a blank node, to keep the ABox clean. Its prefixes (rdf/owl/
+    # geosparql/rm-geom) are declared in shared.ttl and resolve once this block is merged with
+    # shared_text and parsed as a single graph.
+    if lat is not None and lon is not None:
+        blocks.append(
+            "rm-geom:rupe-magna\n"
+            "    rdf:type owl:NamedIndividual, geosparql:Geometry ;\n"
+            f'    geosparql:asWKT "POINT({lon} {lat})"^^geosparql:wktLiteral .'
+        )
     return "\n\n".join(blocks) + ("\n" if blocks else "")
 
 
