@@ -1346,6 +1346,12 @@ rm-mcoll:DSCF4311-jpg a owl:NamedIndividual,
         rm-meas:DSCF4311-jpg-height,
         rm-meas:DSCF4311-jpg-width .
 
+rm-mcoll:DSCF4594-jpg a owl:NamedIndividual,
+        a-dd:MeasurementCollection ;
+    a-dd:hasMeasurement rm-meas:DSCF4594-jpg-filesize,
+        rm-meas:DSCF4594-jpg-height,
+        rm-meas:DSCF4594-jpg-width .
+
 rm-mcoll:DSCF4595-jpg a owl:NamedIndividual,
         a-dd:MeasurementCollection ;
     a-dd:hasMeasurement rm-meas:DSCF4595-jpg-filesize,
@@ -13795,6 +13801,27 @@ rm-meas:DSCF4311-jpg-height a owl:NamedIndividual,
 rm-meas:DSCF4311-jpg-width a owl:NamedIndividual,
         a-dd:Measurement ;
     rdfs:label "Image width — DSCF4311.JPG"@en ;
+    muapit:hasMeasurementUnit rm-unit:pixel ;
+    muapit:value 6240 ;
+    a-dd:measurementType rm-mtype:image-width .
+
+rm-meas:DSCF4594-jpg-filesize a owl:NamedIndividual,
+        a-dd:Measurement ;
+    rdfs:label "File size — DSCF4594.JPG"@en ;
+    muapit:hasMeasurementUnit rm-unit:megabyte ;
+    muapit:value 22 ;
+    a-dd:measurementType rm-mtype:file-size .
+
+rm-meas:DSCF4594-jpg-height a owl:NamedIndividual,
+        a-dd:Measurement ;
+    rdfs:label "Image height — DSCF4594.JPG"@en ;
+    muapit:hasMeasurementUnit rm-unit:pixel ;
+    muapit:value 4160 ;
+    a-dd:measurementType rm-mtype:image-height .
+
+rm-meas:DSCF4594-jpg-width a owl:NamedIndividual,
+        a-dd:Measurement ;
+    rdfs:label "Image width — DSCF4594.JPG"@en ;
     muapit:hasMeasurementUnit rm-unit:pixel ;
     muapit:value 6240 ;
     a-dd:measurementType rm-mtype:image-width .
@@ -51273,6 +51300,14 @@ rm-obs:DSCF4311 a chs:Observation,
     chs:isMemberOf rm-ocoll:RTI-15 ;
     chs:usesMethod rm-method:rti .
 
+rm-obs:DSCF4594 a chs:Observation,
+        owl:NamedIndividual ;
+    rdfs:label "Observation — DSCF4594, F05, RTI-24"@en ;
+    chs:hasFeatureOfInterest rm-fig:F05 ;
+    chs:hasResult rm-photo:DSCF4594-jpg ;
+    chs:isMemberOf rm-ocoll:RTI-24 ;
+    chs:usesMethod rm-method:rti .
+
 rm-obs:DSCF4595 a chs:Observation,
         owl:NamedIndividual ;
     rdfs:label "Observation — DSCF4595, F05, RTI-24"@en ;
@@ -61389,6 +61424,18 @@ rm-photo:DSCF4311-jpg a chs:Result,
     a-cd:digitalFileName "DSCF4311.JPG" ;
     a-cd:hasCaption "Rupe Magna - [F03] - [RTI-15]"@en ;
     a-dd:hasMeasurementCollection rm-mcoll:DSCF4311-jpg .
+
+rm-photo:DSCF4594-jpg a chs:Result,
+        owl:NamedIndividual,
+        a-cd:PhotographicDocumentation ;
+    rdfs:label "DSCF4594 — F05, RTI-24, Rupe Magna (JPEG)"@en ;
+    dct:creator rm-agent:huseyin-erdogan ;
+    dct:format "image/jpeg" ;
+    dct:isPartOf rm-dist:RTI-24-jpg ;
+    dct:rights <https://creativecommons.org/licenses/by/4.0/> ;
+    a-cd:digitalFileName "DSCF4594.JPG" ;
+    a-cd:hasCaption "Rupe Magna - [F05] - [RTI-24]"@en ;
+    a-dd:hasMeasurementCollection rm-mcoll:DSCF4594-jpg .
 
 rm-photo:DSCF4595-jpg a chs:Result,
         owl:NamedIndividual,
@@ -87962,16 +88009,6 @@ rm-dist:RTI-18-raw a owl:NamedIndividual,
     prov:wasGeneratedBy rm-survey:RTI-18 ;
     schema:numberOfItems 47 .
 
-rm-dist:RTI-24-jpg a owl:NamedIndividual,
-        dcat:Distribution ;
-    dct:creator rm-agent:huseyin-erdogan ;
-    dct:format "image/jpeg" ;
-    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    dct:title "RTI-24 JPEG Export — 48 images"@en ;
-    dcat:mediaType <https://www.iana.org/assignments/media-types/image/jpeg> ;
-    prov:wasGeneratedBy rm-survey:RTI-24 ;
-    schema:numberOfItems 48 .
-
 rm-dist:RTI-26-jpg a owl:NamedIndividual,
         dcat:Distribution ;
     dct:creator rm-agent:huseyin-erdogan ;
@@ -88009,13 +88046,6 @@ rm-dist:RTI-40-raw a owl:NamedIndividual,
     dct:title "RTI-40 RAW Files — 47 images"@en ;
     prov:wasGeneratedBy rm-survey:RTI-40 ;
     schema:numberOfItems 47 .
-
-rm-fig:F05 a owl:NamedIndividual,
-        arco:ArchaeologicalProperty ;
-    rdfs:label "The Second Warrior Figure (F05) — Sector L"@en ;
-    dct:description "Rock art figure in Sector L at Rupe Magna Rock Art Site. Depicts a second warrior figure adjacent to F04."@en ;
-    dct:identifier "F05" ;
-    arco:isPartOf rm-site:rupe-magna .
 
 rm-fig:F06 a owl:NamedIndividual,
         arco:ArchaeologicalProperty ;
@@ -88081,57 +88111,6 @@ rm-ocoll:RTI-18 a chs:ObservationCollection,
         rm-obs:DSCF6349,
         rm-obs:DSCF6350,
         rm-obs:DSCF6351 .
-
-rm-ocoll:RTI-24 a chs:ObservationCollection,
-        owl:NamedIndividual ;
-    rdfs:label "Observation Collection — F05, RTI-24, Rupe Magna"@en ;
-    chs:hasMember rm-obs:DSCF4595,
-        rm-obs:DSCF4596,
-        rm-obs:DSCF4597,
-        rm-obs:DSCF4598,
-        rm-obs:DSCF4599,
-        rm-obs:DSCF4600,
-        rm-obs:DSCF4601,
-        rm-obs:DSCF4602,
-        rm-obs:DSCF4603,
-        rm-obs:DSCF4604,
-        rm-obs:DSCF4605,
-        rm-obs:DSCF4606,
-        rm-obs:DSCF4607,
-        rm-obs:DSCF4608,
-        rm-obs:DSCF4609,
-        rm-obs:DSCF4610,
-        rm-obs:DSCF4611,
-        rm-obs:DSCF4612,
-        rm-obs:DSCF4613,
-        rm-obs:DSCF4614,
-        rm-obs:DSCF4615,
-        rm-obs:DSCF4616,
-        rm-obs:DSCF4617,
-        rm-obs:DSCF4618,
-        rm-obs:DSCF4619,
-        rm-obs:DSCF4620,
-        rm-obs:DSCF4621,
-        rm-obs:DSCF4622,
-        rm-obs:DSCF4623,
-        rm-obs:DSCF4624,
-        rm-obs:DSCF4625,
-        rm-obs:DSCF4626,
-        rm-obs:DSCF4627,
-        rm-obs:DSCF4628,
-        rm-obs:DSCF4629,
-        rm-obs:DSCF4630,
-        rm-obs:DSCF4631,
-        rm-obs:DSCF4632,
-        rm-obs:DSCF4633,
-        rm-obs:DSCF4634,
-        rm-obs:DSCF4635,
-        rm-obs:DSCF4636,
-        rm-obs:DSCF4637,
-        rm-obs:DSCF4638,
-        rm-obs:DSCF4639,
-        rm-obs:DSCF4640,
-        rm-obs:DSCF4641 .
 
 rm-ocoll:RTI-26 a chs:ObservationCollection,
         owl:NamedIndividual ;
@@ -88465,6 +88444,16 @@ rm-dist:RTI-23-raw a owl:NamedIndividual,
     prov:wasGeneratedBy rm-survey:RTI-23 ;
     schema:numberOfItems 48 .
 
+rm-dist:RTI-24-jpg a owl:NamedIndividual,
+        dcat:Distribution ;
+    dct:creator rm-agent:huseyin-erdogan ;
+    dct:format "image/jpeg" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:title "RTI-24 JPEG Export — 48 images"@en ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/image/jpeg> ;
+    prov:wasGeneratedBy rm-survey:RTI-24 ;
+    schema:numberOfItems 48 .
+
 rm-dist:RTI-28-jpg a owl:NamedIndividual,
         dcat:Distribution ;
     dct:creator rm-agent:huseyin-erdogan ;
@@ -88584,6 +88573,13 @@ rm-fig:F02 a owl:NamedIndividual,
     rdfs:label "The Praying Woman Figure (F02) — Sector B"@en ;
     dct:description "Rock art figure in Sector B at Rupe Magna Rock Art Site. Depicts a praying female human figure."@en ;
     dct:identifier "F02" ;
+    arco:isPartOf rm-site:rupe-magna .
+
+rm-fig:F05 a owl:NamedIndividual,
+        arco:ArchaeologicalProperty ;
+    rdfs:label "The Second Warrior Figure (F05) — Sector L"@en ;
+    dct:description "Rock art figure in Sector L at Rupe Magna Rock Art Site. Depicts a second warrior figure adjacent to F04."@en ;
+    dct:identifier "F05" ;
     arco:isPartOf rm-site:rupe-magna .
 
 rm-fig:F07 a owl:NamedIndividual,
@@ -89327,6 +89323,58 @@ rm-ocoll:RTI-23 a chs:ObservationCollection,
         rm-obs:DSCF5307,
         rm-obs:DSCF5308,
         rm-obs:DSCF5309 .
+
+rm-ocoll:RTI-24 a chs:ObservationCollection,
+        owl:NamedIndividual ;
+    rdfs:label "Observation Collection — F05, RTI-24, Rupe Magna"@en ;
+    chs:hasMember rm-obs:DSCF4594,
+        rm-obs:DSCF4595,
+        rm-obs:DSCF4596,
+        rm-obs:DSCF4597,
+        rm-obs:DSCF4598,
+        rm-obs:DSCF4599,
+        rm-obs:DSCF4600,
+        rm-obs:DSCF4601,
+        rm-obs:DSCF4602,
+        rm-obs:DSCF4603,
+        rm-obs:DSCF4604,
+        rm-obs:DSCF4605,
+        rm-obs:DSCF4606,
+        rm-obs:DSCF4607,
+        rm-obs:DSCF4608,
+        rm-obs:DSCF4609,
+        rm-obs:DSCF4610,
+        rm-obs:DSCF4611,
+        rm-obs:DSCF4612,
+        rm-obs:DSCF4613,
+        rm-obs:DSCF4614,
+        rm-obs:DSCF4615,
+        rm-obs:DSCF4616,
+        rm-obs:DSCF4617,
+        rm-obs:DSCF4618,
+        rm-obs:DSCF4619,
+        rm-obs:DSCF4620,
+        rm-obs:DSCF4621,
+        rm-obs:DSCF4622,
+        rm-obs:DSCF4623,
+        rm-obs:DSCF4624,
+        rm-obs:DSCF4625,
+        rm-obs:DSCF4626,
+        rm-obs:DSCF4627,
+        rm-obs:DSCF4628,
+        rm-obs:DSCF4629,
+        rm-obs:DSCF4630,
+        rm-obs:DSCF4631,
+        rm-obs:DSCF4632,
+        rm-obs:DSCF4633,
+        rm-obs:DSCF4634,
+        rm-obs:DSCF4635,
+        rm-obs:DSCF4636,
+        rm-obs:DSCF4637,
+        rm-obs:DSCF4638,
+        rm-obs:DSCF4639,
+        rm-obs:DSCF4640,
+        rm-obs:DSCF4641 .
 
 rm-ocoll:RTI-28 a chs:ObservationCollection,
         owl:NamedIndividual ;

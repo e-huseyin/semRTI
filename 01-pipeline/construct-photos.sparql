@@ -151,13 +151,19 @@ WHERE {
   SERVICE <x-sparql-anything:EXIF_LOCATION_PLACEHOLDER> {
     ?root a fx:root ;
           ?idx ?exifItem .
+    # SourceFile + FileName come from the file's path/name, so they are always
+    # present and are the minimum needed to mint the observation. Keep mandatory.
     ?exifItem
       xyz:SourceFile  ?sourcePath ;
-      xyz:FileName    ?fileName ;
-      xyz:CreateDate  ?createDateRaw ;
-      xyz:FileSize    ?fileSizeRaw ;
-      xyz:ImageWidth  ?imageWidthRaw ;
-      xyz:ImageHeight ?imageHeightRaw .
+      xyz:FileName    ?fileName .
+    # The remaining fields are embedded EXIF. Make them OPTIONAL so a frame with
+    # missing/partial metadata (e.g. a re-exported JPEG lacking CreateDate and
+    # camera settings) still yields an observation. Unbound values are silently
+    # omitted by CONSTRUCT downstream, so no data is fabricated.
+    OPTIONAL { ?exifItem xyz:CreateDate  ?createDateRaw }
+    OPTIONAL { ?exifItem xyz:FileSize    ?fileSizeRaw }
+    OPTIONAL { ?exifItem xyz:ImageWidth  ?imageWidthRaw }
+    OPTIONAL { ?exifItem xyz:ImageHeight ?imageHeightRaw }
   }
 
   # Accept processed JPEG exports (all jpg-export* variants) AND camera JPEGs
