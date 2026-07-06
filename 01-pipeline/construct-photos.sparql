@@ -1,38 +1,23 @@
-##############################################################################
-# construct-photos.sparql  (semRTI-ODP)
-# SPARQL Anything — photo triples: per-photo resources
+# ╔════════════════════════════════════════════════════════════════════════╗
+# ║ construct-photos.sparql  ·  per-photo triples (semRTI-ODP)             ║
+# ╠════════════════════════════════════════════════════════════════════════╣
+# ║ One Observation + JPEG/RAF Result + Measurements per captured frame.   ║
+# ║                                                                        ║
+# ║ SECTION MAP                                                            ║
+# ║   1 · Prefixes                                                         ║
+# ║   2 · CONSTRUCT — output graph shape                                   ║
+# ║   3 · WHERE — EXIF read · path IDs · export priority · URIs · labels   ║
+# ╚════════════════════════════════════════════════════════════════════════╝
 #
-# ODP alignment (CulturalHeritageSurvey.ttl):
-#
-#   chs:ObservationCollection
-#     └─ chs:hasMember ──► chs:Observation
-#           ├─ chs:hasFeatureOfInterest ──► arco:ArchaeologicalProperty
-#           └─ chs:hasResult ──► chs:Result (a-cd:PhotographicDocumentation)
-#
-# Generates for every JPG in exif-metadata.json:
-#   rm-obs:{basename}           chs:Observation
-#   rm-photo:{basename}-jpg     chs:Result, a-cd:PhotographicDocumentation
-#   rm-mcoll:{basename}-jpg     a-dd:MeasurementCollection  (filesize + w + h)
-#   rm-meas:{basename}-jpg-*    a-dd:Measurement  × 3
-#
-# Additionally, when the source is a jpg-export* directory (RAW+Fast Forge):
-#   rm-photo:{basename}-raw     chs:Result, a-cd:PhotographicDocumentation
-#   rm-mcoll:{basename}-raw     a-dd:MeasurementCollection  (w + h only)
-#   rm-meas:{basename}-raw-*    a-dd:Measurement  × 2
-#
-# Also adds:
-#   rm-ocoll:{sessionID}  chs:hasMember  rm-obs:{basename}
-#
-# FILTER covers all jpg-export* variants (jpg-export/, jpg-export-linear/,
-# jpg-export-linear-LC/, etc.) AND jpg/ for datasets captured as JPEG-only
-# (no RAW, no Fast Forge). When both directories exist for the same session,
-# jpg-export* takes priority and jpg/ entries are skipped.
-# Camera JPEG files in jpg/ for RAW+Fast Forge sessions are excluded.
-#
-# INPUT
-#   EXIF_LOCATION_PLACEHOLDER — replaced by semRTI.py with file:// URI
-##############################################################################
+# ODP: ObservationCollection -> hasMember -> Observation ->
+#        (hasFeatureOfInterest figure · hasResult PhotographicDocumentation).
+# Only SourceFile + FileName are required; other EXIF fields are OPTIONAL,
+# so a frame with missing metadata still yields an observation.
+# INPUT: EXIF_LOCATION_PLACEHOLDER (semRTI.py).
 
+# ════════════════════════════════════════════════════════════════════════
+# 1 · PREFIXES
+# ════════════════════════════════════════════════════════════════════════
 PREFIX fx:     <http://sparql.xyz/facade-x/ns/>
 PREFIX xyz:    <http://sparql.xyz/facade-x/data/>
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -57,6 +42,9 @@ PREFIX rm-mtype:  <https://w3id.org/rupemagna/resource/measurement-type/>
 PREFIX rm-unit:   <https://w3id.org/rupemagna/resource/unit/>
 PREFIX rm-method: <https://w3id.org/rupemagna/resource/method/>
 
+# ════════════════════════════════════════════════════════════════════════
+# 2 · CONSTRUCT  ·  output graph shape
+# ════════════════════════════════════════════════════════════════════════
 CONSTRUCT {
 
   ### Link ObservationCollection → Observation  [chs:hasMember + inverse] ###
@@ -143,6 +131,10 @@ CONSTRUCT {
     rdfs:label ?labelHeightRaw .
 
 }
+
+# ════════════════════════════════════════════════════════════════════════
+# 3 · WHERE  ·  query logic (data → variables)
+# ════════════════════════════════════════════════════════════════════════
 WHERE {
 
   ##########################################################################

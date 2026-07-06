@@ -1,20 +1,22 @@
-# construct-rti.sparql — RTI provenance (RTI processing output)
+# ╔════════════════════════════════════════════════════════════════════════╗
+# ║ construct-rti.sparql  ·  RTI provenance triples (one dataset)          ║
+# ╠════════════════════════════════════════════════════════════════════════╣
+# ║ From RelightLab provenance JSON + info.json, per dataset.              ║
+# ║                                                                        ║
+# ║ SECTION MAP                                                            ║
+# ║   1 · Prefixes                                                         ║
+# ║   2 · CONSTRUCT — output graph shape                                   ║
+# ║   3 · WHERE — provenance JSON · info.json · identity · IRIs · labels   ║
+# ╚════════════════════════════════════════════════════════════════════════╝
 #
-# Builds the RTI distribution triples for ONE dataset from the ontology-neutral
-# files RelightLab produces, replacing the old approach of concatenating the
-# plugin's hand-written TTL. Run once per dataset by semRTI.py.
-#
-# Placeholders (substituted by semRTI.py with file:// URIs):
-#   PROV_LOCATION_PLACEHOLDER — the provenance JSON (e.g. F01RTI08-ptm.json)
-#   INFO_LOCATION_PLACEHOLDER — the sibling info.json
-#
-# Session / figure / type are derived from the provenance "output" path
-#   .../<figure>/<session>/<type>   e.g. .../F01/RTI-08/ptm
-#
-# Technical scalars (nplanes, quality, basis type, colourspace) come from
-# info.json (authoritative); the processing delta (crop, colour-profile mode,
-# format, web layout, openlime, software version) comes from the provenance JSON.
+# Builds: Dataset -> RTI distribution + processing MeasurementCollection
+#         (nplanes · quality · basis · web-layout · cpm · openlime · crop)
+#         + RelightLab software node.
+# INPUT: PROV_LOCATION_PLACEHOLDER · INFO_LOCATION_PLACEHOLDER (semRTI.py).
 
+# ════════════════════════════════════════════════════════════════════════
+# 1 · PREFIXES
+# ════════════════════════════════════════════════════════════════════════
 PREFIX fx:     <http://sparql.xyz/facade-x/ns/>
 PREFIX xyz:    <http://sparql.xyz/facade-x/data/>
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -40,6 +42,9 @@ PREFIX rm-agent:  <https://w3id.org/rupemagna/resource/agent/>
 PREFIX rm-survey: <https://w3id.org/rupemagna/resource/survey/>
 PREFIX rm-site:   <https://w3id.org/rupemagna/resource/site/>
 
+# ════════════════════════════════════════════════════════════════════════
+# 2 · CONSTRUCT  ·  output graph shape
+# ════════════════════════════════════════════════════════════════════════
 CONSTRUCT {
 
   ### RTI.1  Dataset → RTI distribution ###
@@ -119,6 +124,10 @@ CONSTRUCT {
     foaf:page <https://vcg.isti.cnr.it/relight/> ;
     rdfs:label ?swLabel .
 }
+
+# ════════════════════════════════════════════════════════════════════════
+# 3 · WHERE  ·  query logic (data → variables)
+# ════════════════════════════════════════════════════════════════════════
 WHERE {
 
   ###################################################################

@@ -1,5 +1,23 @@
 #!/usr/bin/env python3
-"""SemRTI — Semantic RTI Knowledge Graph pipeline (standalone)"""
+"""
+╔════════════════════════════════════════════════════════════════════════════╗
+║ SemRTI — Semantic RTI Knowledge Graph pipeline (standalone)                ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║ MODULE MAP  —  section index                                               ║
+║                                                                            ║
+║   1 · Configuration & constants      paths, metadata keys, templates, menu ║
+║   2 · File selection & ingestion     which files may enter the graph       ║
+║   3 · Logging                        per-run, timestamped log files        ║
+║   4 · Terminal UI helpers            input / confirm / wait prompts        ║
+║   5 · Dataset tree browser           pick a dataset folder                 ║
+║   6 · Metadata & Turtle helpers      enrich-metadata.json -> Turtle        ║
+║   7 · Pipeline build steps           EXIF -> SPARQL -> merged .ttl         ║
+║   8 · Menu actions — dataset ops     Generate KG / stamp JPGs              ║
+║   9 · RelightLab RDF-plugin install  patch & build the C++ plugin          ║
+║  10 · Log viewer                     browse pipeline logs                  ║
+║  11 · Home screen & entry point      menu loop + first-run scaffolding     ║
+╚════════════════════════════════════════════════════════════════════════════╝
+"""
 
 import os, sys, json, glob, subprocess, re, shutil, logging, urllib.parse
 from datetime import datetime
@@ -8,6 +26,11 @@ from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 from rich import box
+
+# ══════════════════════════════════════════════════════════════════════════
+# 1 · CONFIGURATION & CONSTANTS
+# Paths, single-source metadata keys, SPARQL templates, banner and menu.
+# ══════════════════════════════════════════════════════════════════════════
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 console = Console()
@@ -52,6 +75,12 @@ MENU = [
     ("Generate KG",              "Build final knowledge graph (.ttl)"),
     ("Logs",                     "Browse pipeline logs"),
 ]
+
+# ══════════════════════════════════════════════════════════════════════════
+# 2 · FILE SELECTION & INGESTION POLICY
+# Filters shared by the dataset browser and the graph ingestion — real source
+# frames and provenance sidecars only; AppleDouble twins and tile pyramids out.
+# ══════════════════════════════════════════════════════════════════════════
 
 _TREE_EXCLUDE = {'raw', 'jpg', 'jpg-export', '.ds_store'}
 
@@ -111,7 +140,10 @@ def _pick_prov_json(files):
                  and fn.lower().endswith(ALLOWED_RTI_SUFFIXES)), None)
 
 
-# ── Logging ────────────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════
+# 3 · LOGGING
+# Per-run, timestamped log files; one logger per pipeline module.
+# ══════════════════════════════════════════════════════════════════════════
 
 def _make_logger(module, label=''):
     log_dir = os.path.join(LOGS_DIR, module)
@@ -134,7 +166,10 @@ def _make_logger(module, label=''):
     return logger, log_path
 
 
-# ── UI helpers ─────────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════
+# 4 · TERMINAL UI HELPERS
+# Small input / confirm / wait-for-Enter prompts used across the menus.
+# ══════════════════════════════════════════════════════════════════════════
 
 def _ask(prompt, default=''):
     """Single-line input. Returns None when user types Q/B or presses Ctrl-C."""
@@ -160,7 +195,10 @@ def _confirm(prompt):
     return val is not None and val.strip().lower() in ('y', 'yes')
 
 
-# ── Dataset tree browser ───────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════
+# 5 · DATASET TREE BROWSER
+# Render 02-datasets/ as a numbered tree and resolve the chosen folder.
+# ══════════════════════════════════════════════════════════════════════════
 
 def _build_dataset_tree(root, max_depth=3):
     items = []
@@ -220,7 +258,11 @@ def _dataset_picker(title, subtitle=''):
     return val.replace('\\ ', ' ').strip().strip("'\"")
 
 
-# ── Knowledge Graph pipeline ───────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════
+# 6 · METADATA & TURTLE HELPERS
+# enrich-metadata.json -> validated Turtle for the project agent, site and
+# GeoSPARQL geometry. Structure lives here; values come from the single source.
+# ══════════════════════════════════════════════════════════════════════════
 
 def _load_metadata():
     """Load project/site metadata from enrich-metadata.json — the single source
@@ -317,6 +359,12 @@ def _metadata_ttl(meta):
         )
     return "\n\n".join(blocks) + ("\n" if blocks else "")
 
+
+# ══════════════════════════════════════════════════════════════════════════
+# 7 · PIPELINE BUILD STEPS
+# The build engine: JPG stamping · EXIF export · SPARQL Anything CONSTRUCTs
+# (dataset / photos / RTI provenance) · merge into one final .ttl.
+# ══════════════════════════════════════════════════════════════════════════
 
 def _kg_step1_metadata(dataset_dir, site_name, meta, logger):
     author      = meta.get('author', '')
@@ -589,6 +637,136 @@ def _kg_section_e(datasets_dir, extra, logger):
     return g, count
 
 
+# Logical categories for the human-readable output, in file order. The written
+# graph is identical to a flat serialisation — only the subject order and the
+# added `#` section banners differ. Every triple is routed to exactly one bucket
+# (see _CATEGORY_PRIORITY); anything unmatched lands in OTHER, so a new ontology
+# class never drops a triple — it just shows up under OTHER until mapped here.
+_CAT_ORDER = [
+    "PROJECT", "SITE & FIGURES", "PEOPLE", "EQUIPMENT", "SURVEYS",
+    "OBSERVATIONS", "MEASUREMENTS", "MEDIA & RESULTS", "DATASETS",
+    "VOCABULARY", "OTHER",
+]
+_CAT_CLASSES = {
+    "PROJECT":         "chs:CulturalHeritageProject",
+    "SITE & FIGURES":  "arco:ArchaeologicalProperty · geosparql:Geometry",
+    "PEOPLE":          "core:Agent · foaf:Person · core:AgentRole",
+    "EQUIPMENT":       "chs:Hardware · chs:EquipmentConfiguration",
+    "SURVEYS":         "chs:CulturalHeritageSurvey",
+    "OBSERVATIONS":    "chs:ObservationCollection · chs:Observation",
+    "MEASUREMENTS":    "a-dd:MeasurementCollection · a-dd:Measurement",
+    "MEDIA & RESULTS": "a-cd:PhotographicDocumentation · chs:Result",
+    "DATASETS":        "dcat:DatasetSeries · dcat:Dataset · dcat:Distribution",
+    "VOCABULARY":      "a-dd:MeasurementType · muapit:MeasurementUnit · chs:Method",
+    "OTHER":           "any individual not matched above",
+}
+_CAT_NS = {
+    "chs":  "http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#",
+    "arco": "https://w3id.org/arco/ontology/arco/",
+    "core": "https://w3id.org/arco/ontology/core/",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "add":  "https://w3id.org/arco/ontology/denotative-description/",
+    "acd":  "https://w3id.org/arco/ontology/context-description/",
+    "mua":  "http://www.ontologydesignpatterns.org/ont/dul/muapit.owl#",
+    "geos": "http://www.opengis.net/ont/geosparql#",
+}
+# First matching rdf:type wins, so a subject with several types (e.g. a
+# dcat:Distribution that is also a chs:Result) lands in exactly one category.
+_CATEGORY_PRIORITY = [
+    (_CAT_NS["dcat"] + "Distribution",              "DATASETS"),
+    (_CAT_NS["dcat"] + "DatasetSeries",             "DATASETS"),
+    (_CAT_NS["dcat"] + "Dataset",                   "DATASETS"),
+    (_CAT_NS["acd"]  + "PhotographicDocumentation", "MEDIA & RESULTS"),
+    (_CAT_NS["chs"]  + "Result",                    "MEDIA & RESULTS"),
+    (_CAT_NS["chs"]  + "CulturalHeritageProject",   "PROJECT"),
+    (_CAT_NS["geos"] + "Geometry",                  "SITE & FIGURES"),
+    (_CAT_NS["arco"] + "ArchaeologicalProperty",    "SITE & FIGURES"),
+    (_CAT_NS["core"] + "AgentRole",                 "PEOPLE"),
+    (_CAT_NS["foaf"] + "Person",                    "PEOPLE"),
+    (_CAT_NS["core"] + "Agent",                     "PEOPLE"),
+    (_CAT_NS["chs"]  + "EquipmentConfiguration",    "EQUIPMENT"),
+    (_CAT_NS["chs"]  + "Hardware",                  "EQUIPMENT"),
+    (_CAT_NS["chs"]  + "CulturalHeritageSurvey",    "SURVEYS"),
+    (_CAT_NS["chs"]  + "ObservationCollection",     "OBSERVATIONS"),
+    (_CAT_NS["chs"]  + "Observation",               "OBSERVATIONS"),
+    (_CAT_NS["add"]  + "MeasurementCollection",     "MEASUREMENTS"),
+    (_CAT_NS["add"]  + "Measurement",               "MEASUREMENTS"),
+    (_CAT_NS["add"]  + "MeasurementType",           "VOCABULARY"),
+    (_CAT_NS["mua"]  + "MeasurementUnit",           "VOCABULARY"),
+    (_CAT_NS["chs"]  + "Method",                    "VOCABULARY"),
+]
+
+
+def _serialize_categorised(g, out_path):
+    """Write g to out_path as Turtle, grouped into logical categories with a
+    single prefix header and `# ===` section banners. Works on the RDF graph,
+    never on the serialised text. The triples are identical to a flat
+    serialisation — proven here by sum-of-parts == len(g) — only the subject
+    order and the added comment banners differ; nothing is deleted."""
+    import rdflib
+    from rdflib import RDF
+
+    def _ttl(x):
+        return x.decode("utf-8") if isinstance(x, bytes) else x
+
+    # 1 · subject -> category index (first matching rdf:type wins, else OTHER).
+    types = {}
+    for s, _, o in g.triples((None, RDF.type, None)):
+        types.setdefault(s, set()).add(str(o))
+    index = {}
+    for s, tset in types.items():
+        chosen = "OTHER"
+        for tiri, cat in _CATEGORY_PRIORITY:
+            if tiri in tset:
+                chosen = cat
+                break
+        index[s] = chosen
+
+    # 2 · one single pass: route every triple into its category bucket graph.
+    buckets = {c: rdflib.Graph() for c in _CAT_ORDER}
+    for b in buckets.values():
+        for pfx, ns in g.namespaces():
+            b.bind(pfx, ns, replace=True)
+    for s, p, o in g:
+        buckets[index.get(s, "OTHER")].add((s, p, o))
+
+    # Completeness + disjointness guard: nothing dropped, nothing duplicated.
+    assert sum(len(b) for b in buckets.values()) == len(g), \
+        "categorised writer lost or duplicated triples"
+
+    # 3 · one prefix header for the whole file (from rdflib's own output).
+    prefix_block = "\n".join(
+        ln for ln in _ttl(g.serialize(format="turtle")).splitlines()
+        if ln.startswith(("@prefix", "@base"))
+    )
+
+    def _body(bucket):
+        return "\n".join(
+            ln for ln in _ttl(bucket.serialize(format="turtle")).splitlines()
+            if not ln.startswith(("@prefix", "@base"))
+        ).strip("\n")
+
+    bar = "# " + "═" * 74
+    parts = [
+        bar,
+        "# RUPE MAGNA RTI KNOWLEDGE GRAPH",
+        f"# {len(g)} triples · grouped into logical sections for readability.",
+        "# Identical graph to a flat serialisation — only order + banners differ.",
+        bar, "", prefix_block, "",
+    ]
+    for cat in _CAT_ORDER:
+        b = buckets[cat]
+        if len(b) == 0:
+            continue
+        parts += [bar, f"# {cat}",
+                  f"#   {_CAT_CLASSES[cat]}  ·  {len(b)} triples",
+                  bar, "", _body(b), ""]
+
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts).rstrip("\n") + "\n")
+
+
 def _kg_build_final(dataset_dir, site_name, meta, logger):
     """Build a single final Knowledge Graph TTL: EXIF → dataset + photo triples
     (SPARQL Anything) + RTI provenance (provenance JSON) + shared.ttl, merged in
@@ -655,7 +833,7 @@ def _kg_build_final(dataset_dir, site_name, meta, logger):
             except Exception as ex:
                 logger.warning(f"merge parse failed for {part}: {ex}")
     g += g_e
-    g.serialize(destination=final_ttl, format='turtle')
+    _serialize_categorised(g, final_ttl)
     for t in (tmp_c, tmp_d):
         try:
             os.remove(t)
@@ -669,6 +847,11 @@ def _kg_build_final(dataset_dir, site_name, meta, logger):
     logger.info(f"=== Build complete: {len(g)} triples → {final_ttl} ===")
     return len(g)
 
+
+# ══════════════════════════════════════════════════════════════════════════
+# 8 · MENU ACTIONS — DATASET OPERATIONS
+# Front-end flows: pick a dataset, then Generate Knowledge Graph or stamp JPGs.
+# ══════════════════════════════════════════════════════════════════════════
 
 def _choose_dataset(title, subtitle):
     """Shared front-end for the dataset operations: clear the screen, load the
@@ -810,7 +993,10 @@ def run_jpg_metadata():
     _wait_enter()
 
 
-# ── RDF Plugin Install ─────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════
+# 9 · RELIGHTLAB RDF-PLUGIN INSTALL
+# Patch relight sources, copy the plugin files, and build with cmake + make.
+# ══════════════════════════════════════════════════════════════════════════
 
 def _patch_cmake(cmake_path):
     with open(cmake_path, encoding='utf-8') as f:
@@ -1277,7 +1463,10 @@ def run_rdf_plugin_install():
     _wait_enter()
 
 
-# ── Logs ───────────────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════
+# 10 · LOG VIEWER
+# List and page through the pipeline log files under 04-logs/.
+# ══════════════════════════════════════════════════════════════════════════
 
 _LOG_MODULES = ['jpg-metadata', 'knowledge-graph', 'rdf-plugin']
 
@@ -1352,7 +1541,10 @@ def run_log_viewer():
             pass
 
 
-# ── Home screen and main ───────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════
+# 11 · HOME SCREEN & ENTRY POINT
+# Banner, menu loop and first-run directory scaffolding.
+# ══════════════════════════════════════════════════════════════════════════
 
 def draw_home():
     console.clear()

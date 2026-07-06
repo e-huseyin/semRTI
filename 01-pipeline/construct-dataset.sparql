@@ -1,35 +1,22 @@
-##############################################################################
-# construct-dataset.sparql  (semRTI-ODP)
-# SPARQL Anything — dataset triples: per-session resources
+# ╔════════════════════════════════════════════════════════════════════════╗
+# ║ construct-dataset.sparql  ·  per-session dataset triples (semRTI-ODP)  ║
+# ╠════════════════════════════════════════════════════════════════════════╣
+# ║ SPARQL Anything CONSTRUCT — one ODP set per acquisition session.       ║
+# ║                                                                        ║
+# ║ SECTION MAP                                                            ║
+# ║   1 · Prefixes                                                         ║
+# ║   2 · CONSTRUCT — output graph shape                                   ║
+# ║   3 · WHERE — VALUES table · EXIF · item counts · URIs · labels        ║
+# ╚════════════════════════════════════════════════════════════════════════╝
 #
-# ODP alignment (CulturalHeritageSurvey.ttl):
-#
-#   chs:CulturalHeritageProject
-#     └─ chs:hasSurvey ──► chs:CulturalHeritageSurvey        [NEW]
-#           ├─ chs:isSurveyOf ──► arco:ArchaeologicalProperty
-#           ├─ chs:usesEquipmentConfiguration ──► chs:EquipmentConfiguration
-#           │     └─ chs:usesEquipment ──► chs:Hardware
-#           └─ chs:hasObservationCollection ──► chs:ObservationCollection
-#
-# Generates for every session in the VALUES table:
-#   rm-project:rupe-magna-rti  chs:hasSurvey  rm-survey:{sessionID}
-#   rm-role:{sessionID}-photographer   core:AgentRole
-#   rm-mcoll:{sessionID}               a-dd:MeasurementCollection
-#   rm-meas:{sessionID}-iso/aperture/shutter-speed/focal-length
-#   rm-econf:{sessionID}               chs:EquipmentConfiguration
-#   rm-survey:{sessionID}              chs:CulturalHeritageSurvey
-#   rm-ocoll:{sessionID}               chs:ObservationCollection
-#   rm-data:{sessionID}                dcat:Dataset
-#   rm-dist:{sessionID}-jpg/raw        dcat:Distribution
-#
-# FILTER covers all jpg-export* variants (jpg-export/, jpg-export-linear/,
-# jpg-export-linear-LC/, etc.) so production datasets are handled correctly.
-#
-# INPUT
-#   EXIF_LOCATION_PLACEHOLDER — replaced by semRTI.py with file:// URI
-#   CSV_LOCATION_PLACEHOLDER  — passed by semRTI.py (placeholder only)
-##############################################################################
+# ODP: Project -> hasSurvey -> Survey -> (isSurveyOn figure+site ·
+#        usesEquipmentConfiguration · hasObservationCollection);
+#        Survey wasGeneratedBy -> Dataset -> JPEG & RAW Distributions.
+# INPUT: EXIF_LOCATION_PLACEHOLDER · CSV_LOCATION_PLACEHOLDER (semRTI.py).
 
+# ════════════════════════════════════════════════════════════════════════
+# 1 · PREFIXES
+# ════════════════════════════════════════════════════════════════════════
 PREFIX fx:     <http://sparql.xyz/facade-x/ns/>
 PREFIX xyz:    <http://sparql.xyz/facade-x/data/>
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -66,6 +53,9 @@ PREFIX rm-unit:    <https://w3id.org/rupemagna/resource/unit/>
 PREFIX prov:       <http://www.w3.org/ns/prov#>
 PREFIX rm-method:  <https://w3id.org/rupemagna/resource/method/>
 
+# ════════════════════════════════════════════════════════════════════════
+# 2 · CONSTRUCT  ·  output graph shape
+# ════════════════════════════════════════════════════════════════════════
 CONSTRUCT {
 
   ### ODP top: Project → Survey  [chs:hasSurvey] ###
@@ -179,6 +169,10 @@ CONSTRUCT {
     prov:wasGeneratedBy ?surveyURI ;
     dct:title ?labelDistRaw .
 }
+
+# ════════════════════════════════════════════════════════════════════════
+# 3 · WHERE  ·  query logic (data → variables)
+# ════════════════════════════════════════════════════════════════════════
 WHERE {
 
   ##########################################################################

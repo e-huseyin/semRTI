@@ -1,22 +1,20 @@
-##############################################################################
-# shared.ttl
-# Rupe Magna RTI Knowledge Graph — ODP-aligned version (semRTI-ODP)
-# Static shared base — the unchanging part of the graph (same across all 40 datasets)
+# ╔════════════════════════════════════════════════════════════════════════╗
+# ║ shared.ttl  ·  static ABox base (semRTI-ODP)                           ║
+# ╠════════════════════════════════════════════════════════════════════════╣
+# ║ The unchanging part of the graph, merged in memory by semRTI.py.       ║
+# ║                                                                        ║
+# ║ SECTION MAP                                                            ║
+# ║   1 · Prefixes & base                                                  ║
+# ║   2 · PART 1 — project-wide resources                                  ║
+# ║   3 · PART 2 — figures & dataset series (F01–F11)                      ║
+# ║   4 · RTI acquisition method                                           ║
+# ╚════════════════════════════════════════════════════════════════════════╝
 #
-# ODP structure followed (CulturalHeritageSurvey.ttl):
-#   chs:CulturalHeritageProject
-#     └─ chs:hasSurvey ──► chs:CulturalHeritageSurvey  [added by construct-dataset]
-#           ├─ chs:isSurveyOn ──► arco:ArchaeologicalProperty
-#           ├─ chs:usesEquipmentConfiguration ──► chs:EquipmentConfiguration
-#           └─ chs:hasObservationCollection ──► chs:ObservationCollection
-#
-# Part 1: Project, Site, Agent, Equipment, MeasurementType, MeasurementUnit
-# Part 2: 11 Figures (F01–F11), 11 DatasetSeries
-#
-# Loaded as the static base by semRTI.py and merged in memory (rdflib) with the
-# dataset / photo / RTI provenance triples — written once, never concatenated.
-##############################################################################
+# ABox/data only — TBox lives in rupemagna-rti-ontology.owl + imports.
 
+# ════════════════════════════════════════════════════════════════════════
+# 1 · PREFIXES & BASE
+# ════════════════════════════════════════════════════════════════════════
 @prefix chs:     <http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#> .
 @prefix dct:     <http://purl.org/dc/terms/> .
 @prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
@@ -70,9 +68,10 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-##############################################################################
-#    PART 1 — Resources shared across the entire project
-##############################################################################
+# ════════════════════════════════════════════════════════════════════════
+# 2 · PART 1  ·  project-wide resources
+# ════════════════════════════════════════════════════════════════════════
+#   Project · Site · Agent · Equipment · MeasurementTypes · Units
 
 # ---------------------------------------------------------------------------
 # A.1 — Cultural Heritage Project  [ODP: chs:CulturalHeritageProject]
@@ -223,9 +222,9 @@ rm-unit:pixel
     rdfs:label "pixel"@en .
 
 
-##############################################################################
-#    PART 2 — Figures and DatasetSeries (one entry per figure)
-##############################################################################
+# ════════════════════════════════════════════════════════════════════════
+# 3 · PART 2  ·  figures & dataset series (F01–F11)
+# ════════════════════════════════════════════════════════════════════════
 
 # ---------------------------------------------------------------------------
 # F01 — Sector AA — The Praying Figure with Spiral
@@ -447,9 +446,9 @@ rm-series:F11
     dct:title "F11 RTI Dataset Series — The Figure with a Square, Rupe Magna"@en .
 
 
-# ---------------------------------------------------------------------------
-# RTI Acquisition Method
-# ---------------------------------------------------------------------------
+# ════════════════════════════════════════════════════════════════════════
+# 4 · RTI ACQUISITION METHOD
+# ════════════════════════════════════════════════════════════════════════
 
 rm-method:rti
     rdf:type owl:NamedIndividual, chs:Method ;

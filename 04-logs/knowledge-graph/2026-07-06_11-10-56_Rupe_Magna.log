@@ -1,0 +1,35 @@
+[11:10:56] INFO    Log: /Volumes/ehuseyin/3DARCHEO/04-logs/knowledge-graph/2026-07-06_11-10-56_Rupe_Magna.log
+[11:10:56] INFO    Dataset: /Volumes/ehuseyin/3DARCHEO/02-datasets/Rupe Magna
+[11:10:56] INFO    Site:    Rupe Magna
+[11:10:57] INFO    === EXIF export ===
+[11:11:21] INFO    EXIF export: 1149 records from 24 source folder(s) → /Volumes/ehuseyin/3DARCHEO/03-outputs/knowledge-graph/rupe-magna-exif.json
+[11:11:21] INFO    === Dataset + photo triples ===
+[11:11:26] INFO    Dataset triples → /Volumes/ehuseyin/3DARCHEO/01-pipeline/_tmp-section-c.ttl
+[11:11:28] INFO    Photo triples → /Volumes/ehuseyin/3DARCHEO/01-pipeline/_tmp-section-d.ttl
+[11:11:28] INFO    === RTI provenance ===
+[11:11:29] INFO    RTI provenance: F01/RTI-03/ptm (F01RTI03-ptm.json)
+[11:11:30] INFO    RTI provenance: F01/RTI-05/ptm (F01RTI05-ptm.json)
+[11:11:31] INFO    RTI provenance: F01/RTI-07/ptm (F01RTI07-ptm.json)
+[11:11:32] INFO    RTI provenance: F01/RTI-08/ptm (F01RTI08-ptm.json)
+[11:11:33] INFO    RTI provenance: F01/RTI-09/ptm (F01RTI09-ptm.json)
+[11:11:34] INFO    RTI provenance: F01/RTI-10/ptm (F01RTI10-ptm.json)
+[11:11:35] INFO    RTI provenance: F02/RTI-12/ptm (F02RTI12-ptm.json)
+[11:11:36] INFO    RTI provenance: F03/RTI-15/ptm (F03RTI15-ptm.json)
+[11:11:37] INFO    RTI provenance: F03/RTI-16/ptm (F03RTI16-ptm.json)
+[11:11:38] INFO    RTI provenance: F03/RTI-17/ptm (F03RTI17-ptm.json)
+[11:11:39] INFO    RTI provenance: F03/RTI-18/ptm (F03RTI18-ptm.json)
+[11:11:40] INFO    RTI provenance: F04/RTI-20/ptm (F04RTI20-ptm.json)
+[11:11:42] INFO    RTI provenance: F04/RTI-21/ptm (F04RTI21-ptm.json)
+[11:11:43] INFO    RTI provenance: F04/RTI-22/ptm (F04RTI22-ptm.json)
+[11:11:44] INFO    RTI provenance: F04/RTI-23/ptm (F04RTI23-ptm.json)
+[11:11:45] INFO    RTI provenance: F05/RTI-24/ptm (F05RTI24-ptm.json)
+[11:11:46] INFO    RTI provenance: F06/RTI-26/ptm (F06RTI26-ptm.json)
+[11:11:47] INFO    RTI provenance: F07/RTI-28/ptm (F07RTI28-ptm.json)
+[11:11:48] INFO    RTI provenance: F08/RTI-33/ptm (F08RTI33-ptm.json)
+[11:11:49] INFO    RTI provenance: F09/RTI-34/ptm (F09RTI34-ptm.json)
+[11:11:50] INFO    RTI provenance: F09/RTI-35/ptm (F09RTI35-ptm.json)
+[11:11:51] INFO    RTI provenance: F10/RTI-37/ptm (F10RTI37-ptm.json)
+[11:11:52] INFO    RTI provenance: F10/RTI-38/ptm (F10RTI38-ptm.json)
+[11:11:53] INFO    RTI provenance: F11/RTI-40/ptm (F11RTI40-ptm.json)
+[11:11:54] INFO    === Merge ===
+[11:11:59] INFO    === Build complete: 78773 triples → /Volumes/ehuseyin/3DARCHEO/03-outputs/knowledge-graph/rupe-magna-knowledge-graph.ttl ===
