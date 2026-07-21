@@ -1,1 +1,29 @@
+# Project-specific
 01-pipeline/sparql-anything.jar
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build / release artifacts
+dist/
+build/
+*.log
+
+# Secrets / local config
+.env
+.env.local
+*.local

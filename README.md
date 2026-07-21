@@ -26,6 +26,21 @@ Italy, September 2025): [**40 RTI acquisition sessions across 11 rock art figure
 > final `.ttl`** — no concatenated, multi-header intermediate files. See
 > [Version.1.0.1-Report.md](Version.1.0.1-Report.md) for the full migration report.
 
+> This repository follows the [Technical Rulebook for INFINITY Developers](docs/) v1.0. Run
+> `scripts/validate.sh` to check compliance.
+
+## Status
+
+| | |
+|---|---|
+| Champion | Hüseyin Erdoğan (Alma Mater Studiorum – Università di Bologna) |
+| Work package | WP8 |
+| Pilot | 3DARCHEO |
+| Component type | Workflow |
+| Latest release | 1.0.1 (2026-06-26) |
+| Licence | CC BY 4.0 |
+| DOI | _pending Zenodo archival_ |
+
 ---
 
 ## Architecture
@@ -325,7 +340,47 @@ complete deliverable can be regenerated once the full source data is available.
 
 ---
 
+## AI usage declaration
+
+> Claude Code (Anthropic) was used to scaffold this repository's INFINITY governance/metadata
+> files and to draft parts of this README's compliance sections.
+
+See [`AI_USAGE.md`](AI_USAGE.md) for the full policy on what AI systems may and may not do with
+this repository's contents, and [`ai.txt`](ai.txt) for the machine-readable version of the same
+policy.
+
+## Citation
+
+If you use this software, please cite it. See [`CITATION.cff`](CITATION.cff) for a machine-readable
+citation, kept in sync with the DOI of the latest Zenodo release.
+
+## Repository contents
+
+| File | Purpose |
+|---|---|
+| [LICENSE](LICENSE) | Licence terms (CC BY 4.0) |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
+| [MAINTAINERS.md](MAINTAINERS.md) | Ownership and roles (Champion, deputy) |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Behavioural expectations for contributors |
+| [CHANGELOG.md](CHANGELOG.md) | Notable changes per release |
+| [SECURITY.md](SECURITY.md) | How to report vulnerabilities |
+| [SUPPORT.md](SUPPORT.md) | How to request help or report issues |
+| [AI_USAGE.md](AI_USAGE.md) / [ai.txt](ai.txt) | AI usage and access policy |
+| [codemeta.json](codemeta.json) | Machine-readable software metadata |
+| [CITATION.cff](CITATION.cff) | Machine-readable citation |
+| [component.md](component.md) | INFINITY Ecosystem component annotation |
+| [docs/governance.md](docs/governance.md) | Champion role and decision-making process |
+| [docs/release-process.md](docs/release-process.md) | Release, versioning, and Zenodo archival workflow |
+| [docs/ethics/](docs/ethics/) | Digital Heritage Ethics Workflow materials |
+
+---
+
 **Author:** Hüseyin Erdoğan · [ORCID 0000-0002-2965-0918](https://orcid.org/0000-0002-2965-0918)
 **Affiliation:** Alma Mater Studiorum – Università di Bologna
 **License:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+
+## Credits
+
+This project has received funding from the European Union's Horizon Europe research and
+innovation programme under grant agreement N. 101233051.
 **Version:** 1.0.1 · June 2026
