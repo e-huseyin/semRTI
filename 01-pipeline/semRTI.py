@@ -51,7 +51,7 @@ TEMPLATE_DATASET    = os.path.join(SCRIPT_DIR, 'construct-dataset.sparql')
 TEMPLATE_PHOTOS     = os.path.join(SCRIPT_DIR, 'construct-photos.sparql')
 TEMPLATE_RTI        = os.path.join(SCRIPT_DIR, 'construct-rti.sparql')
 TEMPLATE_PROVENANCE = os.path.join(SCRIPT_DIR, 'construct-provenance.sparql')
-ONTOLOGY_TTL        = os.path.join(SCRIPT_DIR, 'rupemagna-rti-1_6-global.ttl')
+ONTOLOGY_TTL        = os.path.join(SCRIPT_DIR, 'rupemagna-rti-ontology.ttl')
 KG_DATASET_CSV      = os.path.join(SCRIPT_DIR, 'dataset-config.csv')
 KG_SHARED_TTL       = os.path.join(SCRIPT_DIR, 'shared.ttl')
 KG_OUTPUTS_DIR      = os.path.join(OUTPUTS_DIR, 'knowledge-graph')
@@ -820,15 +820,16 @@ def _serialize_categorised(g, out_path):
         f.write("\n".join(parts).rstrip("\n") + "\n")
 
 
-def _kg_apply_reasoning(g, logger):
+def _kg_apply_reasoning(g, logger, ontology_path=ONTOLOGY_TTL):
     """Materialise OWL-RL/RDFS entailments (subclass/subproperty closure,
     owl:inverseOf, owl:propertyChainAxiom, …) over the merged KG graph `g`
     against the ontology's TBox, in place. Optional pipeline step — off by
     default because it changes triple count/shape and adds build time.
 
     Only NEW facts about individuals already present in `g` are kept: the
-    ontology (rupemagna-rti-1_6-global.ttl) is reasoned over alongside the KG in a
-    working copy, then any entailed triple whose subject isn't already a
+    ontology at `ontology_path` (defaults to ONTOLOGY_TTL, but the user can
+    point this at any TTL from the menu) is reasoned over alongside the KG in
+    a working copy, then any entailed triple whose subject isn't already a
     subject in `g` is discarded (that's a pure TBox-internal entailment —
     e.g. transitive subClassOf between two ontology classes — not a fact
     about one of this project's individuals, so it has no place in a
@@ -840,8 +841,8 @@ def _kg_apply_reasoning(g, logger):
     from owlrl import DeductiveClosure, OWLRL_Semantics
     from rdflib.namespace import RDF, OWL
 
-    if not os.path.exists(ONTOLOGY_TTL):
-        logger.warning(f"Reasoning skipped: ontology not found ({ONTOLOGY_TTL})")
+    if not os.path.exists(ontology_path):
+        logger.warning(f"Reasoning skipped: ontology not found ({ontology_path})")
         return 0
 
     subjects_in_g = set(g.subjects())
@@ -849,7 +850,7 @@ def _kg_apply_reasoning(g, logger):
     working = rdflib.Graph()
     for t in g:
         working.add(t)
-    working.parse(ONTOLOGY_TTL, format='turtle')
+    working.parse(ontology_path, format='turtle')
     before = len(working)
 
     DeductiveClosure(OWLRL_Semantics).expand(working)
@@ -871,12 +872,14 @@ def _kg_apply_reasoning(g, logger):
     return added
 
 
-def _kg_build_final(dataset_dir, site_name, meta, logger, apply_reasoning=False):
+def _kg_build_final(dataset_dir, site_name, meta, logger, apply_reasoning=False,
+                     ontology_path=ONTOLOGY_TTL):
     """Build a single final Knowledge Graph TTL: EXIF → dataset + photo triples
     (SPARQL Anything) + RTI provenance (provenance JSON) + shared.ttl, merged in
     memory with rdflib and written once. No intermediate triple files; no JPG
     stamping (that is a separate menu item). If apply_reasoning is True, an
-    extra OWL-RL closure step runs after the merge (see _kg_apply_reasoning)."""
+    extra OWL-RL closure step runs after the merge (see _kg_apply_reasoning),
+    reasoning over `ontology_path` (defaults to ONTOLOGY_TTL)."""
     import rdflib
     safe_site = re.sub(r'[^\w\-]', '-', site_name).lower().strip('-')
     os.makedirs(KG_OUTPUTS_DIR, exist_ok=True)
@@ -944,7 +947,7 @@ def _kg_build_final(dataset_dir, site_name, meta, logger, apply_reasoning=False)
     if apply_reasoning:
         print(f"\n[5/{total_steps}] Applying OWL-RL reasoning...")
         logger.info("=== Reasoning ===")
-        added = _kg_apply_reasoning(g, logger)
+        added = _kg_apply_reasoning(g, logger, ontology_path=ontology_path)
         print(f"      → +{added} entailed triples")
 
     _serialize_categorised(g, final_ttl)
@@ -1043,10 +1046,20 @@ def run_knowledge_graph():
         return
 
     apply_reasoning = False
+    ontology_path = ONTOLOGY_TTL
     if importlib.util.find_spec('owlrl') is not None:
         apply_reasoning = _confirm(
             "  Apply OWL-RL reasoning to materialise subclass/subproperty "
             "inferences (e.g. chs:CulturalProperty, crm:P2_has_type)? (y/N): ")
+        if apply_reasoning:
+            ontology_path = _ask(
+                f"  Ontology TTL to reason over [{os.path.basename(ONTOLOGY_TTL)}]: ",
+                default=ONTOLOGY_TTL) or ONTOLOGY_TTL
+            if not os.path.isabs(ontology_path):
+                ontology_path = os.path.join(SCRIPT_DIR, ontology_path)
+            if not os.path.exists(ontology_path):
+                console.print(f"  [yellow]Ontology file not found ({ontology_path}) — "
+                               "reasoning will be skipped.[/yellow]")
     else:
         console.print("  [dim]owlrl not installed — skipping optional reasoning step "
                        "(pip install owlrl to enable).[/dim]")
@@ -1063,7 +1076,8 @@ def run_knowledge_graph():
     console.rule(style="dim")
 
     try:
-        _kg_build_final(dataset_dir, site_name, meta, logger, apply_reasoning=apply_reasoning)
+        _kg_build_final(dataset_dir, site_name, meta, logger, apply_reasoning=apply_reasoning,
+                         ontology_path=ontology_path)
     except Exception as e:
         console.print(f"\n  [red][!] Error: {e}[/red]")
         logger.error(str(e), exc_info=True)
