@@ -42,6 +42,8 @@ PREFIX owl:    <http://www.w3.org/2002/07/owl#>
 PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
 PREFIX dct:    <http://purl.org/dc/terms/>
 PREFIX crmdig: <http://www.cidoc-crm.org/extensions/CRMdig/>
+PREFIX core:   <https://w3id.org/arco/ontology/core/>
+PREFIX roapit: <https://w3id.org/italia/onto/RO/>
 
 PREFIX rpm-rti: <https://w3id.org/rupemagna-rti/ontology#>
 
@@ -49,6 +51,16 @@ PREFIX rpm-rti: <https://w3id.org/rupemagna-rti/ontology#>
 # 2 · CONSTRUCT  ·  output graph shape
 # ════════════════════════════════════════════════════════════════════════
 CONSTRUCT {
+
+  ### Processing AgentRole  [reified, mirrors the survey's photographer pattern
+  ### in construct-dataset.sparql. acore:hasAgentRole's domain is E7_Activity,
+  ### so the D10 processing executions carry their own role assignment too —
+  ### not just the acquisition survey. One shared Analyst role-in-context per
+  ### session, reused by both RAWDevelopment and RTIFitting. ###
+  ?roleAnalystURI
+    a owl:NamedIndividual, core:AgentRole ;
+    core:hasAgent rpm-rti:agent-huseyin-erdogan ;
+    roapit:withRole rpm-rti:role-analyst .
 
   ### Stage 2a — RAW development: RawCaptureSet -> DevelopedImageSet (darktable).
   ### crmdig:L11i_was_output_of is the declared inverse of L11_had_output,
@@ -65,6 +77,7 @@ CONSTRUCT {
     crmdig:L10_had_input ?ocollURI ;
     crmdig:L11_had_output ?devImgURI ;
     rpm-rti:usedSoftware rpm-rti:software-darktable ;
+    core:hasAgentRole ?roleAnalystURI ;
     rdfs:label ?actRawDevLabel .
 
   ### Stage 2b — RTI fitting (+ export): DevelopedImageSet -> RTIModel (RelightLab) ###
@@ -81,6 +94,7 @@ CONSTRUCT {
     crmdig:L10_had_input ?devImgURI ;
     crmdig:L11_had_output ?modelURI ;
     rpm-rti:usedSoftware rpm-rti:software-relightlab ;
+    core:hasAgentRole ?roleAnalystURI ;
     dct:created ?started ;
     rdfs:label ?actFitLabel .
 }
@@ -113,6 +127,7 @@ WHERE {
   BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#act-rawdev-", ?session))      AS ?actRawDevURI)
   BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#model-", ?session, "-", ?type)) AS ?modelURI)
   BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#act-rtifit-", ?session, "-", ?type)) AS ?actFitURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#role-", ?session, "-analyst"))       AS ?roleAnalystURI)
 
   # ---- labels
   BIND(STRLANG(CONCAT("Developed JPEG stack — ", ?session), "en")                     AS ?devImgLabel)

@@ -378,10 +378,13 @@ WHERE {
        "en") AS ?labelDistJpg)
   BIND(STRLANG(CONCAT(?sessionID, " RAW Files — ", ?itemCountStr, " images"),
        "en") AS ?labelDistRaw)
+  BIND(IF(?isExport,
+       CONCAT(?itemCountStr, " JPG and ", ?itemCountStr, " RAF images"),
+       CONCAT(?itemCountStr, " JPG images")) AS ?itemsDesc)
   BIND(STRLANG(CONCAT(
        "Photographic RTI dataset of ", ?figureName, " (", ?figureID,
        "), acquisition session ", ?sessionID,
-       ". Comprises ", ?itemCountStr, " JPG and ", ?itemCountStr, " RAF images captured with a custom-built ",
+       ". Comprises ", ?itemsDesc, " captured with a custom-built ",
        "portable RTI dome at Rupe Magna Rock Engraving Park, Grosio, Italy."),
        "en") AS ?dataDesc)
 }

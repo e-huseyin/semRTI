@@ -27,11 +27,6 @@
 @prefix tiapit: <https://w3id.org/italia/onto/TI/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-cis:hasSite a owl:ObjectProperty ;
-    rdfs:label "has site"@en ;
-    rdfs:domain arco:ArchaeologicalPark ;
-    rdfs:range cis:CulturalInstituteOrSite .
-
 dct:created a owl:DatatypeProperty ;
     rdfs:label "created"@en ;
     rdfs:domain [ a owl:Class ;
@@ -130,16 +125,6 @@ crm:P32_used_general_technique a owl:ObjectProperty ;
 crm:P4_has_time-span a owl:ObjectProperty ;
     rdfs:label "has time-span"@en ;
     rdfs:range crm:E52_Time-Span .
-
-crm:P82a_begin_of_the_begin a owl:DatatypeProperty ;
-    rdfs:label "begin of the begin"@en ;
-    rdfs:domain crm:E52_Time-Span ;
-    rdfs:range xsd:dateTime .
-
-crm:P82b_end_of_the_end a owl:DatatypeProperty ;
-    rdfs:label "end of the end"@en ;
-    rdfs:domain crm:E52_Time-Span ;
-    rdfs:range xsd:dateTime .
 
 chs:Interpretation a owl:Class ;
     rdfs:label "Interpretation"@en ;
@@ -351,12 +336,6 @@ acore:hasAgentRole a owl:ObjectProperty ;
     rdfs:range acore:AgentRole ;
     rdfs:subPropertyOf crm:P01i_is_domain_of .
 
-acore:hasLocation a owl:ObjectProperty ;
-    rdfs:label "has location"@en ;
-    rdfs:domain [ a owl:Class ;
-            owl:unionOf ( cis:CulturalInstituteOrSite chs:CulturalHeritageSurvey arco:ArchaeologicalProperty ) ] ;
-    rdfs:range acore:Location .
-
 add:hasMeasurement a owl:ObjectProperty ;
     rdfs:label "has measurement"@en ;
     rdfs:domain add:MeasurementCollection ;
@@ -424,15 +403,6 @@ rpm-rti:RAWDevelopment a owl:Class ;
     rdfs:label "RAW Development"@en ;
     rdfs:comment "Uniform RAW→JPEG development of the multi-light set (exposure, white balance, development settings applied identically across the 48 shots). Typed crm:P2_has_type aat:300054636 (data processing)."@en ;
     rdfs:subClassOf crmdig:D10_Software_Execution .
-
-rpm-rti:RTIExport a owl:Class ;
-    rdfs:label "RTI Export"@en ;
-    rdfs:comment "Export of the fitted model to a delivery format (PTM / HSH). Typed crm:P2_has_type aat:300417260 (saving)."@en ;
-    rdfs:subClassOf crmdig:D10_Software_Execution .
-
-rpm-rti:RTIProcessing a owl:Class ;
-    rdfs:label "RTI Processing"@en ;
-    rdfs:subClassOf crmdig:D3_Formal_Derivation .
 
 rpm-rti:RTIRendering a owl:Class ;
     rdfs:label "RTI Rendering"@en ;
@@ -554,14 +524,16 @@ rpm-rti:rti a owl:Ontology ;
     dct:description "OWL application profile for the Rupe Magna RTI Knowledge Graph, built on the Cultural Heritage Survey Ontology Design Pattern (CulturalHeritageSurvey.ttl). Profiles classes and properties from the CHS-ODP, ArCo, DCAT, DCT, FOAF, GeoWGS84, MUAPIT, ROAPIT and TIAPIT, and aligns the acquisition→processing→review pipeline to the CHAD-AP Process Module (CRMdig)."@en ;
     dct:issued "2026-07-15"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    dct:modified "2026-07-16"^^xsd:date ;
+    dct:modified "2026-07-21"^^xsd:date ;
     dct:title "Rupe Magna RTI — Application Profile Ontology (ODP-aligned)"@en ;
     rdfs:comment """Self-contained profile (no owl:imports): the CHS-ODP and supporting vocabularies are inlined and profiled rather than imported. All rdfs:domain / rdfs:range are PROFILE-SCOPED documentation, not global re-axiomatisations of the source ontologies. Cardinality, fixed-value and datatype constraints live in the companion SHACL file.\r
 v1.2 adds the CHAD-AP-aligned Process Module: crmdig:D2 acquisition + crmdig:D10 software executions chained by L10/L11 over crmdig:D9 data objects. (v1.4 removes the dataset revision/quality grading design.)\r
 v1.5 (additive, backward-compatible) closes four data-coverage gaps that had no home in v1.4 — see the GAP-CLOSURE section at the end: (1) software version; (2) pixel dimensions of the RTI output raster; (3) physical dimensions of hardware (via the existing measurement pattern, whose domain is widened from PhotographicDocumentation to also cover Equipment); (4) a reference page for equipment/software. An OPTIONAL GeoSPARQL geometry block is also provided so the site footprint can be a non-point WKT geometry alongside the scalar geo:lat/long/alt.\r
+v1.7 (2026-07-21, iter9) FIX: crmdig:L1_digitized's rdfs:domain was crmdig:D2_Digitization_Process. chs:hasFeatureOfInterest (domain chs:Observation) is rdfs:subPropertyOf crmdig:L1_digitized, and every Observation legitimately asserts hasFeatureOfInterest — so RDFS subproperty + domain entailment mistyped every one of the KG's ~1,137 individual Observations as crmdig:D2_Digitization_Process (confirmed against the iter8/iter9 KG: 1,161 D2_Digitization_Process instances total, only 24 of them the real rpm-rti:RTISurvey acquisitions). Fixed by widening crmdig:L1_digitized's domain to crm:E7_Activity (crmdig:D2_Digitization_Process ⊑ crm:E7_Activity, so every legitimate use still type-checks); Observations now only entail the correct, already-independently-asserted crm:E7_Activity. Does not touch the KG: existing iter8/iter9 KG files still carry the stale explicit D2_Digitization_Process triples on Observations, baked in at generation time against v1.6.\r
+v1.7 also DELETES six classes/properties found to be dead weight — each had 0 instances/uses in the KG and no other axiom depending on them: rpm-rti:RTIExport (a third D10_Software_Execution stage the KG folds into RTIFitting/the Distribution format instead of logging separately); rpm-rti:RTIProcessing and its sole superclass crmdig:D3_Formal_Derivation (a disconnected, superseded design, not a data gap); rpm-rti:usedDevice and its target crmdig:L12_happened_on_device (a redundant shortcut duplicating what crm:P16_used_specific_object, 48 real uses, already states); acore:hasLocation (redundant with geosparql:hasGeometry/geo:lat/long) and cis:hasSite (there is exactly one site in this dataset); crm:P82a_begin_of_the_begin/P82b_end_of_the_end (CRM's fuzzy-interval dating properties — the project's acquisition dates are exact and use tiapit:startTime/endTime instead). See the FIX/DELETED notes at each term's declaration for details.\r
 Key alignment bridge: arco:ArchaeologicalProperty is a subclass of BOTH chs:CulturalProperty AND chs:FeatureOfInterest."""@en ;
-    owl:versionIRI <https://w3id.org/rupemagna-rti/ontology/rti/1.5> ;
-    owl:versionInfo "1.5" .
+    owl:versionIRI <https://w3id.org/rupemagna-rti/ontology/rti/1.7> ;
+    owl:versionInfo "1.7" .
 
 rpm-rti:tech-rti a owl:NamedIndividual,
         rpm-rti:Technique ;
@@ -610,18 +582,14 @@ rpm-rti:unit-second a owl:NamedIndividual,
         <http://www.ontology-of-units-of-measure.org/resource/om-2/second-Time> ;
     skos:notation "s" .
 
-rpm-rti:usedDevice a owl:ObjectProperty ;
-    rdfs:label "used device"@en ;
-    rdfs:comment "0 uses in the KG (also true of the original monolithic ontology) — domain/range inferred from the sibling crm:P16_used_specific_object property, which this shortcut clearly parallels."@en ;
-    rdfs:domain crmdig:D2_Digitization_Process ;
-    rdfs:range crmdig:D8_Digital_Device ;
-    rdfs:subPropertyOf crmdig:L12_happened_on_device .
-
 rpm-rti:usedSoftware a owl:ObjectProperty ;
     rdfs:label "used software"@en ;
     rdfs:domain crmdig:D10_Software_Execution ;
     rdfs:range crmdig:D14_Software ;
     rdfs:subPropertyOf crmdig:L23_used_software_or_firmware .
+
+cis:CulturalInstituteOrSite a owl:Class ;
+    rdfs:label "Cultural Institute or Site"@en .
 
 crm:E16_Measurement a owl:Class ;
     rdfs:label "Measurement (CRM)"@en .
@@ -686,9 +654,6 @@ crm:PC14_carried_out_by a owl:Class ;
 
 crmdig:D1_Digital_Object a owl:Class .
 
-crmdig:D3_Formal_Derivation a owl:Class ;
-    rdfs:label "Formal Derivation"@en .
-
 crmdig:L10_had_input a owl:ObjectProperty ;
     rdfs:label "had input"@en ;
     rdfs:domain crmdig:D10_Software_Execution ;
@@ -699,13 +664,10 @@ crmdig:L11i_was_output_of a owl:ObjectProperty ;
     rdfs:domain crmdig:D9_Data_Object ;
     owl:inverseOf crmdig:L11_had_output .
 
-crmdig:L12_happened_on_device a owl:ObjectProperty ;
-    rdfs:label "happened on device"@en .
-
 crmdig:L1_digitized a owl:ObjectProperty ;
     rdfs:label "digitized"@en ;
-    rdfs:comment "Acquisition → the engraved surface it digitises. ArchaeologicalProperty serves as the F5_Item here (both ⊑ crm:E24)."@en ;
-    rdfs:domain crmdig:D2_Digitization_Process ;
+    rdfs:comment "Acquisition → the engraved surface it digitises. ArchaeologicalProperty serves as the F5_Item here (both ⊑ crm:E24). Domain is crm:E7_Activity (not narrowed to crmdig:D2_Digitization_Process) because chs:hasFeatureOfInterest, an Observation-level property, is a subproperty of this one — see the FIX note above."@en ;
+    rdfs:domain crm:E7_Activity ;
     rdfs:range arco:ArchaeologicalProperty .
 
 crmdig:L23_used_software_or_firmware a owl:ObjectProperty ;
@@ -787,6 +749,9 @@ acore:Agent a owl:Class ;
     rdfs:comment "Co-typed with foaf:Person on rpm-rti:agent-huseyin-erdogan — the ArCo-core / CRM-actor side of the same individual, alongside acore:AgentRole's own reified links (acore:hasAgent, roapit:withRole)."@en ;
     rdfs:subClassOf crm:E39_Actor .
 
+acore:Location a owl:Class ;
+    rdfs:label "Location"@en .
+
 acore:Method a owl:Class ;
     rdfs:label "Method"@en .
 
@@ -819,6 +784,12 @@ rpm-rti:Technique a owl:Class ;
 dct:LicenseDocument a owl:Class ;
     rdfs:label "License Document"@en ;
     rdfs:comment "An external license resource, e.g. a Creative Commons deed URI. Not further modelled locally — range target for dct:license/dct:rights only."@en .
+
+crm:E52_Time-Span a owl:Class ;
+    rdfs:label "Time-Span"@en .
+
+crmdig:D8_Digital_Device a owl:Class ;
+    rdfs:label "Digital Device"@en .
 
 crmdig:L11_had_output a owl:ObjectProperty ;
     rdfs:label "had output"@en ;
@@ -856,8 +827,8 @@ foaf:Person a owl:Class ;
     rdfs:comment "One shared individual: rpm-rti:agent-huseyin-erdogan (foaf:Person + acore:Agent)."@en ;
     rdfs:subClassOf acore:Agent .
 
-acore:Location a owl:Class ;
-    rdfs:label "Location"@en .
+arco:ArchaeologicalPark a owl:Class ;
+    rdfs:label "Archaeological Park"@en .
 
 tiapit:TimeInterval a owl:Class ;
     rdfs:label "Time Interval"@en ;
@@ -876,25 +847,20 @@ rpm-rti:RockArtFigure a owl:Class ;
     rdfs:subClassOf crm:E25_Human-Made_Feature,
         arco:ArchaeologicalProperty .
 
-cis:CulturalInstituteOrSite a owl:Class ;
-    rdfs:label "Cultural Institute or Site"@en .
-
 crm:E39_Actor a owl:Class ;
     rdfs:label "Actor"@en .
 
 crmdig:D14_Software a owl:Class ;
     rdfs:label "Software"@en .
 
-crmdig:D8_Digital_Device a owl:Class ;
-    rdfs:label "Digital Device"@en .
+crmdig:D2_Digitization_Process a owl:Class ;
+    rdfs:label "Digitization Process"@en ;
+    rdfs:subClassOf crm:E7_Activity .
 
 chs:EquipmentConfiguration a owl:Class ;
     rdfs:label "Equipment Configuration"@en ;
     rdfs:comment "Hardware + camera exposure settings for one RTI session. URI pattern rpm-rti:econf-{sessionID}. Being an add:MeasurementCollection it directly groups the 4 exposure measurements (ISO, aperture, shutter, focal length) via add:hasMeasurement; it links its Hardware via chs:usesEquipment. Cardinalities validated in SHACL."@en ;
     rdfs:subClassOf add:MeasurementCollection .
-
-arco:ArchaeologicalPark a owl:Class ;
-    rdfs:label "Archaeological Park"@en .
 
 acore:AgentRole a owl:Class ;
     rdfs:label "Agent Role"@en ;
@@ -909,9 +875,6 @@ add:MeasurementCollection a owl:Class ;
 roapit:Role a owl:Class ;
     rdfs:label "Role"@en ;
     rdfs:subClassOf crm:E55_Type .
-
-crm:E52_Time-Span a owl:Class ;
-    rdfs:label "Time-Span"@en .
 
 chs:Observation a owl:Class ;
     rdfs:label "Observation (single LED exposure)"@en ;
@@ -928,10 +891,6 @@ add:Measurement a owl:Class ;
 crm:E55_Type a owl:Class ;
     rdfs:label "Type"@en .
 
-crmdig:D2_Digitization_Process a owl:Class ;
-    rdfs:label "Digitization Process"@en ;
-    rdfs:subClassOf crm:E7_Activity .
-
 chs:Equipment a owl:Class ;
     rdfs:label "Equipment"@en ;
     rdfs:comment "Any technological resource used during a survey (camera, dome, processing software)."@en ;
@@ -947,12 +906,12 @@ chs:Result a owl:Class ;
     rdfs:comment "Co-type on every PhotographicDocumentation, marking it as the output of a survey Observation."@en ;
     rdfs:subClassOf crmdig:D1_Digital_Object .
 
-crm:E7_Activity a owl:Class ;
-    rdfs:label "Activity"@en .
-
 crmdig:D10_Software_Execution a owl:Class ;
     rdfs:label "Software Execution"@en ;
     rdfs:subClassOf crm:E7_Activity .
+
+crm:E7_Activity a owl:Class ;
+    rdfs:label "Activity"@en .
 
 chs:CulturalHeritageProject a owl:Class ;
     rdfs:label "Cultural Heritage Project"@en ;
@@ -982,15 +941,15 @@ chs:CulturalHeritageSurvey a owl:Class ;
         dul:Description,
         arco:Survey .
 
-dcat:Dataset a owl:Class ;
-    rdfs:label "Dataset"@en ;
-    rdfs:comment "One RTI acquisition session. URI pattern rpm-rti:data-{sessionID}."@en .
-
 arco:ArchaeologicalProperty a owl:Class ;
     rdfs:label "Archaeological Property"@en ;
     rdfs:comment "Used at two levels: (1) the overall site (rpm-rti:site-rupe-magna, also typed arco:ArchaeologicalPark / rpm-rti:RockArtSite); (2) individual rock art figures (rpm-rti:fig-F01–F11, also typed rpm-rti:RockArtFigure). Figures link to the site via arco:isPartOf. In the Process Module a figure serves as the F5_Item digitised by an acquisition (crmdig:L1_digitized). Declared subclass of BOTH chs:CulturalProperty and chs:FeatureOfInterest — the central bridge of this profile."@en ;
     rdfs:subClassOf chs:CulturalProperty,
         chs:FeatureOfInterest .
+
+dcat:Dataset a owl:Class ;
+    rdfs:label "Dataset"@en ;
+    rdfs:comment "One RTI acquisition session. URI pattern rpm-rti:data-{sessionID}."@en .
 
 dcat:Distribution a owl:Class ;
     rdfs:label "Distribution"@en ;
