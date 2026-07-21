@@ -404,11 +404,6 @@ rpm-rti:RAWDevelopment a owl:Class ;
     rdfs:comment "Uniform RAW→JPEG development of the multi-light set (exposure, white balance, development settings applied identically across the 48 shots). Typed crm:P2_has_type aat:300054636 (data processing)."@en ;
     rdfs:subClassOf crmdig:D10_Software_Execution .
 
-rpm-rti:RTIRendering a owl:Class ;
-    rdfs:label "RTI Rendering"@en ;
-    rdfs:comment "A snapshot rendered from an rpm-rti:RTIModel under a chosen light direction. Distinct from the model itself."@en ;
-    rdfs:subClassOf crmdig:D9_Data_Object .
-
 rpm-rti:RTISurvey a owl:Class ;
     rdfs:label "RTI Survey"@en ;
     rdfs:comment "An RTI acquisition session over a rock art figure. As a crmdig:D2_Digitization_Process it is the Stage-1 acquisition activity: crmdig:L1_digitized → the figure, crmdig:L11_had_output → the rpm-rti:RawCaptureSet, which is also its chs:hasObservationCollection."@en ;
@@ -838,7 +833,7 @@ tiapit:TimeInterval a owl:Class ;
 
 rpm-rti:RTIModel a owl:Class ;
     rdfs:label "RTI Model"@en ;
-    rdfs:comment "The relightable reflectance model (PTM / HSH). Corresponds to the -ptm/-hsh dcat:Distribution. Distinct from rpm-rti:RTIRendering, which is a snapshot rendered from the model."@en ;
+    rdfs:comment "The relightable reflectance model (PTM / HSH). Corresponds to the -ptm/-hsh dcat:Distribution."@en ;
     rdfs:subClassOf crmdig:D9_Data_Object .
 
 rpm-rti:RockArtFigure a owl:Class ;
