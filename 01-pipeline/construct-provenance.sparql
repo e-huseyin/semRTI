@@ -1,0 +1,122 @@
+# ╔════════════════════════════════════════════════════════════════════════╗
+# ║ construct-provenance.sparql  ·  CRMdig process chain (one dataset)     ║
+# ╠════════════════════════════════════════════════════════════════════════╣
+# ║ Stage-2 processing activities closed by rupemagna-rti-1_5.ttl's         ║
+# ║ Process Module: RAW capture set → (RAWDevelopment, darktable) →         ║
+# ║ developed JPEG stack → (RTIFitting, RelightLab) → RTI model.            ║
+# ║ Same two inputs construct-rti.sparql already reads per dataset — no     ║
+# ║ new data source. Runs once per dataset alongside construct-rti.sparql   ║
+# ║ in semRTI.py's RTI-provenance step.                                     ║
+# ║                                                                        ║
+# ║ SECTION MAP                                                            ║
+# ║   1 · Prefixes                                                         ║
+# ║   2 · CONSTRUCT — output graph shape                                   ║
+# ║   3 · WHERE — provenance JSON · identity · IRIs · labels               ║
+# ╚════════════════════════════════════════════════════════════════════════╝
+#
+# Design notes:
+#  - RAWDevelopment (darktable) has no logged timestamp anywhere in the
+#    pipeline's inputs, so that activity is asserted without dct:created
+#    rather than fabricating one.
+#  - RelightLab's provenance JSON doesn't distinguish a separate "fitting"
+#    vs. "export" run — one execution produces one output file — so this
+#    collapses fitting+export into the single RTIFitting activity (the
+#    ontology marks export as "Optional Stage 2c ... if modelled separately";
+#    it isn't here).
+#  - rpm-rti:derivedFrom is materialised explicitly (RTIModel -> DevelopedImageSet
+#    -> RawCaptureSet) even though the TBox also derives it via an
+#    owl:propertyChainAxiom over L11i/L10 — the pipeline doesn't run a
+#    reasoner, so leaving it implicit would make it invisible to consumers
+#    of the plain Turtle output.
+# INPUT: PROV_LOCATION_PLACEHOLDER (semRTI.py) — same provenance JSON as
+# construct-rti.sparql; info.json is not needed here.
+
+# ════════════════════════════════════════════════════════════════════════
+# 1 · PREFIXES
+# ════════════════════════════════════════════════════════════════════════
+PREFIX fx:     <http://sparql.xyz/facade-x/ns/>
+PREFIX xyz:    <http://sparql.xyz/facade-x/data/>
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX dct:    <http://purl.org/dc/terms/>
+PREFIX crmdig: <http://www.cidoc-crm.org/extensions/CRMdig/>
+
+PREFIX rpm-rti: <https://w3id.org/rupemagna-rti/ontology#>
+
+# ════════════════════════════════════════════════════════════════════════
+# 2 · CONSTRUCT  ·  output graph shape
+# ════════════════════════════════════════════════════════════════════════
+CONSTRUCT {
+
+  ### Stage 2a — RAW development: RawCaptureSet -> DevelopedImageSet (darktable).
+  ### crmdig:L11i_was_output_of is the declared inverse of L11_had_output,
+  ### materialised directly rather than left to reasoning. ###
+  ?devImgURI
+    a owl:NamedIndividual, rpm-rti:DevelopedImageSet, crmdig:D9_Data_Object ;
+    rpm-rti:isDistributedAs ?distJpgURI ;
+    rpm-rti:derivedFrom ?ocollURI ;
+    crmdig:L11i_was_output_of ?actRawDevURI ;
+    rdfs:label ?devImgLabel .
+
+  ?actRawDevURI
+    a owl:NamedIndividual, rpm-rti:RAWDevelopment ;
+    crmdig:L10_had_input ?ocollURI ;
+    crmdig:L11_had_output ?devImgURI ;
+    rpm-rti:usedSoftware rpm-rti:software-darktable ;
+    rdfs:label ?actRawDevLabel .
+
+  ### Stage 2b — RTI fitting (+ export): DevelopedImageSet -> RTIModel (RelightLab) ###
+  ?modelURI
+    a owl:NamedIndividual, rpm-rti:RTIModel, crmdig:D9_Data_Object ;
+    rpm-rti:isDistributedAs ?distRtiURI ;
+    rpm-rti:depicts ?figURI ;
+    rpm-rti:derivedFrom ?devImgURI ;
+    crmdig:L11i_was_output_of ?actFitURI ;
+    rdfs:label ?modelLabel .
+
+  ?actFitURI
+    a owl:NamedIndividual, rpm-rti:RTIFitting ;
+    crmdig:L10_had_input ?devImgURI ;
+    crmdig:L11_had_output ?modelURI ;
+    rpm-rti:usedSoftware rpm-rti:software-relightlab ;
+    dct:created ?started ;
+    rdfs:label ?actFitLabel .
+}
+
+# ════════════════════════════════════════════════════════════════════════
+# 3 · WHERE  ·  query logic (data → variables)
+# ════════════════════════════════════════════════════════════════════════
+WHERE {
+
+  ###################################################################
+  # Provenance JSON — just identity (output path) + start time
+  ###################################################################
+  SERVICE <x-sparql-anything:PROV_LOCATION_PLACEHOLDER> {
+    ?root xyz:startedAt ?startedRaw ;
+          xyz:output    ?outPath .
+  }
+
+  # ---- identity derived from the output path  .../<figure>/<session>/<type>
+  BIND(REPLACE(?outPath, ".*/([^/]+)$", "$1")                 AS ?type)
+  BIND(REPLACE(?outPath, ".*/([^/]+)/([^/]+)$", "$1")         AS ?session)
+  BIND(REPLACE(?outPath, ".*/([^/]+)/([^/]+)/([^/]+)$", "$1") AS ?figureID)
+  BIND(xsd:dateTime(?startedRaw)                              AS ?started)
+
+  # ---- IRIs
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#ocoll-", ?session))           AS ?ocollURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#dist-", ?session, "-jpg"))    AS ?distJpgURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#dist-", ?session, "-", ?type)) AS ?distRtiURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#fig-", ?figureID))             AS ?figURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#devimg-", ?session))          AS ?devImgURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#act-rawdev-", ?session))      AS ?actRawDevURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#model-", ?session, "-", ?type)) AS ?modelURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#act-rtifit-", ?session, "-", ?type)) AS ?actFitURI)
+
+  # ---- labels
+  BIND(STRLANG(CONCAT("Developed JPEG stack — ", ?session), "en")                     AS ?devImgLabel)
+  BIND(STRLANG(CONCAT("RAW development (darktable) — ", ?session), "en")              AS ?actRawDevLabel)
+  BIND(STRLANG(CONCAT("RTI model (", UCASE(?type), ") — ", ?session), "en")            AS ?modelLabel)
+  BIND(STRLANG(CONCAT("RTI fitting (RelightLab) — ", ?session, " (", UCASE(?type), ")"), "en") AS ?actFitLabel)
+}
