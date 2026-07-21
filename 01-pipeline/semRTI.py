@@ -19,7 +19,7 @@
 ╚════════════════════════════════════════════════════════════════════════════╝
 """
 
-import os, sys, json, glob, subprocess, re, shutil, logging, urllib.parse
+import os, sys, json, glob, subprocess, re, shutil, logging, urllib.parse, importlib.util
 from datetime import datetime
 
 from rich.console import Console
@@ -50,6 +50,8 @@ SPARQL_ANYTHING_JAR = os.path.join(SCRIPT_DIR, 'sparql-anything.jar')
 TEMPLATE_DATASET    = os.path.join(SCRIPT_DIR, 'construct-dataset.sparql')
 TEMPLATE_PHOTOS     = os.path.join(SCRIPT_DIR, 'construct-photos.sparql')
 TEMPLATE_RTI        = os.path.join(SCRIPT_DIR, 'construct-rti.sparql')
+TEMPLATE_PROVENANCE = os.path.join(SCRIPT_DIR, 'construct-provenance.sparql')
+ONTOLOGY_TTL        = os.path.join(SCRIPT_DIR, 'rupemagna-rti-1_6-global.ttl')
 KG_DATASET_CSV      = os.path.join(SCRIPT_DIR, 'dataset-config.csv')
 KG_SHARED_TTL       = os.path.join(SCRIPT_DIR, 'shared.ttl')
 KG_OUTPUTS_DIR      = os.path.join(OUTPUTS_DIR, 'knowledge-graph')
@@ -277,7 +279,17 @@ def _load_metadata():
 
 
 def _to_file_uri(path):
-    return 'file://' + urllib.parse.quote(os.path.abspath(path), safe='/:')
+    abspath = os.path.abspath(path)
+    if os.name == 'nt':
+        # SPARQL Anything's triplifier (commons-io FilenameUtils) rejects any
+        # ':' in a location string as a possible NTFS ADS separator, which
+        # breaks ordinary "C:\..." absolute paths. Route through the local
+        # admin share (\\localhost\c$\...) instead — same file, no colon.
+        drive, rest = os.path.splitdrive(abspath)
+        abspath = '//localhost/' + drive.rstrip(':').lower() + '$' + rest
+        abspath = abspath.replace('\\', '/')
+        return 'file://' + urllib.parse.quote(abspath, safe='/')
+    return 'file://' + urllib.parse.quote(abspath, safe='/:')
 
 
 def _ttl_literal(s):
@@ -337,23 +349,34 @@ def _metadata_ttl(meta):
     # GeoSPARQL geometry link — emitted only when both coordinates are present, so the
     # WKT below is derived from the same lat/long and therefore agrees with the WGS84 point.
     if lat is not None and lon is not None:
-        site.append('    geosparql:hasGeometry rm-geom:rupe-magna')
+        site.append('    geosparql:hasGeometry rpm-rti:geom-rupe-magna')
     if meta.get('city'):     site.append(f'    schema:addressLocality "{_ttl_literal(meta["city"])}"')
     if meta.get('province'): site.append(f'    schema:addressRegion   "{_ttl_literal(meta["province"])}"')
     if meta.get('country'):  site.append(f'    schema:addressCountry  "{_ttl_literal(meta["country"])}"')
 
+    # license_url is referenced by dct:license/dct:rights all over the KG
+    # (via LICENSE_URL_PLACEHOLDER) but was never itself typed, so every
+    # sh:class check on those values failed SHACL. Typed once here, from the
+    # single source, rather than per-triple in each construct-*.sparql.
+    license_url = meta.get('license_url')
+    is_license_iri = (isinstance(license_url, str)
+                       and license_url.startswith(('http://', 'https://'))
+                       and ' ' not in license_url)
+
     blocks = []
     if agent:
-        blocks.append("rm-agent:huseyin-erdogan\n" + " ;\n".join(agent) + " .")
+        blocks.append("rpm-rti:agent-huseyin-erdogan\n" + " ;\n".join(agent) + " .")
     if site:
-        blocks.append("rm-site:rupe-magna\n" + " ;\n".join(site) + " .")
+        blocks.append("rpm-rti:site-rupe-magna\n" + " ;\n".join(site) + " .")
+    if is_license_iri:
+        blocks.append(f'<{license_url}>\n    a dct:LicenseDocument .')
     # GeoSPARQL geometry individual for the site (WKT order is POINT(long lat)). Named node
-    # (rm-geom:) rather than a blank node, to keep the ABox clean. Its prefixes (rdf/owl/
-    # geosparql/rm-geom) are declared in shared.ttl and resolve once this block is merged with
+    # (rpm-rti:geom-) rather than a blank node, to keep the ABox clean. Its prefixes (rdf/owl/
+    # geosparql/rpm-rti) are declared in shared.ttl and resolve once this block is merged with
     # shared_text and parsed as a single graph.
     if lat is not None and lon is not None:
         blocks.append(
-            "rm-geom:rupe-magna\n"
+            "rpm-rti:geom-rupe-magna\n"
             "    rdf:type owl:NamedIndividual, geosparql:Geometry ;\n"
             f'    geosparql:asWKT "POINT({lon} {lat})"^^geosparql:wktLiteral .'
         )
@@ -548,7 +571,14 @@ def _run_construct(template_path, replacements, out_path, logger):
 
     try:
         result = subprocess.run(
-            ['java', '-jar', SPARQL_ANYTHING_JAR, '-q', tmp, '-o', out_path],
+            # -Dfile.encoding/-Dsun.jnu.encoding/-Dnative.encoding: on Java <18
+            # these default to the platform's ANSI codepage (Cp1252 on
+            # Windows), so the JVM reads this UTF-8 query file's non-ASCII
+            # literals (accented names, em dashes) as Cp1252 and re-encodes
+            # the already-wrong string as UTF-8 on the way out, i.e. mojibake.
+            ['java', '-Dfile.encoding=UTF-8', '-Dsun.jnu.encoding=UTF-8',
+             '-Dnative.encoding=UTF-8', '-jar', SPARQL_ANYTHING_JAR,
+             '-q', tmp, '-o', out_path],
             capture_output=True, text=True
         )
     finally:
@@ -603,6 +633,7 @@ def _kg_section_e(datasets_dir, extra, logger):
 
     count = 0
     tmp_o = os.path.join(SCRIPT_DIR, '_tmp-rti-out.ttl')
+    tmp_p = os.path.join(SCRIPT_DIR, '_tmp-provenance-out.ttl')
     for root, dirs, files in os.walk(datasets_dir):
         if 'info.json' not in files:
             continue
@@ -634,6 +665,28 @@ def _kg_section_e(datasets_dir, extra, logger):
             os.remove(tmp_o)
         except Exception:
             pass
+
+        # CRMdig process chain (RAWDevelopment/RTIFitting activities, D9 data
+        # objects) — same provenance JSON, no info.json needed. Failures here
+        # are logged but don't fail the dataset: the core RTI triples above
+        # already succeeded.
+        if os.path.exists(TEMPLATE_PROVENANCE):
+            ok_p = _run_construct(TEMPLATE_PROVENANCE, {
+                'PROV_LOCATION_PLACEHOLDER': _to_file_uri(prov_path),
+                **extra,
+            }, tmp_p, logger)
+            if ok_p:
+                try:
+                    g.parse(tmp_p, format='turtle')
+                    logger.info(f"Process-chain provenance: {os.path.relpath(root, datasets_dir)} ({prov})")
+                except Exception as e:
+                    logger.warning(f"Process-chain provenance parse failed for {prov_path}: {e}")
+            else:
+                logger.warning(f"Process-chain provenance FAILED for {os.path.relpath(root, datasets_dir)} ({prov})")
+            try:
+                os.remove(tmp_p)
+            except Exception:
+                pass
     return g, count
 
 
@@ -767,11 +820,63 @@ def _serialize_categorised(g, out_path):
         f.write("\n".join(parts).rstrip("\n") + "\n")
 
 
-def _kg_build_final(dataset_dir, site_name, meta, logger):
+def _kg_apply_reasoning(g, logger):
+    """Materialise OWL-RL/RDFS entailments (subclass/subproperty closure,
+    owl:inverseOf, owl:propertyChainAxiom, …) over the merged KG graph `g`
+    against the ontology's TBox, in place. Optional pipeline step — off by
+    default because it changes triple count/shape and adds build time.
+
+    Only NEW facts about individuals already present in `g` are kept: the
+    ontology (rupemagna-rti-1_6-global.ttl) is reasoned over alongside the KG in a
+    working copy, then any entailed triple whose subject isn't already a
+    subject in `g` is discarded (that's a pure TBox-internal entailment —
+    e.g. transitive subClassOf between two ontology classes — not a fact
+    about one of this project's individuals, so it has no place in a
+    per-project ABox file). Trivial OWL-RL boilerplate (every individual is
+    tautologically owl:Thing and owl:sameAs itself) is dropped too — it
+    carries no information and would otherwise be ~35% of the output.
+    Returns the number of triples added to `g`."""
+    import rdflib
+    from owlrl import DeductiveClosure, OWLRL_Semantics
+    from rdflib.namespace import RDF, OWL
+
+    if not os.path.exists(ONTOLOGY_TTL):
+        logger.warning(f"Reasoning skipped: ontology not found ({ONTOLOGY_TTL})")
+        return 0
+
+    subjects_in_g = set(g.subjects())
+
+    working = rdflib.Graph()
+    for t in g:
+        working.add(t)
+    working.parse(ONTOLOGY_TTL, format='turtle')
+    before = len(working)
+
+    DeductiveClosure(OWLRL_Semantics).expand(working)
+    logger.info(f"Reasoning: {before} -> {len(working)} triples in the working (KG+ontology) graph")
+
+    added = 0
+    for t in working:
+        if t in g:
+            continue
+        s, p, o = t
+        if s not in subjects_in_g:
+            continue
+        if p == RDF.type and o == OWL.Thing:
+            continue
+        if p == OWL.sameAs and s == o:
+            continue
+        g.add(t)
+        added += 1
+    return added
+
+
+def _kg_build_final(dataset_dir, site_name, meta, logger, apply_reasoning=False):
     """Build a single final Knowledge Graph TTL: EXIF → dataset + photo triples
     (SPARQL Anything) + RTI provenance (provenance JSON) + shared.ttl, merged in
     memory with rdflib and written once. No intermediate triple files; no JPG
-    stamping (that is a separate menu item)."""
+    stamping (that is a separate menu item). If apply_reasoning is True, an
+    extra OWL-RL closure step runs after the merge (see _kg_apply_reasoning)."""
     import rdflib
     safe_site = re.sub(r'[^\w\-]', '-', site_name).lower().strip('-')
     os.makedirs(KG_OUTPUTS_DIR, exist_ok=True)
@@ -780,6 +885,7 @@ def _kg_build_final(dataset_dir, site_name, meta, logger):
     final_ttl = os.path.join(KG_OUTPUTS_DIR, f'{safe_site}-knowledge-graph.ttl')
     tmp_c     = os.path.join(SCRIPT_DIR, '_tmp-section-c.ttl')
     tmp_d     = os.path.join(SCRIPT_DIR, '_tmp-section-d.ttl')
+    total_steps = 5 if apply_reasoning else 4
 
     sep = "=" * 55
     print(f"\n{sep}")
@@ -787,12 +893,12 @@ def _kg_build_final(dataset_dir, site_name, meta, logger):
     print(f"  Dataset : {dataset_dir}")
     print(sep)
 
-    print("\n[1/4] Exporting EXIF to JSON...")
+    print(f"\n[1/{total_steps}] Exporting EXIF to JSON...")
     logger.info("=== EXIF export ===")
     n = _kg_step2_exif_export(dataset_dir, exif_json, logger)
     print(f"      → {n} records")
 
-    print("\n[2/4] Generating dataset + photo triples (SPARQL Anything)...")
+    print(f"\n[2/{total_steps}] Generating dataset + photo triples (SPARQL Anything)...")
     logger.info("=== Dataset + photo triples ===")
     # Personal-metadata injection: the licence IRI is the only value carried by
     # the SPARQL templates; everything else (agent/site values) is added to the
@@ -811,12 +917,12 @@ def _kg_build_final(dataset_dir, site_name, meta, logger):
                 pass
         raise RuntimeError(f"knowledge-graph build failed: {', '.join(failed)} produced no triples")
 
-    print("\n[3/4] Mapping RTI provenance...")
+    print(f"\n[3/{total_steps}] Mapping RTI provenance...")
     logger.info("=== RTI provenance ===")
     g_e, e_count = _kg_section_e(dataset_dir, extra, logger)
     print(f"      → {e_count} RTI dataset(s)")
 
-    print("\n[4/4] Merging into single final graph...")
+    print(f"\n[4/{total_steps}] Merging into single final graph...")
     logger.info("=== Merge ===")
     g = rdflib.Graph()
     if os.path.exists(KG_SHARED_TTL):
@@ -833,6 +939,14 @@ def _kg_build_final(dataset_dir, site_name, meta, logger):
             except Exception as ex:
                 logger.warning(f"merge parse failed for {part}: {ex}")
     g += g_e
+    print(f"      → {len(g)} triples")
+
+    if apply_reasoning:
+        print(f"\n[5/{total_steps}] Applying OWL-RL reasoning...")
+        logger.info("=== Reasoning ===")
+        added = _kg_apply_reasoning(g, logger)
+        print(f"      → +{added} entailed triples")
+
     _serialize_categorised(g, final_ttl)
     for t in (tmp_c, tmp_d):
         try:
@@ -840,7 +954,6 @@ def _kg_build_final(dataset_dir, site_name, meta, logger):
         except Exception:
             pass
 
-    print(f"      → {len(g)} triples")
     print(f"\n{sep}")
     print(f"  Done → {final_ttl}")
     print(f"{sep}\n")
@@ -893,7 +1006,7 @@ def run_knowledge_graph():
 
     missing = []
     for dep in ['exiftool', 'java']:
-        if subprocess.run(['which', dep], capture_output=True).returncode != 0:
+        if shutil.which(dep) is None:
             missing.append(dep)
     if not os.path.exists(SPARQL_ANYTHING_JAR):
         missing.append('sparql-anything.jar')
@@ -929,6 +1042,15 @@ def run_knowledge_graph():
     if not _confirm("  Build the final knowledge graph from these? (y/N): "):
         return
 
+    apply_reasoning = False
+    if importlib.util.find_spec('owlrl') is not None:
+        apply_reasoning = _confirm(
+            "  Apply OWL-RL reasoning to materialise subclass/subproperty "
+            "inferences (e.g. chs:CulturalProperty, crm:P2_has_type)? (y/N): ")
+    else:
+        console.print("  [dim]owlrl not installed — skipping optional reasoning step "
+                       "(pip install owlrl to enable).[/dim]")
+
     logger, log_path = _make_logger('knowledge-graph', site_name)
     logger.info(f"Dataset: {dataset_dir}")
     logger.info(f"Site:    {site_name}")
@@ -941,7 +1063,7 @@ def run_knowledge_graph():
     console.rule(style="dim")
 
     try:
-        _kg_build_final(dataset_dir, site_name, meta, logger)
+        _kg_build_final(dataset_dir, site_name, meta, logger, apply_reasoning=apply_reasoning)
     except Exception as e:
         console.print(f"\n  [red][!] Error: {e}[/red]")
         logger.error(str(e), exc_info=True)
@@ -958,7 +1080,7 @@ def run_jpg_metadata():
         return
     meta, dataset_dir, site_name = chosen
 
-    if subprocess.run(['which', 'exiftool'], capture_output=True).returncode != 0:
+    if shutil.which('exiftool') is None:
         console.print("\n  [red][!] exiftool not found[/red]")
         _wait_enter()
         return

@@ -1,7 +1,13 @@
 # ╔════════════════════════════════════════════════════════════════════════╗
-# ║ shared.ttl  ·  static ABox base (semRTI-ODP)                           ║
+# ║ shared_updated.ttl  ·  static ABox base (semRTI-ODP)                   ║
 # ╠════════════════════════════════════════════════════════════════════════╣
 # ║ The unchanging part of the graph, merged in memory by semRTI.py.       ║
+# ║ Realigned to rupemagna-rti-1_5.ttl (single rpm-rti: namespace,         ║
+# ║ CIDOC-CRM/CRMdig alignment, reified AgentRole, Equipment/Software      ║
+# ║ split). See changelog.md for the full iter2 → v1.4 design diff.        ║
+# ║ v1.5 gap-closure terms now used here: rpm-rti:mtype-physical-diameter  ║
+# ║ (dome diameter, via the widened add:hasMeasurementCollection domain)   ║
+# ║ and schema:version / foaf:page on chs:Software.                        ║
 # ║                                                                        ║
 # ║ SECTION MAP                                                            ║
 # ║   1 · Prefixes & base                                                  ║
@@ -10,89 +16,112 @@
 # ║   4 · RTI acquisition method                                           ║
 # ╚════════════════════════════════════════════════════════════════════════╝
 #
-# ABox/data only — TBox lives in rupemagna-rti-ontology.owl + imports.
+# ABox/data only — TBox lives in rupemagna-rti-1_5.ttl (self-contained profile,
+# no owl:imports: CHS-ODP/ArCo/DCAT/DCT/FOAF/GeoWGS84/MUAPIT/ROAPIT/TIAPIT/CRM
+# are all inlined there).
+#
+# NOTE — v1_5 already declares, as NamedIndividuals inside its own TBox file,
+# the 6 shared MeasurementUnits (rpm-rti:unit-*) and the 10 shared
+# MeasurementTypes (rpm-rti:mtype-*, including the v1.5 addition
+# rpm-rti:mtype-physical-diameter), plus the E55 technique individual
+# rpm-rti:tech-rti. Those are NOT re-declared here to avoid duplicate/drifting
+# assertions — reference them directly by URI from per-session data.
 
 # ════════════════════════════════════════════════════════════════════════
 # 1 · PREFIXES & BASE
 # ════════════════════════════════════════════════════════════════════════
-@prefix chs:     <http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#> .
-@prefix dct:     <http://purl.org/dc/terms/> .
-@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
-@prefix a-cd:    <https://w3id.org/arco/ontology/context-description/> .
-@prefix a-dd:    <https://w3id.org/arco/ontology/denotative-description/> .
-@prefix arco:    <https://w3id.org/arco/ontology/arco/> .
-@prefix core:    <https://w3id.org/arco/ontology/core/> .
-@prefix dcat:    <http://www.w3.org/ns/dcat#> .
-@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix muapit:  <http://www.ontologydesignpatterns.org/ont/dul/muapit.owl#> .
-@prefix roapit:  <http://www.ontologydesignpatterns.org/ont/ro/roapit.owl#> .
-@prefix schema:  <https://schema.org/> .
-@prefix tiapit:  <http://www.ontologydesignpatterns.org/ont/ti/tiapit.owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:     <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
+@prefix schema:  <https://schema.org/> .
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
 
-@prefix rm-fig:     <https://w3id.org/rupemagna/resource/figure/> .
-@prefix rm-data:    <https://w3id.org/rupemagna/resource/dataset/> .
-@prefix rm-meas:    <https://w3id.org/rupemagna/resource/measurement/> .
-@prefix rm-role:    <https://w3id.org/rupemagna/resource/role/> .
-@prefix rm-site:    <https://w3id.org/rupemagna/resource/site/> .
-@prefix rm-unit:    <https://w3id.org/rupemagna/resource/unit/> .
-@prefix rm-agent:   <https://w3id.org/rupemagna/resource/agent/> .
-@prefix rm-econf:   <https://w3id.org/rupemagna/resource/equipment-config/> .
-@prefix rm-equip:   <https://w3id.org/rupemagna/resource/equipment/> .
-@prefix rm-mcoll:   <https://w3id.org/rupemagna/resource/measurement-collection/> .
-@prefix rm-mtype:   <https://w3id.org/rupemagna/resource/measurement-type/> .
-@prefix rm-ocoll:   <https://w3id.org/rupemagna/resource/observation-collection/> .
-@prefix rm-obs:     <https://w3id.org/rupemagna/resource/observation/> .
-@prefix rm-photo:   <https://w3id.org/rupemagna/resource/photo/> .
-@prefix rm-dist:    <https://w3id.org/rupemagna/resource/distribution/> .
-@prefix rm-series:  <https://w3id.org/rupemagna/resource/dataset-series/> .
-@prefix rm-survey:  <https://w3id.org/rupemagna/resource/survey/> .
-@prefix rm-project: <https://w3id.org/rupemagna/resource/project/> .
-@prefix rm-method:  <https://w3id.org/rupemagna/resource/method/> .
-@prefix rm-geom:    <https://w3id.org/rupemagna/resource/geometry/> .
+@prefix chs:     <http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#> .
+@prefix acd:     <https://w3id.org/arco/ontology/context-description/> .
+@prefix add:     <https://w3id.org/arco/ontology/denotative-description/> .
+@prefix arco:    <https://w3id.org/arco/ontology/arco/> .
+@prefix acore:   <https://w3id.org/arco/ontology/core/> .
+@prefix muapit:  <https://w3id.org/italia/onto/MU/> .
+@prefix roapit:  <https://w3id.org/italia/onto/RO/> .
+@prefix tiapit:  <https://w3id.org/italia/onto/TI/> .
+@prefix cis:     <http://dati.beniculturali.it/cis/#> .
 
-@base <https://w3id.org/rupemagna/ontology/shared#> .
+# --- Single namespace: all former rm- / rm-* resource families gathered
+#     under rpm-rti (fragments), matching the ontology's own consolidation.
+@prefix rpm-rti: <https://w3id.org/rupemagna-rti/ontology#> .
+
+@base <https://w3id.org/rupemagna-rti/ontology#> .
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TBox intentionally NOT declared here (T1/T2).
 # The embedded owl:Ontology header, the class/object-property/datatype-property/
 # annotation-property/datatype re-declarations and the LICENSE NamedIndividual
-# were removed: the schema lives in rupemagna-rti-ontology.owl (own terms) plus
-# the imported external ontologies (chs/arco/core/dcat/dct/a-dd/a-cd/muapit/…).
-# The retired inverse-direction survey property was dropped too (data uses chs:isSurveyOn).
-# shared.ttl carries ABox/data only; the @prefix block + @base above remain for it.
+# were removed: the schema lives entirely in rupemagna-rti-1.4.ttl (own terms,
+# CHS-ODP/ArCo/DCAT/DCT/FOAF/GeoWGS84/MUAPIT/ROAPIT/TIAPIT/CRM all inlined —
+# no owl:imports to chase). The retired inverse-direction survey property was
+# dropped too (data uses acd:isSurveyOn, not chs:isSurveyOn, per v1.4).
+# shared_updated.ttl carries ABox/data only; the @prefix block + @base above
+# remain for it.
 # ─────────────────────────────────────────────────────────────────────────────
 
 
 # ════════════════════════════════════════════════════════════════════════
 # 2 · PART 1  ·  project-wide resources
 # ════════════════════════════════════════════════════════════════════════
-#   Project · Site · Agent · Equipment · MeasurementTypes · Units
+#   Project · Scope · Site · Agent · Roles · Equipment (Hardware + Software)
 
 # ---------------------------------------------------------------------------
 # A.1 — Cultural Heritage Project  [ODP: chs:CulturalHeritageProject]
 #        Top-level container for all 40 RTI sessions at Rupe Magna.
-#        chs:hasSurvey links are added per session in construct-dataset.sparql.
+#        Per-session chs:CulturalHeritageSurvey / rpm-rti:RTISurvey individuals
+#        (one per RTI-01 … RTI-40) are asserted in construct-dataset.sparql,
+#        each with its own acd:isSurveyOn target and acore:hasAgentRole —
+#        NOT declared here.
 # ---------------------------------------------------------------------------
 
-rm-project:rupe-magna-rti
-    rdf:type owl:NamedIndividual, chs:CulturalHeritageProject ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:project-rupe-magna
+    a owl:NamedIndividual, chs:CulturalHeritageProject ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "RTI photographic survey project documenting the rock art engravings at Rupe Magna (Grosio, Lombardy, Italy). Conducted September 2025 by Hüseyin Erdoğan (Università di Bologna). 40 acquisition sessions across 11 rock art figures using a custom-built portable RTI dome."@en ;
-    rdfs:label "Rupe Magna RTI Survey Project"@en .
+    chs:hasSpaceScope rpm-rti:scope-rupe-magna-space ;
+    chs:hasTemporalScope rpm-rti:scope-rupe-magna-time ;
+    rdfs:label "Rupe Magna Project"@en .
+
+rpm-rti:scope-rupe-magna-space
+    # acore:Location materialised alongside chs:SpaceProjectScope (its declared
+    # superclass) so the CRM-alignment class is directly queryable without a
+    # reasoner — same treatment applied throughout this file's A.1-A.4 block.
+    a owl:NamedIndividual, chs:SpaceProjectScope, acore:Location ;
+    rdfs:label "Rupe Magna, Grosio, Lombardy, Italy"@en .
+
+rpm-rti:scope-rupe-magna-time
+    a owl:NamedIndividual, tiapit:TimeInterval, chs:TemporalScope ;
+    tiapit:startTime "2025-09-01"^^xsd:date ;
+    tiapit:endTime "2025-09-30"^^xsd:date ;
+    rdfs:label "September 2025 acquisition campaign"@en .
 
 
 # ---------------------------------------------------------------------------
 # A.2 — Archaeological site  [ODP: chs:CulturalProperty via arco:ArchaeologicalProperty]
+#        v1.4 merges the former separate "park" individual (rm:rupe-magna_park,
+#        cis:ArcheologicalPark) into the site itself: one individual, multiply
+#        typed as arco:ArchaeologicalProperty, arco:ArchaeologicalPark and the
+#        CRM-aligned rpm-rti:RockArtSite (⊑ crm:E27_Site).
 # ---------------------------------------------------------------------------
 
-rm-site:rupe-magna
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
+rpm-rti:site-rupe-magna
+    # chs:CulturalProperty + chs:FeatureOfInterest materialised alongside
+    # arco:ArchaeologicalProperty (its declared superclasses per the ontology's
+    # "central bridge" comment) rather than left to subclass reasoning.
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, arco:ArchaeologicalPark,
+        rpm-rti:RockArtSite, chs:CulturalProperty, chs:FeatureOfInterest ;
+    owl:sameAs <https://www.wikidata.org/wiki/Q21234614> ;
     # geo (lat/long/alt) + address (locality/region/country) are injected at
     # build time from enrich-metadata.json (see _metadata_ttl in semRTI.py).
     dct:description "Parco delle Incisioni Rupestri di Grosio — approximately 84 × 35 metres of alpine rock art surface in Upper Valtellina, Northern Italy, featuring over 5,454 petroglyphs spanning the Bronze and Iron Ages."@en ;
@@ -103,123 +132,87 @@ rm-site:rupe-magna
 # A.3 — Author / Agent
 # ---------------------------------------------------------------------------
 
-rm-agent:huseyin-erdogan
-    rdf:type owl:NamedIndividual, foaf:Person, core:Agent .
+rpm-rti:agent-huseyin-erdogan
+    a owl:NamedIndividual, foaf:Person, acore:Agent .
     # name, email (mbox), orcid, affiliation, jobTitle are injected at build time
     # from enrich-metadata.json (see _metadata_ttl in semRTI.py) — single source.
 
 
 # ---------------------------------------------------------------------------
-# A.4 — Equipment  [ODP: chs:Hardware, subclass of chs:Equipment]
-#        Two shared instances referenced by every EquipmentConfiguration.
+# A.3b — Role vocabulary  [ODP: roapit:Role via rpm-rti:PhotographerRole / AnalystRole]
+#        Shared role-type individuals, reused by every per-session
+#        acore:AgentRole (rpm-rti:role-{sessionID}-photographer / -analyst,
+#        asserted in construct-dataset.sparql) via roapit:withRole.
+#        v1.4 replaces the old bare-string roapit:withRole datatype property
+#        and the external ArCo/dati.cultura.gov.it Role URIs with these two
+#        locally-typed object-property targets.
 # ---------------------------------------------------------------------------
 
-rm-equip:rti-dome
-    rdf:type owl:NamedIndividual, chs:Hardware ;
-    dct:type "RTI Dome" ;
-    schema:numberOfItems 48 ;
-    schema:width "460 mm" ;
-    dct:description "Portable hemispherical RTI dome designed and built by Hüseyin Erdoğan (2021, revised 2024). Aluminium shell, 48-LED array across 6 elevation tiers (8 LEDs per tier, angular coverage ~9°–60°). Powered by a 5V portable power bank. Deployed at Rupe Magna in September 2025."@en ;
-    rdfs:label "Custom-Built Portable RTI Dome"@en .
+rpm-rti:role-photographer
+    a owl:NamedIndividual, rpm-rti:PhotographerRole ;
+    rdfs:label "Photographer"@en .
 
-rm-equip:fujifilm-xs20
-    rdf:type owl:NamedIndividual, chs:Hardware ;
+rpm-rti:role-analyst
+    a owl:NamedIndividual, rpm-rti:AnalystRole ;
+    rdfs:label "Analyst"@en .
+
+
+# ---------------------------------------------------------------------------
+# A.4 — Equipment  [ODP: chs:Hardware / chs:Software, both subclasses of chs:Equipment]
+#        Hardware: two shared instances referenced by every EquipmentConfiguration.
+#        Software: v1.4 adds chs:Software (⊑ crmdig:D14_Software) for the
+#        processing tools used downstream of acquisition (RAWDevelopment,
+#        RTIFitting/RTIExport).
+# ---------------------------------------------------------------------------
+
+rpm-rti:equip-rti-dome
+    # chs:Equipment materialised alongside chs:Hardware (its declared superclass).
+    a owl:NamedIndividual, chs:Hardware, chs:Equipment ;
+    # v1.4 scopes schema:numberOfItems to dcat:Distribution only (48 JPEG/RAF files,
+    # 1 PTM/HSH file) — dropped here in favour of the dome's own description, since
+    # it is not itself a Distribution. schema:width is not a profiled annotation
+    # property (pixel-typed in v1.5, not a physical length). The 460 mm diameter is
+    # instead carried as a structured measurement below, via the v1.5 widening of
+    # add:hasMeasurementCollection to chs:Equipment + rpm-rti:mtype-physical-diameter.
+    dct:description "Portable hemispherical RTI dome designed and built by Hüseyin Erdoğan (2021, revised 2024). Aluminium shell, 460 mm diameter, 48-LED array across 6 elevation tiers (8 LEDs per tier, angular coverage ~9°–60°). Powered by a 5V portable power bank. Deployed at Rupe Magna in September 2025."@en ;
+    rdfs:label "Custom-Built Portable RTI Dome"@en ;
+    add:hasMeasurementCollection rpm-rti:mcoll-rti-dome .
+
+rpm-rti:mcoll-rti-dome
+    a owl:NamedIndividual, add:MeasurementCollection ;
+    add:hasMeasurement rpm-rti:meas-rti-dome-diameter ;
+    rdfs:label "RTI dome physical measurements"@en .
+
+rpm-rti:meas-rti-dome-diameter
+    a owl:NamedIndividual, add:Measurement ;
+    add:measurementType rpm-rti:mtype-physical-diameter ;
+    muapit:hasMeasurementUnit rpm-rti:unit-millimetre ;
+    muapit:value 460 ;
+    rdfs:label "RTI dome diameter — 460 mm"@en .
+
+rpm-rti:equip-fujifilm-xs20
+    a owl:NamedIndividual, chs:Hardware, chs:Equipment ;
     schema:brand "Fujifilm" ;
     schema:model "X-S20" ;
-    dct:description "APS-C mirrorless camera body. Used with Fujifilm XF 16–55 mm f/2.8 R LM WR lens. Operated in manual exposure mode throughout all RTI acquisition sessions. Images processed with darktable 5.4.1 and exported as linear JPEG."@en ;
+    dct:description "APS-C mirrorless camera body. Used with Fujifilm XF 16–55 mm f/2.8 R LM WR lens. Operated in manual exposure mode throughout all RTI acquisition sessions."@en ;
     rdfs:label "Fujifilm X-S20 Mirrorless Camera"@en .
 
+rpm-rti:software-darktable
+    # chs:Equipment materialised alongside chs:Software (its declared superclass).
+    a owl:NamedIndividual, chs:Software, chs:Equipment ;
+    schema:model "darktable 5.4.1" ;
+    dct:description "Open-source RAW photo processing software used to uniformly develop the 48-image RAW multi-light set into the JPEG stack (rpm-rti:RAWDevelopment). Images exported as linear JPEG."@en ;
+    rdfs:label "darktable"@en .
 
-# ---------------------------------------------------------------------------
-# A.5 — MeasurementType definitions (7 types)
-# ---------------------------------------------------------------------------
-
-rm-mtype:iso
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "ISO sensitivity"@en .
-
-rm-mtype:f-number
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "f-number (aperture)"@en .
-
-rm-mtype:exposure-time
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "exposure time"@en .
-
-rm-mtype:focal-length
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "focal length"@en .
-
-rm-mtype:file-size
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "file size"@en .
-
-rm-mtype:image-width
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "image width"@en .
-
-rm-mtype:image-height
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "image height"@en .
-
-# --- RTI processing types (used by the RTI provenance builder, defined once here, not per dataset) ---
-
-rm-mtype:rti-nplanes
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "Number of RTI polynomial planes"@en .
-
-rm-mtype:jpeg-quality
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "JPEG compression quality"@en .
-
-rm-mtype:rti-basis-type
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "RTI basis type"@en .
-
-rm-mtype:rti-web-layout
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "RTI web output layout"@en .
-
-rm-mtype:rti-color-profile-mode
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "RTI colour profile mode"@en .
-
-rm-mtype:rti-openlime
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "OpenLime web viewer enabled"@en .
-
-rm-mtype:rti-crop-origin
-    rdf:type owl:NamedIndividual, a-dd:MeasurementType ;
-    rdfs:label "RTI output crop origin (x, y, angle)"@en .
-
-
-# ---------------------------------------------------------------------------
-# A.6 — MeasurementUnit definitions (6 units)
-# ---------------------------------------------------------------------------
-
-rm-unit:iso-sensitivity
-    rdf:type owl:NamedIndividual, muapit:MeasurementUnit ;
-    rdfs:label "ISO"@en .
-
-rm-unit:f-stop
-    rdf:type owl:NamedIndividual, muapit:MeasurementUnit ;
-    rdfs:label "f-stop"@en .
-
-rm-unit:second
-    rdf:type owl:NamedIndividual, muapit:MeasurementUnit ;
-    rdfs:label "second"@en .
-
-rm-unit:millimetre
-    rdf:type owl:NamedIndividual, muapit:MeasurementUnit ;
-    rdfs:label "mm"@en .
-
-rm-unit:megabyte
-    rdf:type owl:NamedIndividual, muapit:MeasurementUnit ;
-    rdfs:label "MegaByte"@en .
-
-rm-unit:pixel
-    rdf:type owl:NamedIndividual, muapit:MeasurementUnit ;
-    rdfs:label "pixel"@en .
+rpm-rti:software-relightlab
+    a owl:NamedIndividual, chs:Software, chs:Equipment ;
+    dct:description "RTI processing software used for per-pixel reflectance fitting (sphere detection, light-direction recovery, registration, crop, offset) and export to the delivery format (rpm-rti:RTIFitting, rpm-rti:RTIExport)."@en ;
+    # version + homepage newly profiled in v1.5 (schema:version domain chs:Software,
+    # foaf:page domain chs:Equipment) — previously present in the generated KG with
+    # no home in the TBox.
+    schema:version "2026.03" ;
+    foaf:page <https://vcg.isti.cnr.it/relight/> ;
+    rdfs:label "RelightLab"@en .
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -231,16 +224,17 @@ rm-unit:pixel
 # Sessions: RTI-01 – RTI-10  (10 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F01
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F01
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F01" ;
     dct:description "Rock art figure in Sector AA at Rupe Magna Rock Art Site. Depicts a praying human figure with a spiral motif."@en ;
     rdfs:label "The Praying Figure with Spiral (F01) — Sector AA"@en .
 
-rm-series:F01
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F01
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F01 (The Praying Figure with Spiral), Sector AA, at Rupe Magna Rock Art Site, Grosio, Italy. 10 acquisition sessions."@en ;
     dct:title "F01 RTI Dataset Series — The Praying Figure with Spiral, Rupe Magna"@en .
@@ -251,16 +245,17 @@ rm-series:F01
 # Sessions: RTI-11 – RTI-12  (2 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F02
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F02
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F02" ;
     dct:description "Rock art figure in Sector B at Rupe Magna Rock Art Site. Depicts a praying female human figure."@en ;
     rdfs:label "The Praying Woman Figure (F02) — Sector B"@en .
 
-rm-series:F02
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F02
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F02 (The Praying Woman Figure), Sector B, at Rupe Magna Rock Art Site, Grosio, Italy. 2 acquisition sessions."@en ;
     dct:title "F02 RTI Dataset Series — The Praying Woman Figure, Rupe Magna"@en .
@@ -271,16 +266,17 @@ rm-series:F02
 # Sessions: RTI-13 – RTI-18  (6 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F03
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F03
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F03" ;
     dct:description "Rock art figure in Sector F at Rupe Magna Rock Art Site. Depicts a spiral motif."@en ;
     rdfs:label "The Spiral Figure (F03) — Sector F"@en .
 
-rm-series:F03
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F03
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F03 (The Spiral Figure), Sector F, at Rupe Magna Rock Art Site, Grosio, Italy. 6 acquisition sessions."@en ;
     dct:title "F03 RTI Dataset Series — The Spiral Figure, Rupe Magna"@en .
@@ -291,16 +287,17 @@ rm-series:F03
 # Sessions: RTI-19 – RTI-23  (5 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F04
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F04
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F04" ;
     dct:description "Rock art figure in Sector L at Rupe Magna Rock Art Site. Depicts a warrior figure carrying a shield."@en ;
     rdfs:label "The Warrior Figure with Shield (F04) — Sector L"@en .
 
-rm-series:F04
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F04
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F04 (The Warrior Figure with Shield), Sector L, at Rupe Magna Rock Art Site, Grosio, Italy. 5 acquisition sessions."@en ;
     dct:title "F04 RTI Dataset Series — The Warrior Figure with Shield, Rupe Magna"@en .
@@ -311,16 +308,17 @@ rm-series:F04
 # Sessions: RTI-24  (1 session)
 # ---------------------------------------------------------------------------
 
-rm-fig:F05
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F05
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F05" ;
     dct:description "Rock art figure in Sector L at Rupe Magna Rock Art Site. Depicts a second warrior figure adjacent to F04."@en ;
     rdfs:label "The Second Warrior Figure (F05) — Sector L"@en .
 
-rm-series:F05
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F05
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F05 (The Second Warrior Figure), Sector L, at Rupe Magna Rock Art Site, Grosio, Italy. 1 acquisition session."@en ;
     dct:title "F05 RTI Dataset Series — The Second Warrior Figure, Rupe Magna"@en .
@@ -331,16 +329,17 @@ rm-series:F05
 # Sessions: RTI-25 – RTI-26  (2 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F06
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F06
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F06" ;
     dct:description "Rock art figure in Sector L at Rupe Magna Rock Art Site. Depicts a wild boar."@en ;
     rdfs:label "The Wild Boar Figure (F06) — Sector L"@en .
 
-rm-series:F06
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F06
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F06 (The Wild Boar Figure), Sector L, at Rupe Magna Rock Art Site, Grosio, Italy. 2 acquisition sessions."@en ;
     dct:title "F06 RTI Dataset Series — The Wild Boar Figure, Rupe Magna"@en .
@@ -351,16 +350,17 @@ rm-series:F06
 # Sessions: RTI-27 – RTI-28  (2 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F07
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F07
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F07" ;
     dct:description "Rock art figure in Sector Q at Rupe Magna Rock Art Site. Depicts a bearded goat figure."@en ;
     rdfs:label "The Goat Figure with a Beard (F07) — Sector Q"@en .
 
-rm-series:F07
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F07
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F07 (The Goat Figure with a Beard), Sector Q, at Rupe Magna Rock Art Site, Grosio, Italy. 2 acquisition sessions."@en ;
     dct:title "F07 RTI Dataset Series — The Goat Figure with a Beard, Rupe Magna"@en .
@@ -371,16 +371,17 @@ rm-series:F07
 # Sessions: RTI-29 – RTI-33  (5 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F08
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F08
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F08" ;
     dct:description "Rock art figure in Sector Q at Rupe Magna Rock Art Site. Depicts a second goat figure."@en ;
     rdfs:label "The Second Goat Figure (F08) — Sector Q"@en .
 
-rm-series:F08
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F08
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F08 (The Second Goat Figure), Sector Q, at Rupe Magna Rock Art Site, Grosio, Italy. 5 acquisition sessions."@en ;
     dct:title "F08 RTI Dataset Series — The Second Goat Figure, Rupe Magna"@en .
@@ -391,16 +392,17 @@ rm-series:F08
 # Sessions: RTI-34 – RTI-35  (2 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F09
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F09
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F09" ;
     dct:description "Rock art figure in Sector Q at Rupe Magna Rock Art Site. Depicts a complex map-like or topographic motif."@en ;
     rdfs:label "The Map-like Figure (F09) — Sector Q"@en .
 
-rm-series:F09
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F09
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F09 (The Map-like Figure), Sector Q, at Rupe Magna Rock Art Site, Grosio, Italy. 2 acquisition sessions."@en ;
     dct:title "F09 RTI Dataset Series — The Map-like Figure, Rupe Magna"@en .
@@ -411,16 +413,17 @@ rm-series:F09
 # Sessions: RTI-36 – RTI-38  (3 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F10
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F10
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F10" ;
     dct:description "Rock art figure in Sector S at Rupe Magna Rock Art Site. Depicts a mounted knight or rider figure."@en ;
     rdfs:label "The Knight Figure (F10) — Sector S"@en .
 
-rm-series:F10
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F10
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F10 (The Knight Figure), Sector S, at Rupe Magna Rock Art Site, Grosio, Italy. 3 acquisition sessions."@en ;
     dct:title "F10 RTI Dataset Series — The Knight Figure, Rupe Magna"@en .
@@ -431,16 +434,17 @@ rm-series:F10
 # Sessions: RTI-39 – RTI-40  (2 sessions)
 # ---------------------------------------------------------------------------
 
-rm-fig:F11
-    rdf:type owl:NamedIndividual, arco:ArchaeologicalProperty ;
-    arco:isPartOf rm-site:rupe-magna ;
+rpm-rti:fig-F11
+    a owl:NamedIndividual, arco:ArchaeologicalProperty, rpm-rti:RockArtFigure,
+        chs:CulturalProperty, chs:FeatureOfInterest ;
+    arco:isPartOf rpm-rti:site-rupe-magna ;
     dct:identifier "F11" ;
     dct:description "Rock art figure in Sector S at Rupe Magna Rock Art Site. Depicts a figure associated with a square geometric motif."@en ;
     rdfs:label "The Figure with a Square (F11) — Sector S"@en .
 
-rm-series:F11
-    rdf:type owl:NamedIndividual, dcat:DatasetSeries ;
-    dct:creator rm-agent:huseyin-erdogan ;
+rpm-rti:series-F11
+    a owl:NamedIndividual, dcat:DatasetSeries ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     dct:description "All RTI photographic datasets documenting figure F11 (The Figure with a Square), Sector S, at Rupe Magna Rock Art Site, Grosio, Italy. 2 acquisition sessions."@en ;
     dct:title "F11 RTI Dataset Series — The Figure with a Square, Rupe Magna"@en .
@@ -449,8 +453,14 @@ rm-series:F11
 # ════════════════════════════════════════════════════════════════════════
 # 4 · RTI ACQUISITION METHOD
 # ════════════════════════════════════════════════════════════════════════
+#   Dual method/technique typing per v1.4 (see changelog §3): the E29
+#   procedure (chs:Method / rpm-rti:RTIMethod, linked via chs:useMethod) is
+#   complemented by the E55 technique individual rpm-rti:tech-rti (linked
+#   via crm:P32_used_general_technique), which is already declared inside
+#   rupemagna-rti-1.4.ttl itself and therefore NOT repeated here.
 
-rm-method:rti
-    rdf:type owl:NamedIndividual, chs:Method ;
+rpm-rti:method-rti
+    # acore:Method materialised alongside chs:Method (its declared superclass).
+    a owl:NamedIndividual, chs:Method, rpm-rti:RTIMethod, acore:Method ;
     rdfs:label "Reflectance Transformation Imaging (RTI)"@en ;
     dct:description "Photographic RTI acquisition using a custom-built portable hemispherical dome (460 mm diameter, 48 LEDs, 6 tiers). Each session captures 48 sequential exposures under individually activated LEDs for Polynomial Texture Mapping (PTM) and Hemispherical Harmonics (HSH) model generation."@en .

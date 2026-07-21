@@ -12,6 +12,13 @@
 # ODP: Project -> hasSurvey -> Survey -> (isSurveyOn figure+site ·
 #        usesEquipmentConfiguration · hasObservationCollection);
 #        Survey wasGeneratedBy -> Dataset -> JPEG & RAW Distributions.
+# Aligned to rupemagna-rti-1_5.ttl: single rpm-rti: namespace, a-cd:isSurveyOn
+# (not chs:isSurveyOn), chs:useMethod (not usesMethod), reified AgentRole via
+# roapit:withRole -> a typed role individual, per-survey tiapit:TimeInterval
+# (startTime/endTime no longer sit directly on the Survey), and Survey/
+# ObservationCollection additionally typed into the CRMdig Process Module
+# (rpm-rti:RTISurvey / rpm-rti:RawCaptureSet) so the acquisition stage of the
+# provenance chain is asserted here, where the session-static data already is.
 # INPUT: EXIF_LOCATION_PLACEHOLDER · CSV_LOCATION_PLACEHOLDER (semRTI.py).
 
 # ════════════════════════════════════════════════════════════════════════
@@ -29,29 +36,15 @@ PREFIX a-cd:   <https://w3id.org/arco/ontology/context-description/>
 PREFIX a-dd:   <https://w3id.org/arco/ontology/denotative-description/>
 PREFIX chs:    <http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#>
 PREFIX core:   <https://w3id.org/arco/ontology/core/>
-PREFIX muapit: <http://www.ontologydesignpatterns.org/ont/dul/muapit.owl#>
-PREFIX roapit: <http://www.ontologydesignpatterns.org/ont/ro/roapit.owl#>
-PREFIX tiapit: <http://www.ontologydesignpatterns.org/ont/ti/tiapit.owl#>
+PREFIX muapit: <https://w3id.org/italia/onto/MU/>
+PREFIX roapit: <https://w3id.org/italia/onto/RO/>
+PREFIX tiapit: <https://w3id.org/italia/onto/TI/>
 PREFIX schema: <https://schema.org/>
+PREFIX prov:   <http://www.w3.org/ns/prov#>
+PREFIX crm:    <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX crmdig: <http://www.cidoc-crm.org/extensions/CRMdig/>
 
-PREFIX rm-project: <https://w3id.org/rupemagna/resource/project/>
-PREFIX rm-role:    <https://w3id.org/rupemagna/resource/role/>
-PREFIX rm-mcoll:   <https://w3id.org/rupemagna/resource/measurement-collection/>
-PREFIX rm-meas:    <https://w3id.org/rupemagna/resource/measurement/>
-PREFIX rm-econf:   <https://w3id.org/rupemagna/resource/equipment-config/>
-PREFIX rm-survey:  <https://w3id.org/rupemagna/resource/survey/>
-PREFIX rm-ocoll:   <https://w3id.org/rupemagna/resource/observation-collection/>
-PREFIX rm-data:    <https://w3id.org/rupemagna/resource/dataset/>
-PREFIX rm-dist:    <https://w3id.org/rupemagna/resource/distribution/>
-PREFIX rm-series:  <https://w3id.org/rupemagna/resource/dataset-series/>
-PREFIX rm-fig:     <https://w3id.org/rupemagna/resource/figure/>
-PREFIX rm-agent:   <https://w3id.org/rupemagna/resource/agent/>
-PREFIX rm-equip:   <https://w3id.org/rupemagna/resource/equipment/>
-PREFIX rm-site:    <https://w3id.org/rupemagna/resource/site/>
-PREFIX rm-mtype:   <https://w3id.org/rupemagna/resource/measurement-type/>
-PREFIX rm-unit:    <https://w3id.org/rupemagna/resource/unit/>
-PREFIX prov:       <http://www.w3.org/ns/prov#>
-PREFIX rm-method:  <https://w3id.org/rupemagna/resource/method/>
+PREFIX rpm-rti: <https://w3id.org/rupemagna-rti/ontology#>
 
 # ════════════════════════════════════════════════════════════════════════
 # 2 · CONSTRUCT  ·  output graph shape
@@ -59,82 +52,108 @@ PREFIX rm-method:  <https://w3id.org/rupemagna/resource/method/>
 CONSTRUCT {
 
   ### ODP top: Project → Survey  [chs:hasSurvey] ###
-  rm-project:rupe-magna-rti chs:hasSurvey ?surveyURI .
+  rpm-rti:project-rupe-magna chs:hasSurvey ?surveyURI .
 
-  ### AgentRole ###
+  ### AgentRole  [reified: roapit:withRole -> typed role individual, not a string.
+  ### core:hasAgent (not core:hasAgentRole, which is Activity -> AgentRole and is
+  ### asserted separately below on the Survey) links the AgentRole to the Person.] ###
   ?roleURI
     a owl:NamedIndividual, core:AgentRole ;
-    roapit:isRoleOf rm-agent:huseyin-erdogan ;
-    roapit:withRole "Photographer" .
+    core:hasAgent rpm-rti:agent-huseyin-erdogan ;
+    roapit:withRole rpm-rti:role-photographer .
 
-  ### Camera MeasurementCollection ###
-  ?mcollSessionURI
-    a owl:NamedIndividual, a-dd:MeasurementCollection ;
-    a-dd:hasMeasurement
-      ?measIsoURI, ?measApertureURI, ?measShutterURI, ?measFocalURI .
-
+  ### EquipmentConfiguration's own exposure measurements  [chs:EquipmentConfiguration
+  ### is itself an add:MeasurementCollection (v1.4+), so it carries add:hasMeasurement
+  ### directly — no separate MeasurementCollection node/hasMeasurementCollection hop,
+  ### which v1.5 narrowed to (PhotographicDocumentation ⊔ Equipment) only.] ###
   ?measIsoURI
     a owl:NamedIndividual, a-dd:Measurement ;
-    a-dd:measurementType rm-mtype:iso ;
-    muapit:hasMeasurementUnit rm-unit:iso-sensitivity ;
+    a-dd:measurementType rpm-rti:mtype-iso ;
+    muapit:hasMeasurementUnit rpm-rti:unit-iso-sensitivity ;
     muapit:value ?isoVal ;
     rdfs:label ?labelIso .
 
   ?measApertureURI
     a owl:NamedIndividual, a-dd:Measurement ;
-    a-dd:measurementType rm-mtype:f-number ;
-    muapit:hasMeasurementUnit rm-unit:f-stop ;
+    a-dd:measurementType rpm-rti:mtype-f-number ;
+    muapit:hasMeasurementUnit rpm-rti:unit-f-stop ;
     muapit:value ?fNumberVal ;
     rdfs:label ?labelAperture .
 
   ?measShutterURI
     a owl:NamedIndividual, a-dd:Measurement ;
-    a-dd:measurementType rm-mtype:exposure-time ;
-    muapit:hasMeasurementUnit rm-unit:second ;
+    a-dd:measurementType rpm-rti:mtype-exposure-time ;
+    muapit:hasMeasurementUnit rpm-rti:unit-second ;
     muapit:value ?exposureTimeDec ;
     rdfs:label ?labelShutter .
 
   ?measFocalURI
     a owl:NamedIndividual, a-dd:Measurement ;
-    a-dd:measurementType rm-mtype:focal-length ;
-    muapit:hasMeasurementUnit rm-unit:millimetre ;
+    a-dd:measurementType rpm-rti:mtype-focal-length ;
+    muapit:hasMeasurementUnit rpm-rti:unit-millimetre ;
     muapit:value ?focalLengthDec ;
     rdfs:label ?labelFocal .
 
-  ### EquipmentConfiguration ###
+  ### EquipmentConfiguration  [itself an add:MeasurementCollection — groups the
+  ### 4 exposure measurements directly via a-dd:hasMeasurement.] ###
   ?econfURI
     a owl:NamedIndividual, chs:EquipmentConfiguration ;
-    chs:usesEquipment rm-equip:rti-dome, rm-equip:fujifilm-xs20 ;
+    chs:usesEquipment rpm-rti:equip-rti-dome, rpm-rti:equip-fujifilm-xs20 ;
     chs:isEquipmentConfigurationOf ?surveyURI ;
-    a-dd:hasMeasurementCollection ?mcollSessionURI ;
+    a-dd:hasMeasurement
+      ?measIsoURI, ?measApertureURI, ?measShutterURI, ?measFocalURI ;
     rdfs:label ?labelEconf .
 
-  ### Survey  [chs:isSurveyOn — ODP native: Survey → CulturalProperty (figure + site).
-  ###          NB. isSurveyOf's ODP range is CulturalHeritageProject, not the surveyed
-  ###          property; isSurveyOn is the correct term and matches the ontology's
-  ###          isSurveyOn >=2 restriction on ArchaeologicalProperty.] ###
-  ?surveyURI
-    a owl:NamedIndividual, chs:CulturalHeritageSurvey ;
-    chs:usesEquipmentConfiguration ?econfURI ;
-    chs:hasObservationCollection ?ocollURI ;
-    chs:isSurveyOn ?figURI, rm-site:rupe-magna ;
-    core:hasAgentRole ?roleURI ;
+  ### Survey temporal scope  [tiapit:startTime/endTime's domain is
+  ### tiapit:TimeInterval, not chs:CulturalHeritageSurvey — mirrors the
+  ### project-level rpm-rti:scope-rupe-magna-time pattern in shared.ttl] ###
+  ?scopeURI
+    a owl:NamedIndividual, tiapit:TimeInterval, chs:TemporalScope ;
     tiapit:startTime ?startDate ;
     tiapit:endTime   ?endDate ;
-    chs:usesMethod rm-method:rti ;
+    rdfs:label ?labelScope .
+
+  ### Survey  [a-cd:isSurveyOn — v1.5 rename of the former chs:isSurveyOn.
+  ###          Also typed rpm-rti:RTISurvey (CRMdig D2 Digitization Process):
+  ###          the acquisition stage of the provenance chain, digitizing the
+  ###          figure with the dome+camera and outputting the RawCaptureSet.] ###
+  ?surveyURI
+    a owl:NamedIndividual, chs:CulturalHeritageSurvey, rpm-rti:RTISurvey ;
+    chs:usesEquipmentConfiguration ?econfURI ;
+    chs:hasObservationCollection ?ocollURI ;
+    a-cd:isSurveyOn ?figURI, rpm-rti:site-rupe-magna ;
+    core:hasAgentRole ?roleURI ;
+    crm:P14_carried_out_by rpm-rti:agent-huseyin-erdogan ;
+    chs:hasTemporalScope ?scopeURI ;
+    crm:P4_has_time-span ?scopeURI ;
+    chs:useMethod rpm-rti:method-rti ;
+    crm:P32_used_general_technique rpm-rti:tech-rti ;
+    crmdig:L1_digitized ?figURI ;
+    crm:P16_used_specific_object rpm-rti:equip-rti-dome, rpm-rti:equip-fujifilm-xs20 ;
+    crmdig:L11_had_output ?ocollURI ;
+    chs:isSurveyOf rpm-rti:project-rupe-magna ;
     rdfs:label ?labelSurvey .
 
-  ### ObservationCollection ###
+  ### ObservationCollection  [also the RawCaptureSet CRMdig data object.
+  ### chs:hasResult range includes dcat:Dataset for ObservationCollection
+  ### ("An ObservationCollection yields the session dcat:Dataset") — the RAF
+  ### members are hasMember/hasResult (per-Observation), the collection's own
+  ### hasResult is the Dataset it becomes. crmdig:L11i_was_output_of is the
+  ### declared inverse of L11_had_output, materialised directly here rather
+  ### than left to reasoning.] ###
   ?ocollURI
-    a owl:NamedIndividual, chs:ObservationCollection ;
+    a owl:NamedIndividual, chs:ObservationCollection, rpm-rti:RawCaptureSet, crmdig:D9_Data_Object ;
+    chs:hasResult ?dataURI ;
+    crmdig:L11i_was_output_of ?surveyURI ;
     rdfs:label ?labelOcoll .
 
   ### Dataset ###
   ?dataURI
     a owl:NamedIndividual, dcat:Dataset ;
-    dct:creator rm-agent:huseyin-erdogan ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
-    dct:spatial rm-site:rupe-magna ;
+    dct:spatial rpm-rti:site-rupe-magna ;
+    dct:hasPart ?ocollURI ;
     dcat:distribution ?distJpgURI, ?distRawURI ;
     dcat:inSeries ?seriesURI ;
     dct:identifier ?sessionID ;
@@ -154,7 +173,7 @@ CONSTRUCT {
     dcat:mediaType <https://www.iana.org/assignments/media-types/image/jpeg> ;
     dct:format "image/jpeg" ;
     schema:numberOfItems ?itemCount ;
-    dct:creator rm-agent:huseyin-erdogan ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     prov:wasGeneratedBy ?surveyURI ;
     dct:title ?labelDistJpg .
@@ -164,7 +183,7 @@ CONSTRUCT {
     a owl:NamedIndividual, dcat:Distribution ;
     dct:format "image/x-fujifilm-raf" ;
     schema:numberOfItems ?itemCount ;
-    dct:creator rm-agent:huseyin-erdogan ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:license <LICENSE_URL_PLACEHOLDER> ;
     prov:wasGeneratedBy ?surveyURI ;
     dct:title ?labelDistRaw .
@@ -308,34 +327,34 @@ WHERE {
   ##########################################################################
   # URI construction
   ##########################################################################
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/role/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#role-",
        ?sessionID, "-photographer")) AS ?roleURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement-collection/",
-       ?sessionID)) AS ?mcollSessionURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#meas-",
        ?sessionID, "-iso")) AS ?measIsoURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#meas-",
        ?sessionID, "-aperture")) AS ?measApertureURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#meas-",
        ?sessionID, "-shutter-speed")) AS ?measShutterURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#meas-",
        ?sessionID, "-focal-length")) AS ?measFocalURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/equipment-config/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#econf-",
        ?sessionID)) AS ?econfURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/survey/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#survey-",
        ?sessionID)) AS ?surveyURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/observation-collection/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#scope-",
+       ?sessionID, "-time")) AS ?scopeURI)
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#ocoll-",
        ?sessionID)) AS ?ocollURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/dataset/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#data-",
        ?sessionID)) AS ?dataURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/distribution/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#dist-",
        ?sessionID, "-jpg")) AS ?distJpgURI)
   BIND(IF(?isExport,
-       IRI(CONCAT("https://w3id.org/rupemagna/resource/distribution/",
+       IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#dist-",
        ?sessionID, "-raw")), ?_undef) AS ?distRawURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/figure/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#fig-",
        ?figureID)) AS ?figURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/dataset-series/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#series-",
        ?figureID)) AS ?seriesURI)
 
   ##########################################################################
@@ -347,6 +366,7 @@ WHERE {
   BIND(STRLANG(CONCAT("Focal length — ", ?sessionID), "en") AS ?labelFocal)
   BIND(STRLANG(CONCAT("Equipment Configuration — ", ?figureID, ", ",
        ?sessionID, ", Rupe Magna"), "en") AS ?labelEconf)
+  BIND(STRLANG(CONCAT("RTI Survey acquisition period — ", ?sessionID), "en") AS ?labelScope)
   BIND(STRLANG(CONCAT("RTI Survey — ", ?figureName, " (", ?figureID,
        "), Sector ", ?sector, ", ", ?sessionID, ", Rupe Magna"),
        "en") AS ?labelSurvey)

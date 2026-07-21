@@ -13,6 +13,11 @@
 #        (hasFeatureOfInterest figure · hasResult PhotographicDocumentation).
 # Only SourceFile + FileName are required; other EXIF fields are OPTIONAL,
 # so a frame with missing metadata still yields an observation.
+# Aligned to rupemagna-rti-1_5.ttl: single rpm-rti: namespace. The former
+# chs:usesMethod triple on the Observation is dropped — chs:useMethod's
+# domain is chs:CulturalHeritageSurvey only (asserted once, on the Survey,
+# in construct-dataset.sparql); the Observation already reaches the method
+# via its ObservationCollection -> Survey link.
 # INPUT: EXIF_LOCATION_PLACEHOLDER (semRTI.py).
 
 # ════════════════════════════════════════════════════════════════════════
@@ -28,19 +33,9 @@ PREFIX dct:    <http://purl.org/dc/terms/>
 PREFIX a-cd:   <https://w3id.org/arco/ontology/context-description/>
 PREFIX a-dd:   <https://w3id.org/arco/ontology/denotative-description/>
 PREFIX chs:    <http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#>
-PREFIX muapit: <http://www.ontologydesignpatterns.org/ont/dul/muapit.owl#>
+PREFIX muapit: <https://w3id.org/italia/onto/MU/>
 
-PREFIX rm-obs:   <https://w3id.org/rupemagna/resource/observation/>
-PREFIX rm-photo: <https://w3id.org/rupemagna/resource/photo/>
-PREFIX rm-mcoll: <https://w3id.org/rupemagna/resource/measurement-collection/>
-PREFIX rm-meas:  <https://w3id.org/rupemagna/resource/measurement/>
-PREFIX rm-ocoll: <https://w3id.org/rupemagna/resource/observation-collection/>
-PREFIX rm-fig:   <https://w3id.org/rupemagna/resource/figure/>
-PREFIX rm-dist:  <https://w3id.org/rupemagna/resource/distribution/>
-PREFIX rm-agent: <https://w3id.org/rupemagna/resource/agent/>
-PREFIX rm-mtype:  <https://w3id.org/rupemagna/resource/measurement-type/>
-PREFIX rm-unit:   <https://w3id.org/rupemagna/resource/unit/>
-PREFIX rm-method: <https://w3id.org/rupemagna/resource/method/>
+PREFIX rpm-rti: <https://w3id.org/rupemagna-rti/ontology#>
 
 # ════════════════════════════════════════════════════════════════════════
 # 2 · CONSTRUCT  ·  output graph shape
@@ -51,18 +46,23 @@ CONSTRUCT {
   ?ocollURI chs:hasMember ?obsURI .
   ?obsURI chs:isMemberOf ?ocollURI .
 
-  ### Observation  [chs:Observation] ###
+  ### Observation  [chs:Observation — v1.5 narrows this to ONE Result, the RAF
+  ###   raw capture; the JPEG is a downstream rpm-rti:RAWDevelopment product,
+  ###   not a sibling result of the observation, so it is no longer linked
+  ###   here via chs:hasResult (unbound/omitted entirely for jpg-only
+  ###   sessions, which have no raw capture to report). The JPEG
+  ###   PhotographicDocumentation individual below is still asserted in full
+  ###   — it is just reached via its Distribution, not the Observation.] ###
   ?obsURI
     a owl:NamedIndividual, chs:Observation ;
     chs:hasFeatureOfInterest ?figURI ;
-    chs:hasResult ?photoJpgURI, ?photoRawURI ;
-    chs:usesMethod rm-method:rti ;
+    chs:hasResult ?photoRawURI ;
     rdfs:label ?obsLabel .
 
   ### Photo JPG  [chs:Result + a-cd:PhotographicDocumentation] ###
   ?photoJpgURI
     a owl:NamedIndividual, chs:Result, a-cd:PhotographicDocumentation ;
-    dct:creator rm-agent:huseyin-erdogan ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:isPartOf ?distJpgURI ;
     dct:rights <LICENSE_URL_PLACEHOLDER> ;
     a-dd:hasMeasurementCollection ?mcollJpgURI ;
@@ -75,7 +75,7 @@ CONSTRUCT {
   ### Photo RAW  [only for jpg-export* sessions — unbound when jpg-only] ###
   ?photoRawURI
     a owl:NamedIndividual, chs:Result, a-cd:PhotographicDocumentation ;
-    dct:creator rm-agent:huseyin-erdogan ;
+    dct:creator rpm-rti:agent-huseyin-erdogan ;
     dct:isPartOf ?distRawURI ;
     dct:rights <LICENSE_URL_PLACEHOLDER> ;
     a-dd:hasMeasurementCollection ?mcollRawURI ;
@@ -92,22 +92,22 @@ CONSTRUCT {
 
   ?measFilesizeURI
     a owl:NamedIndividual, a-dd:Measurement ;
-    a-dd:measurementType rm-mtype:file-size ;
-    muapit:hasMeasurementUnit rm-unit:megabyte ;
+    a-dd:measurementType rpm-rti:mtype-file-size ;
+    muapit:hasMeasurementUnit rpm-rti:unit-megabyte ;
     muapit:value ?fileSize ;
     rdfs:label ?labelFilesize .
 
   ?measWidthJpgURI
     a owl:NamedIndividual, a-dd:Measurement ;
-    a-dd:measurementType rm-mtype:image-width ;
-    muapit:hasMeasurementUnit rm-unit:pixel ;
+    a-dd:measurementType rpm-rti:mtype-image-width ;
+    muapit:hasMeasurementUnit rpm-rti:unit-pixel ;
     muapit:value ?imageWidth ;
     rdfs:label ?labelWidthJpg .
 
   ?measHeightJpgURI
     a owl:NamedIndividual, a-dd:Measurement ;
-    a-dd:measurementType rm-mtype:image-height ;
-    muapit:hasMeasurementUnit rm-unit:pixel ;
+    a-dd:measurementType rpm-rti:mtype-image-height ;
+    muapit:hasMeasurementUnit rpm-rti:unit-pixel ;
     muapit:value ?imageHeight ;
     rdfs:label ?labelHeightJpg .
 
@@ -118,15 +118,15 @@ CONSTRUCT {
 
   ?measWidthRawURI
     a owl:NamedIndividual, a-dd:Measurement ;
-    a-dd:measurementType rm-mtype:image-width ;
-    muapit:hasMeasurementUnit rm-unit:pixel ;
+    a-dd:measurementType rpm-rti:mtype-image-width ;
+    muapit:hasMeasurementUnit rpm-rti:unit-pixel ;
     muapit:value ?imageWidth ;
     rdfs:label ?labelWidthRaw .
 
   ?measHeightRawURI
     a owl:NamedIndividual, a-dd:Measurement ;
-    a-dd:measurementType rm-mtype:image-height ;
-    muapit:hasMeasurementUnit rm-unit:pixel ;
+    a-dd:measurementType rpm-rti:mtype-image-height ;
+    muapit:hasMeasurementUnit rpm-rti:unit-pixel ;
     muapit:value ?imageHeight ;
     rdfs:label ?labelHeightRaw .
 
@@ -216,38 +216,38 @@ WHERE {
   # Raw-companion URIs are UNDEF when ?isExport is false (jpg-only session),
   # so CONSTRUCT silently omits those triples.
   ##########################################################################
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/observation/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#obs-",
        ?basename)) AS ?obsURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/photo/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#photo-",
        ?basename, "-jpg")) AS ?photoJpgURI)
   BIND(IF(?isExport,
-       IRI(CONCAT("https://w3id.org/rupemagna/resource/photo/",
+       IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#photo-",
        ?basename, "-raw")), ?_undef) AS ?photoRawURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement-collection/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#mcoll-",
        ?basename, "-jpg")) AS ?mcollJpgURI)
   BIND(IF(?isExport,
-       IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement-collection/",
+       IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#mcoll-",
        ?basename, "-raw")), ?_undef) AS ?mcollRawURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#meas-",
        ?basename, "-jpg-filesize")) AS ?measFilesizeURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#meas-",
        ?basename, "-jpg-width")) AS ?measWidthJpgURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#meas-",
        ?basename, "-jpg-height")) AS ?measHeightJpgURI)
   BIND(IF(?isExport,
-       IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+       IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#meas-",
        ?basename, "-raw-width")), ?_undef) AS ?measWidthRawURI)
   BIND(IF(?isExport,
-       IRI(CONCAT("https://w3id.org/rupemagna/resource/measurement/",
+       IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#meas-",
        ?basename, "-raw-height")), ?_undef) AS ?measHeightRawURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/observation-collection/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#ocoll-",
        ?sessionID)) AS ?ocollURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/figure/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#fig-",
        ?figureID)) AS ?figURI)
-  BIND(IRI(CONCAT("https://w3id.org/rupemagna/resource/distribution/",
+  BIND(IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#dist-",
        ?sessionID, "-jpg")) AS ?distJpgURI)
   BIND(IF(?isExport,
-       IRI(CONCAT("https://w3id.org/rupemagna/resource/distribution/",
+       IRI(CONCAT("https://w3id.org/rupemagna-rti/ontology#dist-",
        ?sessionID, "-raw")), ?_undef) AS ?distRawURI)
 
   ##########################################################################
