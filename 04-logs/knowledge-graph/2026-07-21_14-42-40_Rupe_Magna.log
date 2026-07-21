@@ -1,0 +1,61 @@
+[14:42:40] INFO    Log: /Volumes/ehuseyin/3DARCHEO/04-logs/knowledge-graph/2026-07-21_14-42-40_Rupe_Magna.log
+[14:42:40] INFO    Dataset: /Volumes/ehuseyin/3DARCHEO/02-datasets/Rupe Magna
+[14:42:40] INFO    Site:    Rupe Magna
+[14:42:40] INFO    === EXIF export ===
+[14:43:09] INFO    EXIF export: 1149 records from 24 source folder(s) → /Volumes/ehuseyin/3DARCHEO/03-outputs/knowledge-graph/rupe-magna-exif.json
+[14:43:09] INFO    === Dataset + photo triples ===
+[14:43:13] INFO    Dataset triples → /Volumes/ehuseyin/3DARCHEO/01-pipeline/_tmp-section-c.ttl
+[14:43:15] INFO    Photo triples → /Volumes/ehuseyin/3DARCHEO/01-pipeline/_tmp-section-d.ttl
+[14:43:15] INFO    === RTI provenance ===
+[14:43:15] INFO    RTI provenance: F01/RTI-03/ptm (F01RTI03-ptm.json)
+[14:43:16] INFO    Process-chain provenance: F01/RTI-03/ptm (F01RTI03-ptm.json)
+[14:43:17] INFO    RTI provenance: F01/RTI-05/ptm (F01RTI05-ptm.json)
+[14:43:18] INFO    Process-chain provenance: F01/RTI-05/ptm (F01RTI05-ptm.json)
+[14:43:19] INFO    RTI provenance: F01/RTI-07/ptm (F01RTI07-ptm.json)
+[14:43:19] INFO    Process-chain provenance: F01/RTI-07/ptm (F01RTI07-ptm.json)
+[14:43:20] INFO    RTI provenance: F01/RTI-08/ptm (F01RTI08-ptm.json)
+[14:43:20] INFO    Process-chain provenance: F01/RTI-08/ptm (F01RTI08-ptm.json)
+[14:43:21] INFO    RTI provenance: F01/RTI-09/ptm (F01RTI09-ptm.json)
+[14:43:22] INFO    Process-chain provenance: F01/RTI-09/ptm (F01RTI09-ptm.json)
+[14:43:22] INFO    RTI provenance: F01/RTI-10/ptm (F01RTI10-ptm.json)
+[14:43:23] INFO    Process-chain provenance: F01/RTI-10/ptm (F01RTI10-ptm.json)
+[14:43:24] INFO    RTI provenance: F02/RTI-12/ptm (F02RTI12-ptm.json)
+[14:43:25] INFO    Process-chain provenance: F02/RTI-12/ptm (F02RTI12-ptm.json)
+[14:43:26] INFO    RTI provenance: F03/RTI-15/ptm (F03RTI15-ptm.json)
+[14:43:26] INFO    Process-chain provenance: F03/RTI-15/ptm (F03RTI15-ptm.json)
+[14:43:27] INFO    RTI provenance: F03/RTI-16/ptm (F03RTI16-ptm.json)
+[14:43:28] INFO    Process-chain provenance: F03/RTI-16/ptm (F03RTI16-ptm.json)
+[14:43:28] INFO    RTI provenance: F03/RTI-17/ptm (F03RTI17-ptm.json)
+[14:43:29] INFO    Process-chain provenance: F03/RTI-17/ptm (F03RTI17-ptm.json)
+[14:43:30] INFO    RTI provenance: F03/RTI-18/ptm (F03RTI18-ptm.json)
+[14:43:30] INFO    Process-chain provenance: F03/RTI-18/ptm (F03RTI18-ptm.json)
+[14:43:31] INFO    RTI provenance: F04/RTI-20/ptm (F04RTI20-ptm.json)
+[14:43:31] INFO    Process-chain provenance: F04/RTI-20/ptm (F04RTI20-ptm.json)
+[14:43:32] INFO    RTI provenance: F04/RTI-21/ptm (F04RTI21-ptm.json)
+[14:43:32] INFO    Process-chain provenance: F04/RTI-21/ptm (F04RTI21-ptm.json)
+[14:43:33] INFO    RTI provenance: F04/RTI-22/ptm (F04RTI22-ptm.json)
+[14:43:34] INFO    Process-chain provenance: F04/RTI-22/ptm (F04RTI22-ptm.json)
+[14:43:34] INFO    RTI provenance: F04/RTI-23/ptm (F04RTI23-ptm.json)
+[14:43:35] INFO    Process-chain provenance: F04/RTI-23/ptm (F04RTI23-ptm.json)
+[14:43:36] INFO    RTI provenance: F05/RTI-24/ptm (F05RTI24-ptm.json)
+[14:43:36] INFO    Process-chain provenance: F05/RTI-24/ptm (F05RTI24-ptm.json)
+[14:43:37] INFO    RTI provenance: F06/RTI-26/ptm (F06RTI26-ptm.json)
+[14:43:37] INFO    Process-chain provenance: F06/RTI-26/ptm (F06RTI26-ptm.json)
+[14:43:38] INFO    RTI provenance: F07/RTI-28/ptm (F07RTI28-ptm.json)
+[14:43:39] INFO    Process-chain provenance: F07/RTI-28/ptm (F07RTI28-ptm.json)
+[14:43:40] INFO    RTI provenance: F08/RTI-33/ptm (F08RTI33-ptm.json)
+[14:43:40] INFO    Process-chain provenance: F08/RTI-33/ptm (F08RTI33-ptm.json)
+[14:43:41] INFO    RTI provenance: F09/RTI-34/ptm (F09RTI34-ptm.json)
+[14:43:41] INFO    Process-chain provenance: F09/RTI-34/ptm (F09RTI34-ptm.json)
+[14:43:42] INFO    RTI provenance: F09/RTI-35/ptm (F09RTI35-ptm.json)
+[14:43:42] INFO    Process-chain provenance: F09/RTI-35/ptm (F09RTI35-ptm.json)
+[14:43:43] INFO    RTI provenance: F10/RTI-37/ptm (F10RTI37-ptm.json)
+[14:43:44] INFO    Process-chain provenance: F10/RTI-37/ptm (F10RTI37-ptm.json)
+[14:43:45] INFO    RTI provenance: F10/RTI-38/ptm (F10RTI38-ptm.json)
+[14:43:45] INFO    Process-chain provenance: F10/RTI-38/ptm (F10RTI38-ptm.json)
+[14:43:46] INFO    RTI provenance: F11/RTI-40/ptm (F11RTI40-ptm.json)
+[14:43:46] INFO    Process-chain provenance: F11/RTI-40/ptm (F11RTI40-ptm.json)
+[14:43:46] INFO    === Merge ===
+[14:43:48] INFO    === Reasoning ===
+[14:44:28] INFO    Reasoning: 78491 -> 188757 triples in the working (KG+ontology) graph
+[14:44:35] INFO    === Build complete: 147715 triples → /Volumes/ehuseyin/3DARCHEO/03-outputs/knowledge-graph/rupe-magna-knowledge-graph.ttl ===
