@@ -1,0 +1,28 @@
+# ai.txt for semRTI
+# Machine-readable AI usage policy, complementing AI_USAGE.md.
+# Proposed convention: https://arxiv.org/html/2505.07834v1 (aligned with robots.txt for web crawlers)
+#
+# This file expresses intent; it is not a technical access-control mechanism.
+# Human-readable rationale and attribution requirements: see AI_USAGE.md
+
+User-Agent: *
+
+# Training on repository contents
+Train: allow
+
+# Indexing / retrieval for search and discovery
+Index: allow
+
+# Reuse of code/content in AI-generated output
+Reuse: allow
+
+# Attribution required for any permitted use
+Attribution-Required: true
+Attribution-Target: CITATION.cff
+
+# Licence governing any permitted use
+License: CC-BY-4.0
+License-File: /LICENSE
+
+# Contact for questions about this policy
+Contact: huseyin.erdogan@unibo.it

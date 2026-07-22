@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "semRTI"
+abstract: "A self-contained, menu-driven pipeline that converts Reflectance Transformation Imaging (RTI) survey data into a FAIR-compliant RDF/Turtle Knowledge Graph, aligned to the Cultural Heritage Survey Ontology Design Pattern (CHS-ODP) and ArCo."
+version: "1.0.1"
+date-released: "2026-06-26"
+doi: "{{DOI}}"
+license: "CC-BY-4.0"
+repository-code: "https://codeberg.org/erdoganhuseyin/semRTI"
+authors:
+  - family-names: "Erdoğan"
+    given-names: "Hüseyin"
+    affiliation: "Alma Mater Studiorum – Università di Bologna"
+    email: "huseyin.erdogan@unibo.it"
+    orcid: "https://orcid.org/0000-0002-2965-0918"
+keywords:
+  - infinity
+  - "WP8"
+  - "Workflow"
+identifiers:
+  - type: doi
+    value: "{{DOI}}"
+    description: "Zenodo archive of this release"
