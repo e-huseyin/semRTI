@@ -1,0 +1,8 @@
+distribution,width,height,measurement,measurementLabel,type,value
+https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-ptm,5201,3467,https://w3id.org/rupemagna-rti/ontology#meas-RTI-08-ptm-quality,JPEG quality: 95 — RTI-08,https://w3id.org/rupemagna-rti/ontology#mtype-jpeg-quality,95
+https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-ptm,5201,3467,https://w3id.org/rupemagna-rti/ontology#meas-RTI-08-ptm-croporigin,Crop origin — RTI-08,https://w3id.org/rupemagna-rti/ontology#mtype-ptm-crop-origin,x=519 y=346 angle=0
+https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-ptm,5201,3467,https://w3id.org/rupemagna-rti/ontology#meas-RTI-08-ptm-nplanes,PTM planes: 18 — RTI-08,https://w3id.org/rupemagna-rti/ontology#mtype-ptm-nplanes,18
+https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-ptm,5201,3467,https://w3id.org/rupemagna-rti/ontology#meas-RTI-08-ptm-type,RTI basis type: PTM — RTI-08,https://w3id.org/rupemagna-rti/ontology#mtype-rti-basis-type,PTM
+https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-ptm,5201,3467,https://w3id.org/rupemagna-rti/ontology#meas-RTI-08-ptm-cpm,Colour profile mode: Linear RGB — RTI-08,https://w3id.org/rupemagna-rti/ontology#mtype-rti-color-profile-mode,Linear RGB
+https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-ptm,5201,3467,https://w3id.org/rupemagna-rti/ontology#meas-RTI-08-ptm-openlime,OpenLime viewer: true — RTI-08,https://w3id.org/rupemagna-rti/ontology#mtype-rti-openlime,true
+https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-ptm,5201,3467,https://w3id.org/rupemagna-rti/ontology#meas-RTI-08-ptm-weblayout,Web layout: deepzoom — RTI-08,https://w3id.org/rupemagna-rti/ontology#mtype-rti-web-layout,deepzoom

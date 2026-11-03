@@ -1,0 +1,4 @@
+survey,dataset,distribution,format,licence,title
+https://w3id.org/rupemagna-rti/ontology#survey-RTI-08,https://w3id.org/rupemagna-rti/ontology#data-RTI-08,https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-jpg,image/jpeg,https://creativecommons.org/licenses/by/4.0/,RTI-08 JPEG Export — 48 images
+https://w3id.org/rupemagna-rti/ontology#survey-RTI-08,https://w3id.org/rupemagna-rti/ontology#data-RTI-08,https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-ptm,RTI (WEB),https://creativecommons.org/licenses/by/4.0/,PTM output — RTI-08
+https://w3id.org/rupemagna-rti/ontology#survey-RTI-08,https://w3id.org/rupemagna-rti/ontology#data-RTI-08,https://w3id.org/rupemagna-rti/ontology#dist-RTI-08-raw,image/x-fujifilm-raf,https://creativecommons.org/licenses/by/4.0/,RTI-08 RAW Files — 48 images

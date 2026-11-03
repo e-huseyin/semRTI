@@ -1,0 +1,21 @@
+# Reconstructed from the supplied RDF graph (not an archived original query).
+# Research question 1: Which figure and acquisition settings are recorded for RTI-08?
+PREFIX rpm:    <https://w3id.org/rupemagna-rti/ontology#>
+PREFIX crmdig: <http://www.cidoc-crm.org/extensions/CRMdig/>
+PREFIX chs:    <http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#>
+PREFIX add:    <https://w3id.org/arco/ontology/denotative-description/>
+PREFIX muapit: <https://w3id.org/italia/onto/MU/>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?survey ?figure ?figureLabel ?measurement ?measurementType ?value ?unit
+WHERE {
+  BIND(rpm:survey-RTI-08 AS ?survey)
+  ?survey crmdig:L1_digitized ?figure ;
+          chs:usesEquipmentConfiguration ?config .
+  ?figure rdfs:label ?figureLabel .
+  ?config add:hasMeasurement ?measurement .
+  ?measurement add:measurementType ?measurementType ;
+               muapit:value ?value ;
+               muapit:hasMeasurementUnit ?unit .
+}
+ORDER BY ?measurementType

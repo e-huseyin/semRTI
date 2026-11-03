@@ -1,0 +1,22 @@
+# Reconstructed query; not claimed to be the archived original.
+# RTI-08: trace source observations through set-level RAW development and RTI fitting.
+PREFIX rpm:    <https://w3id.org/rupemagna-rti/ontology#>
+PREFIX chs:    <http://www.ontologydesignpatterns.org/cp/owl/culturalheritagesurvey.owl#>
+PREFIX crmdig: <http://www.cidoc-crm.org/extensions/CRMdig/>
+
+SELECT DISTINCT ?survey ?figure ?observation ?sourceImage ?sourceSet
+                ?rawDev ?rawSoftware ?jpgSet ?rtiFitting ?rtiSoftware ?rtiModel
+WHERE {
+  BIND(rpm:survey-RTI-08 AS ?survey)
+  ?survey crmdig:L1_digitized ?figure ;
+          crmdig:L11_had_output ?sourceSet .
+  ?sourceSet chs:hasMember ?observation .
+  ?observation chs:hasResult ?sourceImage .
+  ?rawDev crmdig:L10_had_input ?sourceSet ;
+          crmdig:L11_had_output ?jpgSet ;
+          crmdig:L23_used_software_or_firmware ?rawSoftware .
+  ?rtiFitting crmdig:L10_had_input ?jpgSet ;
+              crmdig:L11_had_output ?rtiModel ;
+              crmdig:L23_used_software_or_firmware ?rtiSoftware .
+}
+ORDER BY ?sourceImage

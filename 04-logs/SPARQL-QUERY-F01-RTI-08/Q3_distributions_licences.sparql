@@ -1,0 +1,18 @@
+# Reconstructed query; not claimed to be the archived original.
+# RTI-08: follow the survey and source collection to dataset distributions.
+PREFIX rpm:    <https://w3id.org/rupemagna-rti/ontology#>
+PREFIX crmdig: <http://www.cidoc-crm.org/extensions/CRMdig/>
+PREFIX dcat:   <http://www.w3.org/ns/dcat#>
+PREFIX dct:    <http://purl.org/dc/terms/>
+
+SELECT ?survey ?dataset ?distribution ?format ?licence ?title
+WHERE {
+  BIND(rpm:survey-RTI-08 AS ?survey)
+  ?survey crmdig:L11_had_output ?sourceSet .
+  ?sourceSet crmdig:L11_had_output ?dataset .
+  ?dataset dcat:distribution ?distribution .
+  ?distribution dct:format ?format ;
+                dct:license ?licence .
+  OPTIONAL { ?distribution dct:title ?title }
+}
+ORDER BY ?distribution

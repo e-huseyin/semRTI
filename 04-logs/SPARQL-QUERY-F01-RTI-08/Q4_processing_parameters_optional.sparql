@@ -1,0 +1,25 @@
+# Optional diagnostic query: seven fitting/export settings stored as RDF measurements.
+# Does not verify light-direction triples: those occur in info.json, not as this graph's measurements.
+PREFIX rpm:    <https://w3id.org/rupemagna-rti/ontology#>
+PREFIX crmdig: <http://www.cidoc-crm.org/extensions/CRMdig/>
+PREFIX dcat:   <http://www.w3.org/ns/dcat#>
+PREFIX a-dd:   <https://w3id.org/arco/ontology/denotative-description/>
+PREFIX muapit: <https://w3id.org/italia/onto/MU/>
+PREFIX schema: <https://schema.org/>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?distribution ?width ?height ?measurement ?measurementLabel ?type ?value
+WHERE {
+  BIND(rpm:survey-RTI-08 AS ?survey)
+  ?survey crmdig:L11_had_output ?sourceSet .
+  ?sourceSet crmdig:L11_had_output ?dataset .
+  ?dataset dcat:distribution ?distribution .
+  ?distribution a-dd:hasMeasurementCollection ?measurementCollection ;
+                schema:width ?width ;
+                schema:height ?height .
+  ?measurementCollection a-dd:hasMeasurement ?measurement .
+  ?measurement a-dd:measurementType ?type ;
+               muapit:value ?value .
+  OPTIONAL { ?measurement rdfs:label ?measurementLabel }
+}
+ORDER BY ?type
